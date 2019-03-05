@@ -1,0 +1,48 @@
+version: '3.5'
+
+services:
+  postgres-redmine:
+    image: postgres:11-alpine
+    restart: always
+    ports:
+      - 15432:5432
+    volumes:
+      - postgres-redmine-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=redmine
+
+  # http://localhost:15000
+  # default username: admin
+  # default password: admin
+  redmine:
+    build:
+      context: .
+    restart: always
+    volumes:
+      - ./plugins:/usr/src/redmine/plugins
+      - redmine-data:/usr/src/redmine/files
+    ports:
+      - 15000:3000
+    depends_on:
+      - postgres-redmine
+    environment:
+      - REDMINE_PLUGINS_MIGRATE=true
+      - REDMINE_HTTPS=false
+      - REDMINE_DB_POSTGRES=postgres-redmine
+      - REDMINE_DB_DATABASE=redmine
+      - REDMINE_DB_PASSWORD=password
+
+  # GET http://localhost:5000/health
+  # POST http://localhost:5000/webhook/redmine
+  redmine-webhook-response-inspector:
+    build:
+      context: ./redmine-webhook-response-inspector
+    restart: always
+    env_file: ./redmine-webhook-response-inspector/.redmine-webhook-response-inspector.env
+    ports:
+      - 5000:5000
+
+volumes:
+  postgres-redmine-data:
+  redmine-data:

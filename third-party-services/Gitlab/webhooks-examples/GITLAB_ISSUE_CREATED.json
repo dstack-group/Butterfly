@@ -1,0 +1,190 @@
+{
+  "object_kind": "issue",
+  "event_type": "issue",
+  "user": {
+    "name": "DStack",
+    "username": "DStack",
+    "avatar_url": "https://secure.gravatar.com/avatar/3c18773f37d6c28b54fce4636085466b?s=80&d=identicon"
+  },
+  "project": {
+    "id": 10560918,
+    "name": "Butterfly",
+    "description": "",
+    "web_url": "https://localhost:10443/dstack/butterfly",
+    "avatar_url": null,
+    "git_ssh_url": "git@localhost:10443:DStack/butterfly.git",
+    "git_http_url": "https://localhost:10443/dstack/butterfly.git",
+    "namespace": "DStack",
+    "visibility_level": 0,
+    "path_with_namespace": "DStack/butterfly",
+    "default_branch": "master",
+    "ci_config_path": null,
+    "homepage": "https://localhost:10443/dstack/butterfly",
+    "url": "git@localhost:10443:DStack/butterfly.git",
+    "ssh_url": "git@localhost:10443:DStack/butterfly.git",
+    "http_url": "https://localhost:10443/dstack/butterfly.git"
+  },
+  "object_attributes": {
+    "author_id": 3456723,
+    "closed_at": null,
+    "confidential": false,
+    "created_at": "2019-02-19 14:21:59 UTC",
+    "description": "Random and pretty long description that discusses about the importance of writing clean and performance-wise code. Something must be fixed.",
+    "due_date": "2019-02-27",
+    "id": 18373993,
+    "iid": 2,
+    "last_edited_at": null,
+    "last_edited_by_id": null,
+    "milestone_id": 795421,
+    "moved_to_id": null,
+    "project_id": 10560918,
+    "relative_position": 1073742823,
+    "state": "opened",
+    "time_estimate": 0,
+    "title": "New performance bug for you",
+    "updated_at": "2019-02-19 14:21:59 UTC",
+    "updated_by_id": null,
+    "weight": null,
+    "url": "https://localhost:10443/dstack/butterfly/issues/2",
+    "total_time_spent": 0,
+    "human_total_time_spent": null,
+    "human_time_estimate": null,
+    "assignee_ids": [
+      3456723
+    ],
+    "assignee_id": 3456723,
+    "action": "open"
+  },
+  "labels": [
+    {
+      "id": 9705793,
+      "title": "bug",
+      "color": "#FF0000",
+      "project_id": 10560918,
+      "created_at": "2019-02-19 14:16:19 UTC",
+      "updated_at": "2019-02-19 14:16:19 UTC",
+      "template": false,
+      "description": null,
+      "type": "BUG",
+      "group_id": null
+    },
+    {
+      "id": 9705875,
+      "title": "testing",
+      "color": "#A8D695",
+      "project_id": 10560918,
+      "created_at": "2019-02-19 14:21:51 UTC",
+      "updated_at": "2019-02-19 14:21:51 UTC",
+      "template": false,
+      "description": null,
+      "type": "ProjectLabel",
+      "group_id": null
+    }
+  ],
+  "changes": {
+    "author_id": {
+      "previous": null,
+      "current": 3456723
+    },
+    "created_at": {
+      "previous": null,
+      "current": "2019-02-19 14:21:59 UTC"
+    },
+    "description": {
+      "previous": null,
+      "current": "This is a new issue"
+    },
+    "due_date": {
+      "previous": null,
+      "current": "2019-02-27"
+    },
+    "id": {
+      "previous": null,
+      "current": 18373993
+    },
+    "iid": {
+      "previous": null,
+      "current": 2
+    },
+    "milestone_id": {
+      "previous": null,
+      "current": 795421
+    },
+    "project_id": {
+      "previous": null,
+      "current": 10560918
+    },
+    "relative_position": {
+      "previous": null,
+      "current": 1073742823
+    },
+    "state": {
+      "previous": null,
+      "current": "opened"
+    },
+    "title": {
+      "previous": null,
+      "current": "New Issue"
+    },
+    "updated_at": {
+      "previous": null,
+      "current": "2019-02-19 14:21:59 UTC"
+    },
+    "assignees": {
+      "previous": [],
+      "current": [
+        {
+          "name": "DStack",
+          "username": "DStack",
+          "avatar_url": "https://secure.gravatar.com/avatar/3c18773f37d6c28b54fce4636085466b?s=80&d=identicon"
+        }
+      ]
+    },
+    "labels": {
+      "previous": [],
+      "current": [
+        {
+          "id": 9705793,
+          "title": "bug",
+          "color": "#FF0000",
+          "project_id": 10560918,
+          "created_at": "2019-02-19 14:16:19 UTC",
+          "updated_at": "2019-02-19 14:16:19 UTC",
+          "template": false,
+          "description": null,
+          "type": "ProjectLabel",
+          "group_id": null
+        },
+        {
+          "id": 9705875,
+          "title": "testing",
+          "color": "#A8D695",
+          "project_id": 10560918,
+          "created_at": "2019-02-19 14:21:51 UTC",
+          "updated_at": "2019-02-19 14:21:51 UTC",
+          "template": false,
+          "description": null,
+          "type": "ProjectLabel",
+          "group_id": null
+        }
+      ]
+    },
+    "total_time_spent": {
+      "previous": null,
+      "current": 0
+    }
+  },
+  "repository": {
+    "name": "Butterfly",
+    "url": "git@localhost:10443:DStack/butterfly.git",
+    "description": "",
+    "homepage": "https://localhost:10443/dstack/butterfly"
+  },
+  "assignees": [
+    {
+      "name": "DStack",
+      "username": "DStack",
+      "avatar_url": "https://secure.gravatar.com/avatar/3c18773f37d6c28b54fce4636085466b?s=80&d=identicon"
+    }
+  ]
+}

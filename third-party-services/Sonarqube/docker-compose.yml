@@ -1,0 +1,42 @@
+version: '3.5'
+
+services:
+  postgres-sonarqube:
+    image: postgres:11-alpine
+    restart: always
+    hostname: postgres-sonarqube
+    ports:
+      - 35432:5432
+    volumes:
+      - postgres-sonarqube-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_USER=sonar
+      - POSTGRES_DB=sonar
+
+  # http://localhost:15002
+  # default username: admin
+  # default password: admin
+  sonarqube:
+    build:
+      context: .
+    restart: always
+    hostname: sonarqube
+    volumes:
+      - ./sonarqube-conf:/opt/sonarqube/conf
+      - ./sonarqube-data:/opt/sonarqube/data
+      - ./sonarqube-extensions:/opt/sonarqube/extensions
+    ports:
+      - 15002:9000
+    depends_on:
+      - postgres-sonarqube
+    environment:
+      - sonar.jdbc.username=sonar
+      - sonar.jdbc.password=sonar
+      - sonar.jdbc.url=jdbc:postgresql://postgres-sonarqube:5432/sonar
+
+volumes:
+  postgres-sonarqube-data:
+  # sonarqube-conf:
+  # sonarqube-data:
+  # sonarqube-extensions:

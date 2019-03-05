@@ -1,0 +1,1 @@
+export { getHealthRouter } from './router';

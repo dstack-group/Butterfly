@@ -1,0 +1,139 @@
+version: '3.5'
+
+services:
+  zookeeper:
+    build:
+      context: ./zookeeper
+    hostname: zookeeper
+    container_name: zookeeper
+    restart: always
+    ports:
+      - 2181:2181
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: 'zookeeper:22888:23888'
+    volumes:
+      - zookeeper-data:/data
+      - zookeeper-datalog:/datalog
+    networks:
+      - kafka-network
+
+  kafka:
+    # Exposes 29092 for external connections to the broker
+    # Use kafka:9092 for connections internal on the docker network
+    # See https://rmoff.net/2018/08/02/kafka-listeners-explained/ for details
+    build:
+      context: ./kafka
+    hostname: kafka
+    container_name: kafka
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG4J_LOGGERS: 'kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO'
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      # KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_SCHEMA_REGISTRY_URL: 'schema-registry:8081'
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    networks:
+      - kafka-network
+
+  schema-registry:
+    build:
+      context: ./schema-registry
+    hostname: schema-registry
+    container_name: schema-registry
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - 18081:8081
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_LISTENERS: 'http://schema-registry:8081'
+    networks:
+      - kafka-network
+
+  gitlab-producer:
+    build:
+      context: ./butterfly/gitlab-producer
+      args:
+        SERVER_PORT: 3000
+        JAR_FILE: 'gitlab-producer-1.0-SNAPSHOT-jar-with-dependencies'
+    env_file: ./butterfly/gitlab-producer/.gitlab-producer.env
+    depends_on:
+      - kafka
+      - zookeeper
+      - schema-registry
+    ports:
+      - 3000:3000
+    networks:
+      - kafka-network
+      - gitlab-producer-network
+      
+  telegram-consumer:
+    build:
+      context: ./butterfly/telegram-consumer
+      args:
+        JAR_FILE: 'telegram-consumer-1.0-SNAPSHOT-jar-with-dependencies'
+    env_file: ./butterfly/telegram-consumer/.telegram-consumer.env
+    depends_on:
+      - kafka
+      - zookeeper
+      - schema-registry
+    networks:
+      - kafka-network
+
+  email-consumer:
+    build:
+      context: ./butterfly/email-consumer
+      args:
+        JAR_FILE: 'email-consumer-1.0-SNAPSHOT-jar-with-dependencies'
+    env_file: ./butterfly/email-consumer/.email-consumer.env
+    depends_on:
+      - kafka
+      - zookeeper
+      - schema-registry
+    networks:
+      - kafka-network
+
+  middleware-dispatcher:
+    build:
+      context: ./butterfly/middleware-dispatcher
+      args:
+        JAR_FILE: 'middleware-dispatcher-1.0-SNAPSHOT-jar-with-dependencies'
+    env_file: ./butterfly/middleware-dispatcher/.middleware-dispatcher.env
+    depends_on:
+      - kafka
+      - zookeeper
+      - schema-registry
+    networks:
+      - kafka-network
+      - middleware-dispatcher-network
+
+volumes:
+  zookeeper-data:
+  zookeeper-datalog:
+  kafka-data:
+
+networks:
+  gitlab-producer-network:
+    name: gitlab-producer-network
+  middleware-dispatcher-network:
+    name: middleware-dispatcher-network
+  kafka-network:
+    name: kafka-network

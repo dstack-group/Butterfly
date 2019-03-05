@@ -1,0 +1,138 @@
+version: '3.5'
+
+services:
+  gitlab-redis:
+    restart: always
+    image: sameersbn/redis:4.0.9-1
+    command:
+      - --loglevel warning
+    volumes:
+      - gitlab-redis-data:/var/lib/redis
+    networks:
+      - gitlab-network
+
+  gitlab-postgres:
+    restart: always
+    image: sameersbn/postgresql:10
+    volumes:
+      - gitlab-postgres-data:/var/lib/postgresql
+    environment:
+    - DB_USER=gitlab
+    - DB_PASS=password
+    - DB_NAME=gitlab_db
+    - DB_EXTENSION=pg_trgm
+    networks:
+      - gitlab-network
+
+  #gitlab:
+  # image: 'gitlab/gitlab-ce:latest'
+  # container_name: gitlab
+  # hostname: gitlab
+  # restart: always
+  # ports:
+  #   - '10080:80'
+  #   - '10443:443'
+  #   - '30022:22'
+  # volumes:
+  #   - './config:/etc/gitlab'
+  #   - './logs:/var/log/gitlab'
+  #   - 'gitlab-data:/var/opt/gitlab'
+  # logging:
+  #   driver: "json-file"
+  #   options:
+  #     max-size: 500k
+  #     max-file: "3"
+
+  # http://localhost:10443
+  # admin username: root
+  gitlab:
+    build:
+      context: .
+    restart: always
+    depends_on:
+      - gitlab-redis
+      - gitlab-postgres
+    ports:
+      - '10080:80'
+      - '10443:443'
+      - '30022:22'
+    volumes:
+      - gitlab-data:/home/git/data
+      - ./certs:/home/git/data/certs
+    environment:
+    - DEBUG=false
+    - DB_ADAPTER=postgresql
+    - DB_HOST=gitlab-postgres
+    - DB_PORT=5432
+    - DB_USER=gitlab
+    - DB_PASS=password
+    - DB_NAME=gitlab_db
+    - REDIS_HOST=gitlab-redis
+    - REDIS_PORT=6379
+    - TZ=Europe/Rome
+    - GITLAB_TIMEZONE=Rome
+    - GITLAB_HTTPS=true
+    - SSL_SELF_SIGNED=true
+    - GITLAB_HOST=localhost
+    - GITLAB_PORT=10443
+    - GITLAB_SSH_PORT=30022
+    - GITLAB_RELATIVE_URL_ROOT=
+    - GITLAB_SECRETS_DB_KEY_BASE=long-and-random-alphanumeric-string
+    - GITLAB_SECRETS_SECRET_KEY_BASE=long-and-random-alphanumeric-string
+    - GITLAB_SECRETS_OTP_KEY_BASE=long-and-random-alphanumeric-string
+    - GITLAB_ROOT_PASSWORD=
+    - GITLAB_ROOT_EMAIL=
+    - GITLAB_NOTIFY_ON_BROKEN_BUILDS=true
+    - GITLAB_NOTIFY_PUSHER=false
+    - GITLAB_EMAIL=notifications@butterfly.gitlab.com
+    - GITLAB_EMAIL_REPLY_TO=noreply@butterfly.gitlab.com
+    - GITLAB_INCOMING_EMAIL_ADDRESS=reply@butterfly.gitlab.com
+    - GITLAB_BACKUP_SCHEDULE=daily
+    - GITLAB_BACKUP_TIME=01:00
+    - SMTP_ENABLED=false
+    - SMTP_DOMAIN=www.butterfly.gitlab.com
+    - SMTP_HOST=smtp.gmail.com
+    - SMTP_PORT=587
+    - SMTP_USER=mailer@butterfly.gitlab.com
+    - SMTP_PASS=password
+    - SMTP_STARTTLS=true
+    - SMTP_AUTHENTICATION=login
+    - IMAP_ENABLED=false
+    - IMAP_HOST=imap.gmail.com
+    - IMAP_PORT=993
+    - IMAP_USER=mailer@butterfly.gitlab.com
+    - IMAP_PASS=password
+    - IMAP_SSL=true
+    - IMAP_STARTTLS=false
+    - OAUTH_ENABLED=false
+    - OAUTH_AUTO_SIGN_IN_WITH_PROVIDER=
+    - OAUTH_ALLOW_SSO=
+    - OAUTH_BLOCK_AUTO_CREATED_USERS=true
+    - OAUTH_AUTO_LINK_LDAP_USER=false
+    - OAUTH_AUTO_LINK_SAML_USER=false
+    - OAUTH_EXTERNAL_PROVIDERS=
+    - OAUTH_CAS3_LABEL=cas3
+    - OAUTH_CAS3_SERVER=
+    - OAUTH_CAS3_DISABLE_SSL_VERIFICATION=false
+    - OAUTH_CAS3_LOGIN_URL=/cas/login
+    - OAUTH_CAS3_VALIDATE_URL=/cas/p3/serviceValidate
+    - OAUTH_CAS3_LOGOUT_URL=/cas/logout
+    - OAUTH_GITHUB_API_KEY=f040bdc8cba6f1c44229
+    - OAUTH_GITHUB_APP_SECRET=3c8343a0476f5131e6b411643d1333549a7ebbe0
+    - OAUTH_SAML_LABEL="Our SAML Provider"
+    - OAUTH_SAML_NAME_IDENTIFIER_FORMAT=urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+    networks:
+      - gitlab-network
+      - gitlab-producer-network
+
+volumes:
+  gitlab-redis-data:
+  gitlab-postgres-data:
+  gitlab-data:
+
+networks:
+  gitlab-network:
+    name: gitlab-network
+  gitlab-producer-network:
+    external:
+      name: gitlab-producer-network

@@ -1,0 +1,91 @@
+{
+  "object_kind": "issue",
+  "event_type": "issue",
+  "user": {
+    "name": "Administrator",
+    "username": "root",
+    "avatar_url": "https://secure.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon"
+  },
+  "project": {
+    "id": 1,
+    "name": "Butterfly",
+    "description": "Some project description",
+    "web_url": "https://localhost:10443/dstack/butterfly",
+    "avatar_url": null,
+    "git_ssh_url": "ssh://git@localhost:30022/dstack/butterfly.git",
+    "git_http_url": "https://localhost:10443/dstack/butterfly.git",
+    "namespace": "DStack",
+    "visibility_level": 0,
+    "path_with_namespace": "dstack/butterfly",
+    "default_branch": "staging",
+    "ci_config_path": null,
+    "homepage": "https://localhost:10443/dstack/butterfly",
+    "url": "ssh://git@localhost:30022/dstack/butterfly.git",
+    "ssh_url": "ssh://git@localhost:30022/dstack/butterfly.git",
+    "http_url": "https://localhost:10443/dstack/butterfly.git"
+  },
+  "object_attributes": {
+    "author_id": 1,
+    "closed_at": "2019-03-02 14:12:00 UTC",
+    "confidential": false,
+    "created_at": "2019-03-01 22:07:38 +0100",
+    "description": "Random and pretty long description that discusses about the importance of writing clean and performance-wise code. Something must be fixed. ASd",
+    "due_date": null,
+    "id": 1,
+    "iid": 1,
+    "last_edited_at": "2019-03-01 23:15:17 +0100",
+    "last_edited_by_id": 1,
+    "milestone_id": null,
+    "moved_to_id": null,
+    "project_id": 1,
+    "relative_position": 1073742323,
+    "state": "closed",
+    "time_estimate": 0,
+    "title": "New performance bug for you",
+    "updated_at": "2019-03-02 15:12:00 +0100",
+    "updated_by_id": 1,
+    "url": "https://localhost:10443/dstack/butterfly/issues/1",
+    "total_time_spent": 0,
+    "human_total_time_spent": null,
+    "human_time_estimate": null,
+    "assignee_ids": [
+      1
+    ],
+    "assignee_id": 1,
+    "action": "close"
+  },
+  "labels": [],
+  "changes": {
+    "updated_at": {
+      "previous": "2019-03-02 15:12:00 +0100",
+      "current": "2019-03-02 15:12:00 +0100"
+    },
+    "assignees": {
+      "previous": [],
+      "current": [
+        {
+          "name": "Administrator",
+          "username": "root",
+          "avatar_url": "https://secure.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon"
+        }
+      ]
+    },
+    "total_time_spent": {
+      "previous": null,
+      "current": 0
+    }
+  },
+  "repository": {
+    "name": "Butterfly",
+    "url": "ssh://git@localhost:30022/dstack/butterfly.git",
+    "description": "Some project description",
+    "homepage": "https://localhost:10443/dstack/butterfly"
+  },
+  "assignees": [
+    {
+      "name": "Administrator",
+      "username": "root",
+      "avatar_url": "https://secure.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon"
+    }
+  ]
+}

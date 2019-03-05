@@ -1,0 +1,166 @@
+[
+  {
+    "namespace": "it.unipd.dstack.butterfly.producer.avro",
+    "type": "enum",
+    "name": "Services",
+    "doc": "Producer services supported by Butterfly",
+    "symbols": [
+      "REDMINE",
+      "GITLAB",
+      "SONARQUBE"
+    ]
+  },
+  {
+    "namespace": "it.unipd.dstack.butterfly.producer.avro",
+    "type": "enum",
+    "name": "ServiceEventTypes",
+    "doc": "List of events available for each supported service",
+    "symbols": [
+      "GITLAB_COMMIT_CREATED",
+      "GITLAB_ISSUE_CREATED",
+      "GITLAB_ISSUE_EDITED",
+      "REDMINE_TICKET_CREATED",
+      "REDMINE_TICKET_EDITED",
+      "REDMINE_TICKET_PRIORITY_EDITED",
+      "REDMINE_USER_ADDED",
+      "SONARQUBE_PROJECT_ANALYSIS_COMPLETED"
+    ]
+  },
+  {
+    "namespace": "it.unipd.dstack.butterfly.producer.avro",
+    "type": "record",
+    "name": "Event",
+    "doc": "Avro Schema for producer events",
+    "fields": [
+      {
+        "name": "timestamp",
+        "type": "long",
+        "logicalType": "timestamp-millis",
+        "doc": "Time in which the event happened"
+      },
+      {
+        "name": "service",
+        "type": "it.unipd.dstack.butterfly.producer.avro.Services",
+        "doc": "Third party service that originated the event"
+      },
+      {
+        "name": "projectName",
+        "type": "string",
+        "doc": "The name of the project associated with the current event"
+      },
+      {
+        "name": "projectURL",
+        "type": [
+          "null",
+          "string"
+        ],
+        "doc": "The URL of the project associated with the current event. Sonarqube doesn't provide this information."
+      },
+      {
+        "name": "eventId",
+        "type": "string",
+        "doc": "The ID of the current event, whose representation may change based on `service` and `event_type`"
+      },
+      {
+        "name": "eventType",
+        "type": "it.unipd.dstack.butterfly.producer.avro.ServiceEventTypes",
+        "doc": "Event type related to the current event"
+      },
+      {
+        "name": "username",
+        "type": [
+          "null",
+          "string"
+        ],
+        "doc": "The username of the user that originated the event. Sonarqube doesn't provide this information."
+      },
+      {
+        "name": "userEmail",
+        "type": [
+          "null",
+          "string"
+        ],
+        "doc": "Email of the user that originated the event. Sonarqube doesn't provide this information."
+      },
+      {
+        "name": "title",
+        "type": [
+          "null",
+          "string"
+        ],
+        "doc": "Title of the event. For instance, in Gitlab this would be the branch in which there was a new commit, or the title of an issue."
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "doc": "Description of the event. For instance, in Gitlab this would be the commit message or the body of the issue."
+      },
+      {
+        "name": "tags",
+        "type": {
+          "type": "array",
+          "items": "string"
+        },
+        "default": [],
+        "doc": "List of tags associated with the event. For instance, in Gitlab this would be the issue labels."
+      }
+    ]
+  },
+  {
+    "namespace": "it.unipd.dstack.butterfly.consumer.avro",
+    "type": "enum",
+    "name": "Contacts",
+    "doc": "Consumer contact applications supported by Butterfly",
+    "symbols": [
+      "TELEGRAM",
+      "SLACK",
+      "EMAIL"
+    ]
+  },
+  {
+    "namespace": "it.unipd.dstack.butterfly.consumer.avro",
+    "type": "record",
+    "name": "UserSingleContact",
+    "doc": "Avro Schema which contains the user info, a single contact platform and a contact ID",
+    "fields": [
+      {
+        "name": "firstname",
+        "type": "string",
+        "doc": "The firstname of the user that should receive the event notification"
+      },
+      {
+        "name": "lastname",
+        "type": "string",
+        "doc": "The lastname of the user that should receive the event notification"
+      },
+      {
+        "name": "contact",
+        "type": "it.unipd.dstack.butterfly.consumer.avro.Contacts",
+        "doc": "The type of contact platform where the user designed as recipient should receive this notification"
+      },
+      {
+        "name": "contactRef",
+        "type": "string",
+        "doc": "The ID that identifies the user in the chosen contact platform"
+      }
+    ]
+  },
+  {
+    "namespace": "it.unipd.dstack.butterfly.consumer.avro",
+    "type": "record",
+    "name": "EventWithUserContact",
+    "doc": "Avro Schema that aggregates the event to notify to the user, and the contact info of said user",
+    "fields": [
+      {
+        "name": "event",
+        "type": "it.unipd.dstack.butterfly.producer.avro.Event",
+        "doc": "Avro Schema for the event to notify to the user"
+      },
+      {
+        "name": "userContact",
+        "type": "it.unipd.dstack.butterfly.consumer.avro.UserSingleContact",
+        "doc": "Avro Schema which contains the user info, the preferred contact platform and a contact ID"
+      }
+    ]
+  }
+]

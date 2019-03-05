@@ -1,0 +1,1 @@
+FROM redmine:3

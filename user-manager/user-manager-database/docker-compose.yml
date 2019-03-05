@@ -1,0 +1,34 @@
+version: '3.5'
+
+services:
+  pgadmin:
+    image: "dpage/pgadmin4:latest"
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./pgadmin/servers.json:/pgadmin4/servers.json
+    links:
+      - postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "user@domain.com"
+      PGADMIN_DEFAULT_PASSWORD: "secret"
+    depends_on:
+      - postgres
+
+  postgres:
+    image: "postgres:11-alpine"
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pg_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_PASSWORD: "butterfly_user"
+      POSTGRES_USER: "butterfly_user"
+      POSTGRES_DB: "butterfly"
+    # network_mode: bridge
+
+volumes:
+  pg_data:

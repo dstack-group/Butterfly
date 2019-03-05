@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="avro-schemas" />
+        <module name="config" />
+        <module name="consumer" />
+        <module name="email-consumer" />
+        <module name="gitlab-producer" />
+        <module name="middleware-dispatcher" />
+        <module name="producer" />
+        <module name="redmine-producer" />
+        <module name="sonarqube-producer" />
+        <module name="telegram-consumer" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="telegram-consumer-old" target="1.11" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

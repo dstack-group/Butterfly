@@ -1,0 +1,18 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class WebhookHandler.Builder {
+    -route : String
+    -method : {GET, POST}
+    -exceptionConsumer : Consumer<Exception>
+    +setRoute() : WebhookHandler.Builder
+    +create() : WebhookHandler
+}
+
+WebhookHandler <|-- ArrayList
+
+WebhookHandler : WebhookHandler()
+ArrayList : Object[] elementData
+ArrayList : size()
+
+@enduml

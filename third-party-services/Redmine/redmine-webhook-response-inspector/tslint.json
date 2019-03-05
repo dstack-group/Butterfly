@@ -1,0 +1,23 @@
+{
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint:recommended"
+  ],
+  "rules": {
+    "no-console": false,
+    "interface-name": false,
+    "member-ordering": false,
+    "ordered-imports": false,
+    "quotemark": [true, "single"],
+    "member-access": [true, "no-public"],
+    "arrow-parens": [true, "ban-single-arg-parens"]
+  },
+  "rulesDirectory": [],
+  "linterOptions": {
+    "exclude": [
+      "config/**/*.js",
+      "node_modules/**/*.ts",
+      "coverage/lcov-report/*.js"
+    ]
+  }
+}

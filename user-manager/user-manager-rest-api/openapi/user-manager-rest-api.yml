@@ -1,0 +1,382 @@
+# OpenAPI Specification version
+openapi: 3.0.0
+info:
+
+  # arbitrary string that specifies the version of the API
+  version: 0.0.1
+
+  # API name
+  title: Butterfly User Manager API
+
+  # Extended information about the API
+  description: >-
+    Butterfly User Manager REST API
+
+  contact:
+    name: DStack Group
+    email: dstackgroup@gmail.com
+    # url: https://example.com/
+
+# API server and base URL
+servers:
+  - url: http://localhost:8080/api/v1/
+    description: Development Server
+
+# tags are used for organizing operations
+tags:
+  - name: APIStatus
+    description: Non business operations related to the API health status and usage metrics
+  - name: CRUD
+    description: Operations related to creating, reading, updating or deleting resources
+  - name: Query
+    description: Operations which take in queries to perform a piece of work. For example matching users to alerts.
+
+# paths define the API exposed endpoints
+paths:
+  /health:
+    get:
+      operationId: isHealthy
+      summary: Returns code 200, it ensures the API is still alive
+      tags: [ 'APIStatus' ]
+      responses:
+        '204':
+          description: OK, no content to return
+
+  /health/metrics:
+    get:
+      operationId: getStatusMetrics
+      summary: Returns code 200 with basic status metrics
+      tags: [ 'APIStatus' ]
+      responses:
+        '200':
+          description: OK, returns system metrics
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /users:
+    get:
+      operationId: getUsers
+      summary: Returns code 200, returns the user data as JSON
+      tags: [ 'CRUD' ]
+      responses:
+        '200':
+          description: OK, a list of user records.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+    post:
+      operationId: createUser
+      summary: Creates new user and returns the user record
+      tags: [ 'CRUD' ]
+      requestBody:
+        description: User record
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: OK, user inserted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '422':
+          description: Unprocessable Entity, another user exists with the same email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: error message
+
+  /users/{user_id}:
+    get:
+      operationId: getUserById
+      summary: Attempts to get a user by its id
+      tags: [ 'CRUD' ]
+      parameters:
+        - in: path
+          name: user_id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK, user found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Error, the user does not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: error message
+
+    put:
+      operationId: updateUser
+      summary: Updates user data and returns the updated user record
+      tags: [ 'CRUD' ]
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: OK, user updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Error, the user does not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: error message
+
+    delete:
+      operationId: deleteUserById
+      summary: Attempts to DELETE a document by its index,type and ID
+      tags: [ 'CRUD' ]
+      parameters:
+        - in: path
+          name: user_id
+          schema:
+            type: string
+          required: true
+      responses:
+        '204':
+          description: OK, user deleted, no content to return
+        '404':
+          description: Error, the user does not exist
+
+  /users/{user_id}/keywords:
+    get:
+      operationId: getUserKeywords
+      summary: Returns the list of keywords defined by the current user
+      tags: [ 'CRUD' ]
+      parameters:
+        - in: path
+          name: user_id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK, returns list of user keywords
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: error message
+        '404':
+          description: Error, the user does not exist
+
+    patch:
+      operationId: setUserKeywords
+      summary: Sets the new list of keywords defined by the current user
+      tags: [ 'CRUD' ]
+      parameters:
+        - in: path
+          name: user_id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: User keywords
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                color:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: OK, user keywords updated. Returns the list of keywords
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  color:
+                    type: array
+                    items:
+                      type: string
+
+  /search/events/users:
+    post:
+      operationId: getUsersRecipientsFromAlert
+      summary: Returns the list of keywords defined by the current user
+      tags: [ 'Query' ]
+      requestBody:
+        description: Event record
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+      responses:
+        '200':
+          description: OK, user keywords updated. Returns the list of keywords
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventWithContactInfo'
+
+components:
+  schemas:
+    ThirdPartyProducerService:
+      type: string
+      enum:
+        - REDMINE
+        - GITLAB
+        - SONARQUBE
+
+    ThirdPartyContactService:
+      type: string
+      enum:
+        - TELEGRAM
+        - SLACK
+        - EMAIL
+
+    User:
+      type: object
+      required:
+        - user_id
+        - email
+        - description
+      properties:
+        id:
+          type: integer
+          format: int64
+        industrialcode:
+          type: string
+        description:
+          type: string
+
+    Event:
+      type: object
+      required:
+        - service_name
+        - server_url
+        - project_url
+        - project_name
+        - title
+        - description
+        - event_type
+      properties:
+        service_name:
+          $ref: '#/components/schemas/ThirdPartyProducerService'
+        server_url:
+          type: string
+        project_url:
+          type: string
+        project_name:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        event_type:
+          type: string
+        user_email:
+          type: string
+
+    EventWithContactInfo:
+      type: object
+      required:
+        - service_name
+        - server_url
+        - project_url
+        - project_name
+        - title
+        - description
+        - event_type
+        - contact_name
+        - contact_ref
+      properties:
+        service_name:
+          $ref: '#/components/schemas/ThirdPartyProducerService'
+        server_url:
+          type: string
+        project_url:
+          type: string
+        project_name:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        event_type:
+          type: string
+        user_email:
+          type: string
+        contact_name:
+          $ref: '#/components/schemas/ThirdPartyContactService'
+        contact_ref:
+          type: string
+
+  responses:
+    UserSuccessReturnRecord:
+        description: OK, user processed correctly
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                data:
+                  $ref: '#/components/schemas/User'
+
+    NotFound:
+      description: Entity not found.
+    IllegalInput:
+      description: Illegal input for operation.
+
+  parameters:
+    skip:
+      name: skip
+      in: query
+      description: number of items to skip
+      required: true
+      schema:
+        type: integer
+        format: int32
+    limit:
+      name: limit
+      in: query
+      description: max records to return
+      required: true
+      schema:
+        type: integer
+        format: int32

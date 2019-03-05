@@ -1,0 +1,1 @@
+FROM confluentinc/cp-schema-registry:5.1.1

@@ -1,0 +1,1 @@
+FROM sameersbn/gitlab:11.7.5
