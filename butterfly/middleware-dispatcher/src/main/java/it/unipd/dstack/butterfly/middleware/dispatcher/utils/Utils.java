@@ -5,8 +5,8 @@ import it.unipd.dstack.butterfly.consumer.avro.UserSingleContact;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserContact;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponseData;
 import it.unipd.dstack.butterfly.producer.avro.Event;
+import it.unipd.dstack.butterfly.config.record.Record;
 import org.apache.avro.specific.SpecificRecord;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,11 +65,11 @@ public final class Utils {
      *
      * @param topic
      * @param avroRecord
-     * @param <T>        the type of avroRecord
+     * @param <T> the type of avroRecord
      * @return
      */
-    public static <T extends SpecificRecord> ProducerRecord<String, T> getProducerRecord(String topic, T avroRecord) {
-        return new ProducerRecord<>(topic, avroRecord);
+    public static <T extends SpecificRecord> Record<T> getProducerRecord(String topic, T avroRecord) {
+        return new Record<>(topic, avroRecord);
     }
 
     /**

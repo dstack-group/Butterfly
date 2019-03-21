@@ -8,7 +8,7 @@ import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponse
 import it.unipd.dstack.butterfly.middleware.dispatcher.processor.EventProcessor;
 import it.unipd.dstack.butterfly.middleware.dispatcher.utils.Utils;
 import it.unipd.dstack.butterfly.producer.avro.Event;
-import it.unipd.dstack.butterfly.producer.producer.Producer;
+import it.unipd.dstack.butterfly.producer.producer.ProducerImpl;
 import org.apache.avro.AvroRuntimeException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -24,7 +24,7 @@ public class MiddlewareDispatcherController {
     private final List<String> topics;
     private String messageTopicPrefix;
     private Consumer<String, Event> consumer;
-    private Producer<String, EventWithUserContact> producer;
+    private ProducerImpl<EventWithUserContact> producer;
     private EventProcessor eventProcessor;
 
     MiddlewareDispatcherController() {
@@ -35,7 +35,7 @@ public class MiddlewareDispatcherController {
         logger.info("Middleware dispatcher reading topics: " + this.topics);
         this.consumer = ConsumerUtils.createConsumer();
         this.consumer.subscribe(this.topics);
-        this.producer = new Producer<>();
+        this.producer = new ProducerImpl<>();
 
         this.setupEventProcessor();
     }
@@ -119,7 +119,6 @@ public class MiddlewareDispatcherController {
     private void onValidResponse(UserManagerResponse userManagerResponse, Event event) {
         try {
             UserManagerResponseData data = userManagerResponse.getData();
-            logger.info("is UserManagerResponseData null? " + (data == null ? "true" : "false"));
 
             /**
              * Extracts every possible association between a user and 1 to N contact platforms, and aggregates this
@@ -130,7 +129,7 @@ public class MiddlewareDispatcherController {
                     Utils.parseUserManagerResponseData(data, event);
 
             /**
-             * Creates a new Producer record for each EventWithUserContact instance in eventWithUserContactList.
+             * Creates a new ProducerImpl record for each EventWithUserContact instance in eventWithUserContactList.
              * The destination topic is extracted from the contact platform name.
              */
             logger.info("Trying to assemble producerRecordList");
