@@ -2,12 +2,15 @@ package it.unipd.dstack.butterfly.consumer.utils;
 
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import it.unipd.dstack.butterfly.config.ConfigManager;
+import it.unipd.dstack.butterfly.config.record.Record;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -19,6 +22,18 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZE
 
 public final class ConsumerUtils {
     private ConsumerUtils() {
+    }
+
+    public static <T> List<T> getListFromSingleton(T single) {
+        return Arrays.asList(single);
+    }
+
+    public static <T> List<Record<T>> consumerRecordsToList(ConsumerRecords<String, T> consumerRecordList) {
+        List<Record<T>> recordList = new ArrayList<>();
+        consumerRecordList.iterator().forEachRemaining(consumerRecord -> {
+            recordList.add(new Record<>(consumerRecord.topic(), consumerRecord.value()));
+        });
+        return recordList;
     }
 
     /**
@@ -49,11 +64,10 @@ public final class ConsumerUtils {
 
     /**
      * Returns a Kafka Consumer
-     * @param <K>
      * @param <V>
      * @return
      */
-    public static <K, V> Consumer<K, V> createConsumer() {
+    public static <V> KafkaConsumer<String, V> createConsumer() {
         Properties props = new Properties();
 
         // A list of URLs to use for establishing the initial connection to the cluster.
@@ -79,7 +93,7 @@ public final class ConsumerUtils {
         props.put(SPECIFIC_AVRO_READER_CONFIG, "true");
         props.put(SCHEMA_REGISTRY_URL_CONFIG,
                 ConfigManager.getStringProperty("AVRO_SCHEMA_REGISTRY_URL", "http://localhost:8081"));
-        KafkaConsumer<K, V> consumer = new KafkaConsumer<>(props);
+        KafkaConsumer<String, V> consumer = new KafkaConsumer<>(props);
 
         return consumer;
     }

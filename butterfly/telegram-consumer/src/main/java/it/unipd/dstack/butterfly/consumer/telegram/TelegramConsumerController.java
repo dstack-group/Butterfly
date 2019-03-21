@@ -1,8 +1,9 @@
 package it.unipd.dstack.butterfly.consumer.telegram;
 
 import it.unipd.dstack.butterfly.config.ConfigManager;
-import it.unipd.dstack.butterfly.consumer.ConsumerController;
+import it.unipd.dstack.butterfly.config.record.Record;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
+import it.unipd.dstack.butterfly.consumer.consumer.ConsumerImpl;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.TelegramBot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +15,13 @@ public class TelegramConsumerController {
     private static final Logger logger = LoggerFactory.getLogger(TelegramConsumerController.class);
     private final String kafkaTopic;
     private TelegramBot bot;
-    private ConsumerController<String, EventWithUserContact> consumerController;
+    private ConsumerImpl<EventWithUserContact> consumer;
 
     public TelegramConsumerController() {
         this.kafkaTopic = ConfigManager.getStringProperty("KAFKA_TOPIC");
         logger.info(kafkaTopic);
-        this.consumerController = new ConsumerController<>(this.kafkaTopic);
+        this.consumer = new ConsumerImpl<>(this::onMessageConsume);
+
         bot = new TelegramBot();
         TelegramBotsApi botsApi = new TelegramBotsApi();
         try {
@@ -31,16 +33,11 @@ public class TelegramConsumerController {
 
     public void start() {
         logger.info("*** TelegramConsumer started...");
-        // TODO id must be obtained from the message
-        long id = 50736039;
-        try {
-            this.consumerController.start(this::onMessageConsume);
-        } catch (Exception e) {
-            logger.error("Exception while consuming: " + e);
-        }
+        this.consumer.start();
     }
 
-    private void onMessageConsume(EventWithUserContact eventWithUserContact) {
+    private void onMessageConsume(Record<EventWithUserContact> record) {
+        EventWithUserContact eventWithUserContact = record.getData();
         Pair values = getMessageFromEvent(eventWithUserContact);
         logger.info("TelegramConsumer message: " + values.msg);
         bot.sendMessage(values.id, values.msg);
@@ -57,9 +54,9 @@ public class TelegramConsumerController {
         return new Pair(id, String.format("**[{0}](http://{1})**: {2}", title, url, description));
     }
 
-    //stops the consumer
-    public void stop() {
-        this.consumerController.stop();
+    // stops the consumer
+    public void close() {
+        this.consumer.close();
     }
 
     public class Pair {

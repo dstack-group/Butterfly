@@ -1,7 +1,9 @@
 package it.unipd.dstack.butterfly.middleware.dispatcher;
 
 import it.unipd.dstack.butterfly.config.ConfigManager;
+import it.unipd.dstack.butterfly.config.record.Record;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
+import it.unipd.dstack.butterfly.consumer.consumer.ConsumerImpl;
 import it.unipd.dstack.butterfly.consumer.utils.ConsumerUtils;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponse;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponseData;
@@ -10,20 +12,16 @@ import it.unipd.dstack.butterfly.middleware.dispatcher.utils.Utils;
 import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.producer.producer.ProducerImpl;
 import org.apache.avro.AvroRuntimeException;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.util.List;
 
 public class MiddlewareDispatcherController {
     private static final Logger logger = LoggerFactory.getLogger(MiddlewareDispatcherController.class);
     private final List<String> topics;
     private String messageTopicPrefix;
-    private Consumer<String, Event> consumer;
+    private ConsumerImpl<Event> consumer;
     private ProducerImpl<EventWithUserContact> producer;
     private EventProcessor eventProcessor;
 
@@ -32,8 +30,8 @@ public class MiddlewareDispatcherController {
         String topicsAsCommaString = ConfigManager.getStringProperty("KAFKA_TOPICS");
 
         this.topics = ConsumerUtils.getListFromCommaSeparatedString(topicsAsCommaString);
-        logger.info("Middleware dispatcher reading topics: " + this.topics);
-        this.consumer = ConsumerUtils.createConsumer();
+
+        this.consumer = new ConsumerImpl<>(this::processRecord);
         this.consumer.subscribe(this.topics);
         this.producer = new ProducerImpl<>();
 
@@ -58,34 +56,22 @@ public class MiddlewareDispatcherController {
     /**
      * Starts consuming messages from <code>this.topics</code>.
      */
-    void start() {
-        int pollDurationMs = ConfigManager.getIntProperty("KAFKA_POLL_DURATION_MS", 2000);
-        consumer.subscribe(topics);
-        while (true) {
-            try {
-                ConsumerRecords<String, Event> records = consumer.poll(Duration.ofMillis(pollDurationMs));
-                int count = records.count();
-                if (count > 0) {
-                    logger.info("Received " + count + " records");
-                    records.forEach(this::processRecord);
-                }
-            } catch (Exception e) {
-                logger.error("Error consuming from dispatcher: " + e.getMessage() + " " + e.getStackTrace());
-            }
-        }
+    public void start() {
+        logger.info("Middleware dispatcher reading topics: " + this.topics);
+        this.consumer.start();
     }
 
     /**
      * Relinquishes process resources
      */
-    void close() {
+    public void close() {
         this.consumer.close();
         this.producer.close();
     }
 
-    private void processRecord(ConsumerRecord<String, Event> record) {
-        String topic = record.topic();
-        Event event = record.value();
+    private void processRecord(Record<Event> record) {
+        String topic = record.getTopic();
+        Event event = record.getData();
         logger.info("Read message from topic " + topic + ": " + event.toString());
         this.processEvent(event);
     }
