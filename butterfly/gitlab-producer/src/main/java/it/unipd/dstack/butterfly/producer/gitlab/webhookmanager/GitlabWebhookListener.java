@@ -2,27 +2,12 @@ package it.unipd.dstack.butterfly.producer.gitlab.webhookmanager;
 
 import it.unipd.dstack.butterfly.producer.avro.Event;
 
+@FunctionalInterface
 public interface GitlabWebhookListener {
-
     /**
-     * This method is called when a WebHook merge request event has been received.
-     * Not currently supported.
-     *
-     * @param event the Event instance containing info about the merge request event
+     * This method is called when a WebHook event has been received. The event object has info about the
+     * specific event type and its data.
+     * @param event
      */
-    // void handleMergeRequestEvent(Event event);
-
-    /**
-     * This method is called when a WebHook push event has been received.
-     *
-     * @param event the Event instance containing info about the push event
-     */
-    void handlePushEvent(Event event);
-
-    /**
-     * This method is called when a WebHook issue event has been received.
-     *
-     * @param event the Event instance containing info about the issue event
-     */
-    void handleIssueEvent(Event event);
+    void handleEvent(Event event);
 }

@@ -44,7 +44,7 @@ public class GitlabWebhookListenerAdapter implements WebHookListener {
         eventBuilder.setDescription(mergeRequestEvent.getObjectAttributes().getDescription());
         Event event = eventBuilder.build();
 
-        this.listener.handleMergeRequestEvent(event);
+        this.listener.handleEvent(event);
         logger.info("Created AVRO Event after onMergeRequestEvent");
     }
     */
@@ -73,7 +73,7 @@ public class GitlabWebhookListenerAdapter implements WebHookListener {
             eventBuilder.setTitle(pushEvent.getBranch());
             eventBuilder.setDescription(commit.getMessage());
             return eventBuilder.build();
-        }).forEach(this.listener::handlePushEvent);
+        }).forEach(this.listener::handleEvent);
         logger.info("Created AVRO Event after onPushEvent");
     }
 
@@ -109,7 +109,7 @@ public class GitlabWebhookListenerAdapter implements WebHookListener {
             eventBuilder.setTitle(issueEvent.getObjectAttributes().getTitle());
             eventBuilder.setDescription(issueEvent.getObjectAttributes().getDescription());
             Event event = eventBuilder.build();
-            this.listener.handleIssueEvent(event);
+            this.listener.handleEvent(event);
             logger.info("Created AVRO Event after onIssueEvent");
         } catch (AvroRuntimeException e) {
             logger.error("AvroRuntimeException: " + e.getMessage() + " " + e.getStackTrace());

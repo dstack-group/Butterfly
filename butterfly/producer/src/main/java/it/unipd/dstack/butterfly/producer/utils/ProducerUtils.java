@@ -7,12 +7,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class ProducerUtils {
-    public static void gracefulShutdown(Runnable shutdownTask) {
-        Thread shutdownThread = new Thread(shutdownTask);
-        Runtime.getRuntime()
-                .addShutdownHook(shutdownThread);
-    }
-
     public static <T> CompletableFuture<Void> composeFutureList(List<CompletableFuture<T>> completableFutureList) {
         CompletableFuture<T>[] completableFutureArray =
                 new CompletableFuture[completableFutureList.size()];
@@ -33,5 +27,4 @@ public class ProducerUtils {
         supplier.accept(callback);
         return completableFuture;
     }
-
 }
