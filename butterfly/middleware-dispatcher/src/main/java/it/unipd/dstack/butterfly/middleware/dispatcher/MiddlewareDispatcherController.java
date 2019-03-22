@@ -3,39 +3,58 @@ package it.unipd.dstack.butterfly.middleware.dispatcher;
 import it.unipd.dstack.butterfly.config.ConfigManager;
 import it.unipd.dstack.butterfly.config.record.Record;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
-import it.unipd.dstack.butterfly.consumer.consumer.ConsumerImpl;
+import it.unipd.dstack.butterfly.consumer.consumer.ConsumerFactory;
+import it.unipd.dstack.butterfly.consumer.consumer.controller.ConsumerController;
 import it.unipd.dstack.butterfly.consumer.utils.ConsumerUtils;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponse;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponseData;
 import it.unipd.dstack.butterfly.middleware.dispatcher.processor.EventProcessor;
 import it.unipd.dstack.butterfly.middleware.dispatcher.utils.Utils;
 import it.unipd.dstack.butterfly.producer.avro.Event;
-import it.unipd.dstack.butterfly.producer.producer.ProducerImpl;
+import it.unipd.dstack.butterfly.producer.producer.Producer;
 import org.apache.avro.AvroRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class MiddlewareDispatcherController {
+public class MiddlewareDispatcherController extends ConsumerController<Event> {
     private static final Logger logger = LoggerFactory.getLogger(MiddlewareDispatcherController.class);
-    private final List<String> topics;
     private String messageTopicPrefix;
-    private ConsumerImpl<Event> consumer;
-    private ProducerImpl<EventWithUserContact> producer;
+    private Producer<EventWithUserContact> producer;
     private EventProcessor eventProcessor;
 
-    MiddlewareDispatcherController() {
+    MiddlewareDispatcherController(Producer<EventWithUserContact> producer, ConsumerFactory<Event> consumerFactory) {
+        super(consumerFactory, MiddlewareDispatcherController.getKafkaTopicList());
         this.messageTopicPrefix = ConfigManager.getStringProperty("MESSAGE_TOPIC_PREFIX");
-        String topicsAsCommaString = ConfigManager.getStringProperty("KAFKA_TOPICS");
-
-        this.topics = ConsumerUtils.getListFromCommaSeparatedString(topicsAsCommaString);
-
-        this.consumer = new ConsumerImpl<>(this::processRecord);
-        this.consumer.subscribe(this.topics);
-        this.producer = new ProducerImpl<>();
+        this.producer = producer;
 
         this.setupEventProcessor();
+    }
+
+    /**
+     * Called when a new record is received from the broker.
+     *
+     * @param record
+     */
+    @Override
+    protected void onMessageConsume(Record<Event> record) {
+        String topic = record.getTopic();
+        Event event = record.getData();
+        logger.info("Read message from topic " + topic + ": " + event.toString());
+        this.processEvent(event);
+    }
+
+    /**
+     * Releases MiddlewareDispatcherController's resources
+     */
+    @Override
+    protected void releaseResources() {
+        this.producer.close();
+    }
+
+    private static List<String> getKafkaTopicList() {
+        return ConsumerUtils.getListFromCommaSeparatedString(ConfigManager.getStringProperty("KAFKA_TOPICS"));
     }
 
     /**
@@ -51,29 +70,6 @@ public class MiddlewareDispatcherController {
                 .setTimeoutInMs(userManagerRequestTimeout)
                 .setThreadsNumber(userManagerThreadsNumber)
                 .build();
-    }
-
-    /**
-     * Starts consuming messages from <code>this.topics</code>.
-     */
-    public void start() {
-        logger.info("Middleware dispatcher reading topics: " + this.topics);
-        this.consumer.start();
-    }
-
-    /**
-     * Relinquishes process resources
-     */
-    public void close() {
-        this.consumer.close();
-        this.producer.close();
-    }
-
-    private void processRecord(Record<Event> record) {
-        String topic = record.getTopic();
-        Event event = record.getData();
-        logger.info("Read message from topic " + topic + ": " + event.toString());
-        this.processEvent(event);
     }
 
     /**
