@@ -3,7 +3,6 @@ package it.unipd.dstack.butterfly.consumer.utils;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import it.unipd.dstack.butterfly.config.ConfigManager;
 import it.unipd.dstack.butterfly.config.record.Record;
-import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;

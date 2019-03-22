@@ -1,46 +1,26 @@
 package it.unipd.dstack.butterfly.consumer.telegram;
 
-import it.unipd.dstack.butterfly.config.ConfigManager;
 import it.unipd.dstack.butterfly.config.record.Record;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
-import it.unipd.dstack.butterfly.consumer.consumer.ConsumerImpl;
+import it.unipd.dstack.butterfly.consumer.consumer.ConsumerFactory;
+import it.unipd.dstack.butterfly.consumer.consumer.controller.ConsumerController;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.TelegramBot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
-public class TelegramConsumerController {
+public class TelegramConsumerController extends ConsumerController<EventWithUserContact> {
 
     private static final Logger logger = LoggerFactory.getLogger(TelegramConsumerController.class);
-    private final String kafkaTopic;
-    private TelegramBot bot;
-    private ConsumerImpl<EventWithUserContact> consumer;
 
-    public TelegramConsumerController() {
-        this.kafkaTopic = ConfigManager.getStringProperty("KAFKA_TOPIC");
-        logger.info(kafkaTopic);
-        this.consumer = new ConsumerImpl<>(this::onMessageConsume);
+    /**
+     * TODO: this should become an Adapter
+     */
+    private final TelegramBot bot;
 
-        bot = new TelegramBot();
-        TelegramBotsApi botsApi = new TelegramBotsApi();
-        try {
-            botsApi.registerBot(bot);
-        } catch (TelegramApiRequestException e) {
-            logger.error("TELEGRAM CONSUMER bot error", e.toString());
-        }
-    }
-
-    public void start() {
-        logger.info("*** TelegramConsumer started...");
-        this.consumer.start();
-    }
-
-    private void onMessageConsume(Record<EventWithUserContact> record) {
-        EventWithUserContact eventWithUserContact = record.getData();
-        Pair values = getMessageFromEvent(eventWithUserContact);
-        logger.info("TelegramConsumer message: " + values.msg);
-        bot.sendMessage(values.id, values.msg);
+    public TelegramConsumerController(ConsumerFactory<EventWithUserContact> consumerFactory, TelegramBot bot) {
+        super(consumerFactory);
+        this.bot = bot;
     }
 
     private Pair getMessageFromEvent(EventWithUserContact eventWithUserContact) {
@@ -54,9 +34,29 @@ public class TelegramConsumerController {
         return new Pair(id, String.format("**[{0}](http://{1})**: {2}", title, url, description));
     }
 
-    // stops the consumer
-    public void close() {
-        this.consumer.close();
+    /**
+     * Called when a new record is received from the broker.
+     *
+     * @param record
+     */
+    @Override
+    protected void onMessageConsume(Record<EventWithUserContact> record) {
+        EventWithUserContact eventWithUserContact = record.getData();
+        Pair values = getMessageFromEvent(eventWithUserContact);
+        logger.info("TelegramConsumer message: " + values.msg);
+        bot.sendMessage(values.id, values.msg);
+    }
+
+    /**
+     * Releases TelegramConsumerController's resources
+     */
+    @Override
+    protected void releaseResources() {
+        try {
+            this.bot.clearWebhook();
+        } catch (TelegramApiRequestException e) {
+            logger.error("Error releasing Telegram bot: " + e.getStackTrace());
+        }
     }
 
     public class Pair {

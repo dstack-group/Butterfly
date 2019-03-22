@@ -1,5 +1,5 @@
 package it.unipd.dstack.butterfly.consumer.consumer;
 
-public interface Consumer <T> extends ConsumerReceiver, Closeable {
+public interface Consumer extends ConsumerReceiver, Closeable {
     void start();
 }

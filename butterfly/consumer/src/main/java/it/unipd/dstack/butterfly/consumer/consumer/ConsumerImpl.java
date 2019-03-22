@@ -2,7 +2,6 @@ package it.unipd.dstack.butterfly.consumer.consumer;
 
 import it.unipd.dstack.butterfly.config.ConfigManager;
 import it.unipd.dstack.butterfly.config.record.Record;
-import it.unipd.dstack.butterfly.consumer.ConsumerController;
 import it.unipd.dstack.butterfly.consumer.utils.ConsumerUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -12,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.util.List;
 
-public class ConsumerImpl <V> implements Consumer <V> {
-    private static final Logger logger = LoggerFactory.getLogger(ConsumerController.class);
+public class ConsumerImpl <V> implements Consumer {
+    private static final Logger logger = LoggerFactory.getLogger(ConsumerImpl.class);
     private List<String> topicList;
     private KafkaConsumer<String, V> kafkaConsumer;
     private final Duration pollDuration;
@@ -26,16 +25,6 @@ public class ConsumerImpl <V> implements Consumer <V> {
 
         int pollDurationMs = ConfigManager.getIntProperty("KAFKA_POLL_DURATION_MS", 2000);
         this.pollDuration = Duration.ofMillis(pollDurationMs);
-    }
-
-    /**
-     * Subscribes to a single topic.
-     *
-     * @param topic
-     */
-    @Override
-    public void subscribe(String topic) {
-        this.subscribe(ConsumerUtils.getListFromSingleton(topic));
     }
 
     /**
