@@ -1,1 +1,1 @@
-FROM redmine:3
+FROM redmine:3.3.9
