@@ -1,21 +1,25 @@
+import * as path from 'path';
 import { QueryFile, TQueryFileOptions } from 'pg-promise';
 
-export function getSQLFile(fullPath: string, schema = 'public') {
+export function getSQLFile(directoryName: string, relativeFilename: string, schema = 'public'): string {
+  const fullPath = path.join(directoryName, relativeFilename);
+
   const options: TQueryFileOptions = {
     minify: true,
     params: {
-      schema, // replaces ${schema~} with 'public'
+      schema, // replaces ${schema~} with the value of the `schema` argument
     },
   };
 
-  const qf: QueryFile = new QueryFile(fullPath, options);
+  const queryFile: QueryFile = new QueryFile(fullPath, options);
 
-  if (qf.error) {
+  if (queryFile.error) {
     // Something is wrong with our query file :(
     // Testing all files through queries can be cumbersome,
     // so we also report it here, while loading the module:
-    console.error(qf.error);
+    // tslint:disable-next-line:no-console
+    console.error(queryFile.error);
   }
 
-  return qf;
+  return queryFile.toPostgres(queryFile);
 }

@@ -1,5 +1,6 @@
-import * as path from 'path';
 import { getSQLFile } from '../../../utils/getSQLFile';
+
+const dirName = __dirname;
 
 export = {
   create: sql('./create.sql'),
@@ -11,6 +12,5 @@ export = {
 };
 
 function sql(relativeFilename: string) {
-  const fullPath = path.join(__dirname, relativeFilename);
-  return getSQLFile(fullPath);
+  return getSQLFile(dirName, relativeFilename);
 }

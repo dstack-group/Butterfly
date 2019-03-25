@@ -1,11 +1,10 @@
-import * as path from 'path';
 import { getSQLFile } from '../../../utils/getSQLFile';
 
+const directoryName = __dirname;
 export = {
   searchUsersFromEvent: sql('./searchUsersFromEvent.sql'),
 };
 
 function sql(relativeFilename: string) {
-  const fullPath = path.join(__dirname, relativeFilename);
-  return getSQLFile(fullPath);
+  return getSQLFile(directoryName, relativeFilename);
 }
