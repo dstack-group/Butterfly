@@ -1,6 +1,7 @@
 package it.unipd.dstack.butterfly.consumer.telegram;
 
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerImplFactory;
+import it.unipd.dstack.butterfly.consumer.telegram.formatstrategy.TelegramFormatStrategy;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.TelegramBot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +22,10 @@ public class Main {
             logger.error("TELEGRAM CONSUMER bot error", e.toString());
         }
 
+        TelegramFormatStrategy formatStrategy = new TelegramFormatStrategy();
+
         TelegramConsumerController telegramConsumerController =
-                new TelegramConsumerController(new ConsumerImplFactory<>(), bot);
+                new TelegramConsumerController(new ConsumerImplFactory<>(), bot, formatStrategy);
         telegramConsumerController.start();
     }
 }

@@ -5,6 +5,8 @@ import it.unipd.dstack.butterfly.config.record.Record;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerFactory;
 import it.unipd.dstack.butterfly.consumer.consumer.controller.ConsumerController;
+import it.unipd.dstack.butterfly.consumer.consumer.formatstrategy.FormatStrategy;
+import it.unipd.dstack.butterfly.consumer.email.message.EmailMessage;
 import it.unipd.dstack.butterfly.consumer.email.sender.EmailSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +17,10 @@ public class EmailConsumerController extends ConsumerController<EventWithUserCon
     private static final Logger logger = LoggerFactory.getLogger(EmailConsumerController.class);
 
     private final EmailSender emailSender;
+    private final FormatStrategy<EventWithUserContact> formatStrategy;
 
-    public EmailConsumerController(ConsumerFactory<EventWithUserContact> consumerFactory) {
+    public EmailConsumerController(ConsumerFactory<EventWithUserContact> consumerFactory,
+                                   FormatStrategy<EventWithUserContact> formatStrategy) {
         super(consumerFactory);
 
         String emailServer = ConfigManager.getStringProperty("EMAIL_SERVER");
@@ -24,6 +28,7 @@ public class EmailConsumerController extends ConsumerController<EventWithUserCon
         String password = ConfigManager.getStringProperty("EMAIL_PASSWORD");
 
         this.emailSender = new EmailSender(emailServer, emailAddress, password);
+        this.formatStrategy = formatStrategy;
     }
 
     /**
@@ -41,11 +46,14 @@ public class EmailConsumerController extends ConsumerController<EventWithUserCon
                 event.getService(),
                 event.getEventType(),
                 event.getProjectName());
-        String content = String.format("%s<br/>%s", event.getTitle(), event.getDescription());
+        String content = this.formatStrategy.format(eventWithUserContact);
         String recipient = eventWithUserContact.getUserContact().getContactRef();
         logger.info("Contact ref " + recipient);
+
+        EmailMessage emailMessage = new EmailMessage(recipient, content, subject);
+
         try {
-            this.emailSender.sendMessage(recipient, subject, content);
+            this.emailSender.sendMessage(emailMessage);
         } catch (MessagingException e) {
             logger.error("Error sending email message " + e);
         }

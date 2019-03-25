@@ -4,9 +4,12 @@ import it.unipd.dstack.butterfly.config.record.Record;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerFactory;
 import it.unipd.dstack.butterfly.consumer.consumer.controller.ConsumerController;
+import it.unipd.dstack.butterfly.consumer.consumer.formatstrategy.FormatStrategy;
+import it.unipd.dstack.butterfly.consumer.telegram.message.TelegramMessage;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.TelegramBot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 public class TelegramConsumerController extends ConsumerController<EventWithUserContact> {
@@ -17,21 +20,14 @@ public class TelegramConsumerController extends ConsumerController<EventWithUser
      * TODO: this should become an Adapter
      */
     private final TelegramBot bot;
+    private final FormatStrategy<EventWithUserContact> formatStrategy;
 
-    public TelegramConsumerController(ConsumerFactory<EventWithUserContact> consumerFactory, TelegramBot bot) {
+    public TelegramConsumerController(ConsumerFactory<EventWithUserContact> consumerFactory,
+                                      TelegramBot bot,
+                                      FormatStrategy<EventWithUserContact> formatStrategy) {
         super(consumerFactory);
         this.bot = bot;
-    }
-
-    private Pair getMessageFromEvent(EventWithUserContact eventWithUserContact) {
-        var event = eventWithUserContact.getEvent();
-        var title = event.getTitle();
-        var url = event.getProjectName();
-        var description = event.getDescription();
-        // long id = Long.parseLong(event.getUserId().toString());
-        long id = 50736039;
-
-        return new Pair(id, String.format("**[{0}](http://{1})**: {2}", title, url, description));
+        this.formatStrategy = formatStrategy;
     }
 
     /**
@@ -42,9 +38,22 @@ public class TelegramConsumerController extends ConsumerController<EventWithUser
     @Override
     protected void onMessageConsume(Record<EventWithUserContact> record) {
         EventWithUserContact eventWithUserContact = record.getData();
-        Pair values = getMessageFromEvent(eventWithUserContact);
-        logger.info("TelegramConsumer message: " + values.msg);
-        bot.sendMessage(values.id, values.msg);
+        String message = this.formatStrategy.format(eventWithUserContact);
+
+        // TODO: retrieve from "eventWithUserContact.getUserContact().getContactRef()"
+        Long id = Long.valueOf(50736039);
+
+        logger.info("TelegramConsumer message: " + message);
+
+        TelegramMessage telegramMessage = new TelegramMessage(id.toString(), message);
+        try {
+            bot.sendMessage(telegramMessage);
+        } catch (TelegramApiException e) {
+            logger.error(String.format("Could not sendMessage message with chat_id={0} and content={1} "),
+                    telegramMessage.getRecipient(),
+                    telegramMessage.getContent());
+            logger.error(e.getMessage());
+        }
     }
 
     /**
@@ -57,16 +66,5 @@ public class TelegramConsumerController extends ConsumerController<EventWithUser
         } catch (TelegramApiRequestException e) {
             logger.error("Error releasing Telegram bot: " + e.getStackTrace());
         }
-    }
-
-    public class Pair {
-        public final long id;
-        public final String msg;
-
-        public Pair(long id, String msg) {
-            this.id = id;
-            this.msg = msg;
-        }
-
     }
 }

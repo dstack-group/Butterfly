@@ -1,15 +1,14 @@
 package it.unipd.dstack.butterfly.consumer.email.sender;
 
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Message;
-import javax.mail.Transport;
+import it.unipd.dstack.butterfly.consumer.consumer.message.MessageSender;
+import it.unipd.dstack.butterfly.consumer.email.message.EmailMessage;
+
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.util.Collections;
 import java.util.Properties;
 
-public class EmailSender {
+public class EmailSender implements MessageSender<EmailMessage> {
     private final Properties mailServerProperties;
     private final String server;
     private final String email;
@@ -29,33 +28,34 @@ public class EmailSender {
         this.mailSession = Session.getDefaultInstance(mailServerProperties, null);
     }
 
-    private Message buildMailMessage(String recipientAddress,
-                                     String subject,
-                                     String content) throws MessagingException {
+    private Message buildEmailMessage(EmailMessage emailMessage) throws MessagingException {
         Message message = new MimeMessage(this.mailSession);
 
         InternetAddress[] fromArray = new InternetAddress[1];
         fromArray[0] = new InternetAddress("noreply-butterfly@unipd.it");
         message.addFrom(fromArray);
-        message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientAddress));
-        message.setSubject(subject);
-        message.setContent(content, "text/html");
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress(emailMessage.getRecipient()));
+        message.setSubject(emailMessage.getSubject());
+        message.setContent(emailMessage.getContent(), "text/html");
         return message;
     }
 
     /**
-     * TODO: this should become asynchronous
-     * @throws MessagingException
+     * Forwards the given messaage to the appropriate service.
+     *
+     * @param message
      */
-    public void sendMessage(String recipientAddress,
-                             String subject,
-                             String content) throws MessagingException {
-        Transport transport = this.mailSession.getTransport("smtp");
+    @Override
+    public void sendMessage(EmailMessage message) throws MessagingException {
+        Transport transport = null;
+        try {
+            transport = this.mailSession.getTransport("smtp");
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        }
         transport.connect(this.server, this.email, this.password);
-
-        var message = this.buildMailMessage(recipientAddress, subject, content);
-
-        transport.sendMessage(message, message.getAllRecipients());
+        var mailMessage = this.buildEmailMessage(message);
+        transport.sendMessage(mailMessage, mailMessage.getAllRecipients());
         transport.close();
     }
 }
