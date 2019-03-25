@@ -193,123 +193,171 @@ CREATE VIEW public.v_filtered_users_project AS (
   JOIN public.project p ON p.project_id = xup.project_id
 );
 
------------------ INSERT ------------------
+----------------- PROCEDURES -----------------
 
-INSERT INTO public.service(service_id, producer_service_key) VALUES(1, 'REDMINE');
-INSERT INTO public.service(service_id, producer_service_key) VALUES(2, 'GITLAB');
-INSERT INTO public.service(service_id, producer_service_key) VALUES(3, 'SONARQUBE');
+/*
+`trunc_data()` deletes every data inserted by the user
+*/
+CREATE OR REPLACE PROCEDURE public.trunc_data()
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    truncate_query varchar;
+BEGIN
+	  FOR truncate_query IN
+        SELECT 'TRUNCATE ' || table_id || ' CASCADE;' AS truncate_query
+        FROM (
+          SELECT (schemaname || '.' || tablename) AS table_id
+          FROM pg_catalog.pg_tables
+          WHERE schemaname NOT LIKE 'pg_%'
+          AND schemaname != 'information_schema'
+        ) user_tables
+    LOOP
+        EXECUTE truncate_query;
+    END LOOP;
 
-INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(1, 'REDMINE_TICKET_CREATED');
-INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(2, 'REDMINE_TICKET_EDITED');
-INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(3, 'REDMINE_TICKET_PRIORITY_EDITED');
-INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(4, 'REDMINE_USER_ADDED');
+    COMMIT;
+END;
+$$;
 
-INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(10, 'GITLAB_COMMIT_CREATED');
-INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(11, 'GITLAB_ISSUE_CREATED');
-INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(12, 'GITLAB_ISSUE_EDITED');
+/*
+`init_event_data()` initializes the static data related to the event's relationships
+*/
+CREATE OR REPLACE PROCEDURE public.init_event_data()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO public.service(service_id, producer_service_key) VALUES(1, 'REDMINE');
+    INSERT INTO public.service(service_id, producer_service_key) VALUES(2, 'GITLAB');
+    INSERT INTO public.service(service_id, producer_service_key) VALUES(3, 'SONARQUBE');
 
-INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(20, 'SONARQUBE_PROJECT_ANALYSIS_COMPLETED');
+    INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(1, 'REDMINE_TICKET_CREATED');
+    INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(2, 'REDMINE_TICKET_EDITED');
+    INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(3, 'REDMINE_TICKET_PRIORITY_EDITED');
+    INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(4, 'REDMINE_USER_ADDED');
 
--- REDMINE event types
-INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (1, 1, 1);
-INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (2, 1, 2);
-INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (3, 1, 3);
-INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (4, 1, 4);
+    INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(10, 'GITLAB_COMMIT_CREATED');
+    INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(11, 'GITLAB_ISSUE_CREATED');
+    INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(12, 'GITLAB_ISSUE_EDITED');
 
--- GITLAB event types
-INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (5, 2, 10);
-INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (6, 2, 11);
-INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (7, 2, 12);
+    INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(20, 'SONARQUBE_PROJECT_ANALYSIS_COMPLETED');
 
--- SONARQUBE event types
-INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (8, 3, 20);
+    -- REDMINE event types
+    INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (1, 1, 1);
+    INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (2, 1, 2);
+    INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (3, 1, 3);
+    INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (4, 1, 4);
 
-INSERT INTO public.project(project_id, project_name, project_url) VALUES (1, 'Butterfly', '{"redmine": "redmine.dstackgroup.com/butterfly/butterfly.git", "gitlab": "https://localhost:10443/dstack/butterfly.git"}');
-INSERT INTO public.project(project_id, project_name, project_url) VALUES (2, 'Amazon', '{"gitlab": "gitlab.amazon.com/amazon/amazon.git"}');
-INSERT INTO public.project(project_id, project_name, project_url) VALUES (3, 'Uber', '{"gitlab": "gitlab.uber.com/uber/uber.git"}');
-INSERT INTO public.project(project_id, project_name, project_url) VALUES (4, 'Twitter', '{"sonarqube": "sonarqube.twitter.com/twitter/twitter.git", "gitlab": "gitlab.twitter.com/twitter/twitter.git"}');
+    -- GITLAB event types
+    INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (5, 2, 10);
+    INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (6, 2, 11);
+    INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (7, 2, 12);
 
-INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (1, 'jkomyno', 'alberto.schiabel@gmail.com', 'Alberto', 'Schiabel', 'jkomyno');
-INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (2, 'federicorispo', 'federico.rispo@gmail.com', 'Federico', 'Rispo', 'federicorispo');
-INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (3, 'Dogemist', 'enrico.trinco@gmail.com', 'Enrico', 'Trinco', 'Dogemist');
-INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (4, 'eleonorasignor', 'eleonorasignor@gmail.com', 'Eleonora', 'Signor', 'eleonorasignor');
-INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (5, 'TheAlchemist97', 'TheAlchemist97@gmail.com', 'Niccolò', 'Vettorello', 'TheAlchemist97');
-INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (6, 'elton97', 'elton97@gmail.com', 'Elton', 'Stafa', 'elton97');
-INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (7, 'singh', 'singh@gmail.com', 'Harwinder', 'Singh', 'singh');
+    -- SONARQUBE event types
+    INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (8, 3, 20);
+END;
+$$;
 
--- jkomyno is interested into REDMINE_TICKET_CREATED
-INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (1, 1);
+/*
+`init_demo_data()` initializes the data needed for a demo presentation
+*/
+CREATE OR REPLACE PROCEDURE public.init_demo_data()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO public.project(project_id, project_name, project_url) VALUES (1, 'Butterfly', '{"redmine": "redmine.dstackgroup.com/butterfly/butterfly.git", "gitlab": "https://localhost:10443/dstack/butterfly.git"}');
+    INSERT INTO public.project(project_id, project_name, project_url) VALUES (2, 'Amazon', '{"gitlab": "gitlab.amazon.com/amazon/amazon.git"}');
+    INSERT INTO public.project(project_id, project_name, project_url) VALUES (3, 'Uber', '{"gitlab": "gitlab.uber.com/uber/uber.git"}');
+    INSERT INTO public.project(project_id, project_name, project_url) VALUES (4, 'Twitter', '{"sonarqube": "sonarqube.twitter.com/twitter/twitter.git", "gitlab": "gitlab.twitter.com/twitter/twitter.git"}');
 
--- jkomyno is interested into GITLAB_COMMIT_CREATED
-INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (1, 5);
+    INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (1, 'jkomyno', 'alberto.schiabel@gmail.com', 'Alberto', 'Schiabel', 'jkomyno');
+    INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (2, 'federicorispo', 'federico.rispo@gmail.com', 'Federico', 'Rispo', 'federicorispo');
+    INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (3, 'Dogemist', 'enrico.trinco@gmail.com', 'Enrico', 'Trinco', 'Dogemist');
+    INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (4, 'eleonorasignor', 'eleonorasignor@gmail.com', 'Eleonora', 'Signor', 'eleonorasignor');
+    INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (5, 'TheAlchemist97', 'TheAlchemist97@gmail.com', 'Niccolò', 'Vettorello', 'TheAlchemist97');
+    INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (6, 'elton97', 'elton97@gmail.com', 'Elton', 'Stafa', 'elton97');
+    INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (7, 'singh', 'singh@gmail.com', 'Harwinder', 'Singh', 'singh');
 
--- jkomyno is interested into GITLAB_ISSUE_CREATED
-INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (1, 6);
+    -- jkomyno is interested into REDMINE_TICKET_CREATED
+    INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (1, 1);
 
--- jkomyno is interested into GITLAB_ISSUE_EDITED
-INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (1, 7);
+    -- jkomyno is interested into GITLAB_COMMIT_CREATED
+    INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (1, 5);
 
--- federicorispo is interested into GITLAB_COMMIT_CREATED
-INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (2, 5);
+    -- jkomyno is interested into GITLAB_ISSUE_CREATED
+    INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (1, 6);
 
--- federicorispo is interested into SONARQUBE_PROJECT_ANALYSIS_COMPLETED
-INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (2, 8);
+    -- jkomyno is interested into GITLAB_ISSUE_EDITED
+    INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (1, 7);
 
--- Dogemist is interested into GITLAB_COMMIT_CREATED
-INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (3, 5);
+    -- federicorispo is interested into GITLAB_COMMIT_CREATED
+    INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (2, 5);
 
--- Dogemist is interested into GITLAB_ISSUE_CREATED
-INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (3, 6);
+    -- federicorispo is interested into SONARQUBE_PROJECT_ANALYSIS_COMPLETED
+    INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (2, 8);
 
--- elton97 is interested into SONARQUBE_PROJECT_ANALYSIS_COMPLETED
-INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (6, 8);
+    -- Dogemist is interested into GITLAB_COMMIT_CREATED
+    INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (3, 5);
 
--- singh is interested into REDMINE_TICKET_EDITED
-INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (7, 2);
+    -- Dogemist is interested into GITLAB_ISSUE_CREATED
+    INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (3, 6);
 
--- singh is interested into GITLAB_ISSUE_CREATED
-INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (7, 6);
+    -- elton97 is interested into SONARQUBE_PROJECT_ANALYSIS_COMPLETED
+    INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (6, 8);
 
--- singh is interested into GITLAB_ISSUE_EDITED
-INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (7, 7);
+    -- singh is interested into REDMINE_TICKET_EDITED
+    INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (7, 2);
 
-INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (1, 'TELEGRAM', 'jkomyno');
-INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (1, 'SLACK', 'jkomyno');
-INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (1, 'EMAIL', 'dstackgroup@gmail.com');
-INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (2, 'TELEGRAM', 'frispo');
-INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (2, 'EMAIL', 'dstackgroup@gmail.com');
-INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (3, 'TELEGRAM', 'enrico_dogen');
-INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (3, 'EMAIL', 'dstackgroup@gmail.com');
-INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (4, 'TELEGRAM', 'mrossi');
-INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (4, 'EMAIL', 'dstackgroup@gmail.com');
+    -- singh is interested into GITLAB_ISSUE_CREATED
+    INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (7, 6);
 
-INSERT INTO public.x_user_project(user_id, project_id) VALUES (1, 1);
-INSERT INTO public.x_user_project(user_id, project_id) VALUES (1, 2);
-INSERT INTO public.x_user_project(user_id, project_id) VALUES (2, 1);
-INSERT INTO public.x_user_project(user_id, project_id) VALUES (3, 1);
-INSERT INTO public.x_user_project(user_id, project_id) VALUES (3, 2);
-INSERT INTO public.x_user_project(user_id, project_id) VALUES (3, 3);
-INSERT INTO public.x_user_project(user_id, project_id) VALUES (4, 2);
-INSERT INTO public.x_user_project(user_id, project_id) VALUES (4, 3);
-INSERT INTO public.x_user_project(user_id, project_id) VALUES (5, 1);
-INSERT INTO public.x_user_project(user_id, project_id) VALUES (5, 2);
-INSERT INTO public.x_user_project(user_id, project_id) VALUES (5, 3);
+    -- singh is interested into GITLAB_ISSUE_EDITED
+    INSERT INTO public.x_user_service_event_type(user_id, x_service_event_type_id) VALUES (7, 7);
 
-INSERT INTO public.keywords(keyword, user_id) VALUES ('bug', 1);
-INSERT INTO public.keywords(keyword, user_id) VALUES ('fix', 1);
-INSERT INTO public.keywords(keyword, user_id) VALUES ('performance', 1);
-INSERT INTO public.keywords(keyword, user_id) VALUES ('enhance', 1);
+    INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (1, 'TELEGRAM', 'jkomyno');
+    INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (1, 'SLACK', 'jkomyno');
+    INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (1, 'EMAIL', 'dstackgroup@gmail.com');
+    INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (2, 'TELEGRAM', 'frispo');
+    INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (2, 'EMAIL', 'dstackgroup@gmail.com');
+    INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (3, 'TELEGRAM', 'enrico_dogen');
+    INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (3, 'EMAIL', 'dstackgroup@gmail.com');
+    INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (4, 'TELEGRAM', 'mrossi');
+    INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (4, 'EMAIL', 'dstackgroup@gmail.com');
 
-INSERT INTO public.keywords(keyword, user_id) VALUES ('bug', 2);
-INSERT INTO public.keywords(keyword, user_id) VALUES ('revert', 2);
-INSERT INTO public.keywords(keyword, user_id) VALUES ('clean', 2);
+    INSERT INTO public.x_user_project(user_id, project_id) VALUES (1, 1);
+    INSERT INTO public.x_user_project(user_id, project_id) VALUES (1, 2);
+    INSERT INTO public.x_user_project(user_id, project_id) VALUES (2, 1);
+    INSERT INTO public.x_user_project(user_id, project_id) VALUES (3, 1);
+    INSERT INTO public.x_user_project(user_id, project_id) VALUES (3, 2);
+    INSERT INTO public.x_user_project(user_id, project_id) VALUES (3, 3);
+    INSERT INTO public.x_user_project(user_id, project_id) VALUES (4, 2);
+    INSERT INTO public.x_user_project(user_id, project_id) VALUES (4, 3);
+    INSERT INTO public.x_user_project(user_id, project_id) VALUES (5, 1);
+    INSERT INTO public.x_user_project(user_id, project_id) VALUES (5, 2);
+    INSERT INTO public.x_user_project(user_id, project_id) VALUES (5, 3);
 
-INSERT INTO public.keywords(keyword, user_id) VALUES ('performance', 3);
-INSERT INTO public.keywords(keyword, user_id) VALUES ('enhance', 3);
+    INSERT INTO public.keywords(keyword, user_id) VALUES ('bug', 1);
+    INSERT INTO public.keywords(keyword, user_id) VALUES ('fix', 1);
+    INSERT INTO public.keywords(keyword, user_id) VALUES ('performance', 1);
+    INSERT INTO public.keywords(keyword, user_id) VALUES ('enhance', 1);
 
-INSERT INTO public.keywords(keyword, user_id) VALUES ('bug', 5);
-INSERT INTO public.keywords(keyword, user_id) VALUES ('revert', 5);
-INSERT INTO public.keywords(keyword, user_id) VALUES ('clean', 5);
+    INSERT INTO public.keywords(keyword, user_id) VALUES ('bug', 2);
+    INSERT INTO public.keywords(keyword, user_id) VALUES ('revert', 2);
+    INSERT INTO public.keywords(keyword, user_id) VALUES ('clean', 2);
+
+    INSERT INTO public.keywords(keyword, user_id) VALUES ('performance', 3);
+    INSERT INTO public.keywords(keyword, user_id) VALUES ('enhance', 3);
+
+    INSERT INTO public.keywords(keyword, user_id) VALUES ('bug', 5);
+    INSERT INTO public.keywords(keyword, user_id) VALUES ('revert', 5);
+    INSERT INTO public.keywords(keyword, user_id) VALUES ('clean', 5);
+END;
+$$;
+
+------------------ EXECUTE ------------------
+
+CALL public.trunc_data();
+CALL public.init_event_data();
 
 /*
 Returns the users to be notified about the current event record, their contact info and the original record.
@@ -459,6 +507,3 @@ JOIN (
 	FROM USER_CONTACTS_INFO u
 ) t(user_contacts) ON TRUE
 */
-
-SET row_security = on;
-SET check_function_bodies = true;

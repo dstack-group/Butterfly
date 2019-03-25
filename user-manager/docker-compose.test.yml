@@ -1,32 +1,15 @@
 version: '3.5'
 
 services:
-  pgadmin:
-    image: "dpage/pgadmin4:latest"
-    restart: always
-    ports:
-      - "8080:80"
-    volumes:
-      - ./user-manager-database/pgadmin/servers.json:/pgadmin4/servers.json
-    links:
-      - postgres
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "user@domain.com"
-      PGADMIN_DEFAULT_PASSWORD: "secret"
-    depends_on:
-      - postgres
-    networks:
-      - user-manager-network
-
-  postgres:
+  postgres-test:
     image: "postgres:11-alpine"
     restart: always
     ports:
       - "5432:5432"
     volumes:
-      # for the production database, no demo data should be inserted
-      - ./user-manager-database/ddl.sql:/docker-entrypoint-initdb.d/ddl.sql
-      - pg_data:/var/lib/postgresql/data/
+      # for the test database, no demo data should be inserted
+      - ./user-manager-database/sql/ddl.sql:/docker-entrypoint-initdb.d/ddl.sql
+      - pg_test_data:/var/lib/postgresql/data/
     environment:
       POSTGRES_PASSWORD: "butterfly_user"
       POSTGRES_USER: "butterfly_user"
@@ -37,22 +20,26 @@ services:
   user-manager:
     build:
       context: ./user-manager-rest-api
-    restart: always
+    restart: "no"
     ports:
       - "5000:5000"
     links:
-      - postgres
+      # 'postgres' will be an alias for the 'postgres-test' service
+      - postgres-test:postgres
     depends_on:
-      - postgres
+      - postgres-test
     env_file: ./user-manager-rest-api/.user-manager-rest-api.env
     environment:
-      NODE_ENV: "development"
+      NODE_ENV: "test"
     networks:
       - user-manager-network
       - middleware-dispatcher-network
+    entrypoint:
+      - npm
+      - test
 
 volumes:
-  pg_data:
+  pg_test_data:
 
 networks:
   user-manager-network:

@@ -47,4 +47,4 @@ COPY --from=test /tmp/package.json ./package.json
 COPY --from=test /tmp/dist ./dist
 # Launch the app
 EXPOSE ${APP_PORT}
-CMD ["node", "dist/index.js"]
+ENTRYPOINT ["node", "dist/index.js"]
