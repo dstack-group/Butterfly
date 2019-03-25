@@ -76,7 +76,7 @@ public final class Utils {
      * Builds a list of objects returned by resultFactory for each item in messageDataList, which, upon applying
      * topicFactory to them, should return the correct topic for each item.
      *
-     * @param messageDataList List of items to send from which topicFactory is able to gather the proper topic
+     * @param messageDataList List of items to sendMessage from which topicFactory is able to gather the proper topic
      * @param topicFactory    Function that, given the data to be sent, returns the proper topic
      * @param resultFactory   Function that, given the topic chose by topicFactory and the data to be sent, returns
      *                        an object of type V

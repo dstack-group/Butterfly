@@ -10,6 +10,7 @@ import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponse
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponseData;
 import it.unipd.dstack.butterfly.middleware.dispatcher.processor.EventProcessor;
 import it.unipd.dstack.butterfly.middleware.dispatcher.utils.Utils;
+import it.unipd.dstack.butterfly.middleware.json.JSONConverterImpl;
 import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.producer.producer.Producer;
 import org.apache.avro.AvroRuntimeException;
@@ -69,6 +70,7 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
                 .setUserManagerURL(userManagerUrl)
                 .setTimeoutInMs(userManagerRequestTimeout)
                 .setThreadsNumber(userManagerThreadsNumber)
+                .setJsonConverter(new JSONConverterImpl())
                 .build();
     }
 
@@ -127,7 +129,7 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
                         logger.info("SENT EVERYTHING");
                     })
                     .exceptionally(e -> {
-                        logger.error("Couldn't send batch of messages " + e);
+                        logger.error("Couldn't sendMessage batch of messages " + e);
                         return null;
                     });
         } catch (AvroRuntimeException e) {

@@ -3,6 +3,7 @@ package it.unipd.dstack.butterfly.middleware.dispatcher.processor;
 import it.unipd.dstack.butterfly.middleware.dispatcher.utils.Utils;
 import it.unipd.dstack.butterfly.middleware.json.JSONConverter;
 import it.unipd.dstack.butterfly.middleware.json.JSONConverterException;
+import it.unipd.dstack.butterfly.middleware.json.JSONConverterImpl;
 import org.apache.avro.specific.SpecificRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,15 +37,20 @@ public class EventProcessor {
      * @param userManagerURL
      * @param threadsNumber
      * @param timeoutInMs
+     * @param jsonConverter
      */
-    private EventProcessor(String userManagerURL, int threadsNumber, int timeoutInMs) {
+    private EventProcessor(String userManagerURL,
+                           int threadsNumber,
+                           int timeoutInMs,
+                           JSONConverter jsonConverter) {
         this.userManagerURL = userManagerURL;
         this.executorService = Executors.newFixedThreadPool(threadsNumber);
         this.timeoutInMs = timeoutInMs;
+        this.jsonConverter = jsonConverter;
+
         this.client = HttpClient.newBuilder()
                 .executor(this.executorService)
                 .build();
-        this.jsonConverter = new JSONConverter();
     }
 
     /**
@@ -116,6 +122,7 @@ public class EventProcessor {
         private int threadsNumber = 0;
         private String userManagerURL;
         private int timeoutInMs;
+        private JSONConverter jsonConverter;
 
         public Builder() {
         }
@@ -135,11 +142,20 @@ public class EventProcessor {
             return this;
         }
 
+        public Builder setJsonConverter(JSONConverter jsonConverter) {
+            this.jsonConverter = jsonConverter;
+            return this;
+        }
+
         public EventProcessor build() {
+            if (this.jsonConverter == null) {
+                throw new NullPointerException("jsonConverter can't be null");
+            }
+
             int eventProcessorThreads = this.threadsNumber > 0 ?
                     this.threadsNumber :
                     defaultEventProcessThreads;
-            return new EventProcessor(userManagerURL, eventProcessorThreads, timeoutInMs);
+            return new EventProcessor(userManagerURL, eventProcessorThreads, timeoutInMs, jsonConverter);
         }
     }
 }
