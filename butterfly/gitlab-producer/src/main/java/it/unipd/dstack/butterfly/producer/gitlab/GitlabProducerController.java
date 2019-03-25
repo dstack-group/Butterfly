@@ -2,11 +2,9 @@ package it.unipd.dstack.butterfly.producer.gitlab;
 
 import it.unipd.dstack.butterfly.config.ConfigManager;
 import it.unipd.dstack.butterfly.producer.producer.Producer;
-import it.unipd.dstack.butterfly.config.record.Record;
 import it.unipd.dstack.butterfly.producer.producer.controller.ProducerController;
 import it.unipd.dstack.butterfly.producer.webhookhandler.WebhookHandler;
 import it.unipd.dstack.butterfly.producer.avro.Event;
-import it.unipd.dstack.butterfly.producer.gitlab.webhookmanager.GitlabWebhookListener;
 import it.unipd.dstack.butterfly.producer.gitlab.webhookmanager.GitlabWebhookManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,19 +15,13 @@ public class GitlabProducerController extends ProducerController<Event> {
     private static final Logger logger = LoggerFactory.getLogger(GitlabProducerController.class);
 
     private final String secretToken;
-    private GitlabWebhookListener gitlabWebhookListener;
     private GitlabWebhookManager gitlabWebhookManager;
 
     public GitlabProducerController(Producer<Event> producer) {
         super(producer, WebhookHandler.HTTPMethod.POST);
 
         this.secretToken = ConfigManager.getStringProperty("SECRET_TOKEN");
-        this.gitlabWebhookListener = (Event event) -> {
-            logger.info(serviceName + " Received " + event.getEventType() + " event: " + event.toString());
-            Record<Event> record = new Record<>(kafkaTopic, event);
-            this.producer.send(record);
-        };
-        this.gitlabWebhookManager = new GitlabWebhookManager(this.secretToken, this.gitlabWebhookListener);
+        this.gitlabWebhookManager = new GitlabWebhookManager(this.secretToken, this.onWebhookEvent);
     }
 
     /**

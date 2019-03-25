@@ -3,6 +3,7 @@ package it.unipd.dstack.butterfly.producer.gitlab.webhookmanager;
 import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.producer.avro.ServiceEventTypes;
 import it.unipd.dstack.butterfly.producer.avro.Services;
+import it.unipd.dstack.butterfly.producer.producer.OnWebhookEvent;
 import org.apache.avro.AvroRuntimeException;
 import org.gitlab4j.api.webhook.IssueEvent;
 import org.gitlab4j.api.webhook.PushEvent;
@@ -16,9 +17,9 @@ import org.slf4j.LoggerFactory;
 public class GitlabWebhookListenerAdapter implements WebHookListener {
     private static final Logger logger = LoggerFactory.getLogger(GitlabWebhookListenerAdapter.class);
 
-    private final GitlabWebhookListener listener;
+    private final OnWebhookEvent<Event> listener;
 
-    public GitlabWebhookListenerAdapter(GitlabWebhookListener listener) {
+    public GitlabWebhookListenerAdapter(OnWebhookEvent<Event> listener) {
         this.listener = listener;
     }
 
