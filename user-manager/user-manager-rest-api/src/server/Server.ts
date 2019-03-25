@@ -1,10 +1,11 @@
 import Koa from 'koa';
 import { Server as HTTPServer } from 'http';
 import { ServerConfig } from './';
-import { asyncRetry } from '../utils/asyncRetry';
+// import { asyncRetry } from '../utils/asyncRetry';
 import { Logger } from '../config/logger';
 import { Database } from '../database';
 import { RoutesInjectionParams } from '../routes/RoutesInjectionParams';
+import { DatabaseConnection } from '@src/database/DatabaseConnection';
 
 export class Server {
   private app: Koa = new Koa();
@@ -14,10 +15,10 @@ export class Server {
   private server?: HTTPServer;
   private logger: Logger;
 
-  constructor(config: ServerConfig) {
+  constructor(config: ServerConfig, databaseConnection: DatabaseConnection) {
     this.config = config;
     this.logger = config.logger;
-    this.database = new Database(config.databaseConfig);
+    this.database = new Database(databaseConnection);
   }
 
   createServer() {
@@ -59,6 +60,7 @@ export class Server {
     });
   }
 
+  /*
   private checkPendingRequests(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.server!.getConnections((err, pendingRequests) => {
@@ -72,6 +74,7 @@ export class Server {
       });
     });
   }
+  */
 
   private setupMiddlewares() {
     this.config.middlewares.forEach(middleware => {

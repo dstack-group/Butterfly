@@ -6,6 +6,7 @@ import { ServerConfig } from './server/ServerConfig';
 import { Log } from './config/logger';
 import { registerProcessEvents } from './utils/registerProcessEvents';
 import { databaseConfig } from './config/database';
+import { PgDatabaseConnection } from './database/PgDatabaseConnection';
 
 const logger = new Log();
 
@@ -23,7 +24,8 @@ const serverConfig: ServerConfig = {
   routersFactory,
 };
 
-export const app = new Server(serverConfig);
+const databaseConnection = new PgDatabaseConnection(databaseConfig);
+export const app = new Server(serverConfig, databaseConnection);
 export const server = app.createServer();
 
 registerProcessEvents(logger, app);

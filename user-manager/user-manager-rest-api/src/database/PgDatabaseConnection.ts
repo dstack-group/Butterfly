@@ -1,22 +1,20 @@
+import pgPromiseFactory, { IMain, IDatabase } from 'pg-promise';
 import { DatabaseConnection, DatabaseConnectionValues } from './DatabaseConnection';
+import { DatabaseConfig } from './DatabaseConfig';
 
 /**
- * Database class adapter that acts as a Facade for the given DatabaseConnection.
+ * PgDatabaseConnection is a Postgres-oriented implementation of DatabaseConnection.
+ * Internally, it uses `pg-promise` as database client.
  */
-export class Database implements DatabaseConnection {
-  private connection: DatabaseConnection;
+export class PgDatabaseConnection implements DatabaseConnection {
+  private config: DatabaseConfig;
+  private pgPromise: IMain;
+  private database: IDatabase<{}>;
 
-  constructor(connection: DatabaseConnection) {
-    this.connection = connection;
-  }
-
-  async isConnected(): Promise<boolean> {
-    try {
-      await this.connection.any('SELECT NOW()');
-      return true;
-    } catch (error) {
-      return false;
-    }
+  constructor(config: DatabaseConfig) {
+    this.config = config;
+    this.pgPromise = pgPromiseFactory();
+    this.database = this.pgPromise(this.config);
   }
 
   /**
@@ -26,7 +24,7 @@ export class Database implements DatabaseConnection {
    * @param values the named value parameters to be passed to the query
    */
   async none(query: string, values?: DatabaseConnectionValues): Promise<void> {
-    await this.connection.none(query, values);
+    await this.database.none(query, values);
   }
 
   /**
@@ -36,7 +34,7 @@ export class Database implements DatabaseConnection {
    * @param values the named value parameters to be passed to the query
    */
   async one<T = any>(query: string, values?: DatabaseConnectionValues): Promise<T> {
-    return this.connection.one(query, values);
+    return this.database.one(query, values);
   }
 
   /**
@@ -45,7 +43,7 @@ export class Database implements DatabaseConnection {
    * @param values the named value parameters to be passed to the query
    */
   async any<T = any>(query: string, values?: DatabaseConnectionValues): Promise<T[]> {
-    return this.connection.any(query, values);
+    return this.database.any(query, values);
   }
 
   /**
@@ -54,13 +52,14 @@ export class Database implements DatabaseConnection {
    * @param values the named value parameters to be passed to the stored procedure
    */
   async proc(procedureName: string, values?: DatabaseConnectionValues): Promise<void> {
-    await this.connection.proc(procedureName, values);
+    await this.database.proc(procedureName, values);
   }
 
   /**
    * Shuts down all connection pools created in the process, so it can terminate without delay.
    */
   async close(): Promise<void> {
-    await this.connection.close();
+    await this.database.$pool.end();
+    await this.pgPromise.end();
   }
 }
