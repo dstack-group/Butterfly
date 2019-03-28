@@ -11,6 +11,8 @@ services:
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=redmine
+    networks:
+      - redmine-network
 
   # http://localhost:15000
   # default username: admin
@@ -32,17 +34,27 @@ services:
       - REDMINE_DB_POSTGRES=postgres-redmine
       - REDMINE_DB_DATABASE=redmine
       - REDMINE_DB_PASSWORD=password
+    networks:
+      - redmine-network
+      - redmine-producer-network
 
-  # GET http://localhost:5000/health
   # POST http://localhost:5000/webhook/redmine
-  redmine-webhook-response-inspector:
-    build:
-      context: ./redmine-webhook-response-inspector
-    restart: always
-    env_file: ./redmine-webhook-response-inspector/.redmine-webhook-response-inspector.env
-    ports:
-      - 5000:5000
+  # redmine-webhook-response-inspector:
+  #   build:
+  #     context: ./redmine-webhook-response-inspector
+  #   restart: always
+  #   env_file: ./redmine-webhook-response-inspector/.redmine-webhook-response-inspector.env
+  #   ports:
+  #     - 5000:5000
+  #     - redmine-network
 
 volumes:
   postgres-redmine-data:
   redmine-data:
+
+networks:
+  redmine-network:
+    name: redmine-network
+  redmine-producer-network:
+    external:
+      name: redmine-producer-network

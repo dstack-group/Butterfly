@@ -84,6 +84,23 @@ services:
     networks:
       - kafka-network
       - gitlab-producer-network
+
+  redmine-producer:
+    build:
+      context: ./butterfly/redmine-producer
+      args:
+        SERVER_PORT: 4000
+        JAR_FILE: 'redmine-producer-1.0-SNAPSHOT-jar-with-dependencies'
+    env_file: ./butterfly/redmine-producer/.redmine-producer.env
+    depends_on:
+      - kafka
+      - zookeeper
+      - schema-registry
+    ports:
+      - 4000:4000
+    networks:
+      - kafka-network
+      - redmine-producer-network
       
   telegram-consumer:
     build:
@@ -133,6 +150,8 @@ volumes:
 networks:
   gitlab-producer-network:
     name: gitlab-producer-network
+  redmine-producer-network:
+    name: redmine-producer-network
   middleware-dispatcher-network:
     name: middleware-dispatcher-network
   kafka-network:
