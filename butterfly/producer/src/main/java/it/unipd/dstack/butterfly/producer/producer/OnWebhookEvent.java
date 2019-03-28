@@ -1,5 +1,7 @@
 package it.unipd.dstack.butterfly.producer.producer;
 
+import java.util.concurrent.CompletableFuture;
+
 @FunctionalInterface
 public interface OnWebhookEvent <T> {
     /**
@@ -7,5 +9,5 @@ public interface OnWebhookEvent <T> {
      * specific event type and its data.
      * @param event
      */
-    void handleEvent(T event);
+    CompletableFuture<Void> handleEvent(T event);
 }

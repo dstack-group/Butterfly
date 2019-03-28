@@ -3,7 +3,6 @@ package it.unipd.dstack.butterfly.producer.gitlab.webhookmanager;
 import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.producer.avro.ServiceEventTypes;
 import it.unipd.dstack.butterfly.producer.avro.Services;
-import it.unipd.dstack.butterfly.producer.producer.OnWebhookEvent;
 import org.apache.avro.AvroRuntimeException;
 import org.gitlab4j.api.webhook.IssueEvent;
 import org.gitlab4j.api.webhook.PushEvent;
@@ -12,14 +11,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Adapter that abstracts the Gitlab Client API
+ * GitlabWebhookListenerAggregator is a concrete implementation of the third-party interface WebHookListener.
+ * Each time an event is fired, it converts it into an Event object that the given GitlabWebhookListener instance
+ * is able to understand.
  */
-public class GitlabWebhookListenerAdapter implements WebHookListener {
-    private static final Logger logger = LoggerFactory.getLogger(GitlabWebhookListenerAdapter.class);
+public class GitlabWebhookListenerObserver implements WebHookListener {
+    private static final Logger logger = LoggerFactory.getLogger(GitlabWebhookListenerObserver.class);
 
-    private final OnWebhookEvent<Event> listener;
+    private final GitlabWebhookListener<Event> listener;
 
-    public GitlabWebhookListenerAdapter(OnWebhookEvent<Event> listener) {
+    public GitlabWebhookListenerObserver(GitlabWebhookListener<Event> listener) {
         this.listener = listener;
     }
 
@@ -45,7 +46,7 @@ public class GitlabWebhookListenerAdapter implements WebHookListener {
         eventBuilder.setDescription(mergeRequestEvent.getObjectAttributes().getDescription());
         Event event = eventBuilder.build();
 
-        this.listener.handleEvent(event);
+        this.listener.onNewGitlabEvent(event);
         logger.info("Created AVRO Event after onMergeRequestEvent");
     }
     */
@@ -74,7 +75,7 @@ public class GitlabWebhookListenerAdapter implements WebHookListener {
             eventBuilder.setTitle(pushEvent.getBranch());
             eventBuilder.setDescription(commit.getMessage());
             return eventBuilder.build();
-        }).forEach(this.listener::handleEvent);
+        }).forEach(this.listener::onCommitCreatedEvent);
         logger.info("Created AVRO Event after onPushEvent");
     }
 
@@ -93,7 +94,8 @@ public class GitlabWebhookListenerAdapter implements WebHookListener {
          * Apparently the only way to discriminate between a new issue or an edited issue is comparing
          * the timestamps in which the issue was created and updated.
          */
-        ServiceEventTypes serviceEventTypes = updatedAt > createdAt ?
+        boolean isIssueEditedEvent = updatedAt > createdAt;
+        ServiceEventTypes serviceEventTypes = isIssueEditedEvent ?
                 ServiceEventTypes.GITLAB_ISSUE_EDITED :
                 ServiceEventTypes.GITLAB_ISSUE_CREATED;
 
@@ -110,7 +112,13 @@ public class GitlabWebhookListenerAdapter implements WebHookListener {
             eventBuilder.setTitle(issueEvent.getObjectAttributes().getTitle());
             eventBuilder.setDescription(issueEvent.getObjectAttributes().getDescription());
             Event event = eventBuilder.build();
-            this.listener.handleEvent(event);
+
+            if (isIssueEditedEvent) {
+                this.listener.onIssueEditedEvent(event);
+            } else {
+                this.listener.onIssueCreatedEvent(event);
+            }
+
             logger.info("Created AVRO Event after onIssueEvent");
         } catch (AvroRuntimeException e) {
             logger.error("AvroRuntimeException: " + e.getMessage() + " " + e.getStackTrace());

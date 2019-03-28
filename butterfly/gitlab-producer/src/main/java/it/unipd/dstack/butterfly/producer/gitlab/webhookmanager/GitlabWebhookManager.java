@@ -1,7 +1,6 @@
 package it.unipd.dstack.butterfly.producer.gitlab.webhookmanager;
 
 import it.unipd.dstack.butterfly.producer.avro.Event;
-import it.unipd.dstack.butterfly.producer.producer.OnWebhookEvent;
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.webhook.WebHookListener;
 import org.gitlab4j.api.webhook.WebHookManager;
@@ -16,13 +15,13 @@ public class GitlabWebhookManager {
     private final WebHookManager webHookManager;
     private final WebHookListener webHookListener;
 
-    public GitlabWebhookManager(String secretToken, OnWebhookEvent<Event> listener) {
+    public GitlabWebhookManager(String secretToken, GitlabWebhookListener<Event> listener) {
         this.webHookManager = new WebHookManager(secretToken);
-        this.webHookListener = new GitlabWebhookListenerAdapter(listener);
+        this.webHookListener = new GitlabWebhookListenerObserver(listener);
         webHookManager.addListener(this.webHookListener);
     }
 
-    public void handleEvent(HttpServletRequest request) throws GitlabWebhookException {
+    public void onNewGitlabEvent(HttpServletRequest request) throws GitlabWebhookException {
         try {
             webHookManager.handleEvent(request);
             logger.info("NEW EVENT FROM " + request.getRequestURI());

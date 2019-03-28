@@ -1,6 +1,8 @@
 package it.unipd.dstack.butterfly.producer.gitlab;
 
 import it.unipd.dstack.butterfly.config.ConfigManager;
+import it.unipd.dstack.butterfly.producer.gitlab.webhookmanager.GitlabWebhookListener;
+import it.unipd.dstack.butterfly.producer.gitlab.webhookmanager.GitlabWebhookListenerAggregator;
 import it.unipd.dstack.butterfly.producer.producer.Producer;
 import it.unipd.dstack.butterfly.producer.producer.controller.ProducerController;
 import it.unipd.dstack.butterfly.producer.webhookhandler.WebhookHandler;
@@ -15,13 +17,16 @@ public class GitlabProducerController extends ProducerController<Event> {
     private static final Logger logger = LoggerFactory.getLogger(GitlabProducerController.class);
 
     private final String secretToken;
+    private GitlabWebhookListener<Event> gitlabWebhookListener;
     private GitlabWebhookManager gitlabWebhookManager;
 
     public GitlabProducerController(Producer<Event> producer) {
         super(producer, WebhookHandler.HTTPMethod.POST);
 
         this.secretToken = ConfigManager.getStringProperty("SECRET_TOKEN");
-        this.gitlabWebhookManager = new GitlabWebhookManager(this.secretToken, this.onWebhookEvent);
+
+        this.gitlabWebhookListener = new GitlabWebhookListenerAggregator<>(this.onWebhookEvent);
+        this.gitlabWebhookManager = new GitlabWebhookManager(this.secretToken, this.gitlabWebhookListener);
     }
 
     /**
@@ -60,6 +65,6 @@ public class GitlabProducerController extends ProducerController<Event> {
      */
     @Override
     public void onWebhookRequest(HttpServletRequest request) {
-        this.gitlabWebhookManager.handleEvent(request);
+        this.gitlabWebhookManager.onNewGitlabEvent(request);
     }
 }

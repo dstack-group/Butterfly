@@ -18,6 +18,10 @@ public abstract class ProducerController<V> implements Controller {
     private final String kafkaTopic;
     private final int serverPort;
     private final String webhookEndpoint;
+
+    /**
+     * This must be estracted somehow
+     */
     protected final OnWebhookEvent<V> onWebhookEvent;
     private final WebhookHandler webhookHandler;
 
@@ -32,7 +36,7 @@ public abstract class ProducerController<V> implements Controller {
         this.onWebhookEvent = (V event) -> {
             logger.info(serviceName + " Received event: " + event.toString());
             Record<V> record = new Record<>(kafkaTopic, event);
-            this.producer.send(record);
+            return this.producer.send(record);
         };
 
         this.webhookHandler = new WebhookHandler.Builder()
