@@ -16,4 +16,44 @@ public class Issue {
     private User author;
 
     private User assignee;
+
+    public long getId() {
+        return id;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public int getDoneRatio() {
+        return doneRatio;
+    }
+
+    public int getEstimatedHours() {
+        return estimatedHours;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public SimpleEntity getStatus() {
+        return status;
+    }
+
+    public SimpleEntity getTracker() {
+        return tracker;
+    }
+
+    public SimpleEntity getPriority() {
+        return priority;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public User getAssignee() {
+        return assignee;
+    }
 }

@@ -1,8 +1,10 @@
 package it.unipd.dstack.butterfly.producer.redmine;
 
-import it.unipd.dstack.butterfly.config.ConfigManager;
 import it.unipd.dstack.butterfly.producer.producer.Producer;
 import it.unipd.dstack.butterfly.producer.producer.controller.ProducerController;
+import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.RedmineWebhookListener;
+import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.RedmineWebhookListenerAggregator;
+import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.RedmineWebhookManager;
 import it.unipd.dstack.butterfly.producer.webhookhandler.WebhookHandler;
 import it.unipd.dstack.butterfly.producer.avro.Event;
 import org.slf4j.Logger;
@@ -13,20 +15,14 @@ import javax.servlet.http.HttpServletRequest;
 public class RedmineProducerController extends ProducerController<Event> {
     private static final Logger logger = LoggerFactory.getLogger(RedmineProducerController.class);
 
-    private final String secretToken;
-    /*
-    private GitlabWebhookListener<Event> gitlabWebhookListener;
-    private GitlabWebhookManager gitlabWebhookManager;
-    */
+    private RedmineWebhookListener<Event> redmineWebhookListener;
+    private RedmineWebhookManager redmineWebhookManager;
 
     public RedmineProducerController(Producer<Event> producer) {
         super(producer, WebhookHandler.HTTPMethod.POST);
 
-        this.secretToken = ConfigManager.getStringProperty("SECRET_TOKEN");
-        /*
-        this.gitlabWebhookListener = new GitlabWebhookListenerAggregator<>(this.onWebhookEvent);
-        this.gitlabWebhookManager = new GitlabWebhookManager(this.secretToken, this.gitlabWebhookListener);
-        */
+        this.redmineWebhookListener = new RedmineWebhookListenerAggregator<>(this.onWebhookEvent);
+        this.redmineWebhookManager = new RedmineWebhookManager(this.redmineWebhookListener);
     }
 
     /**
@@ -35,7 +31,7 @@ public class RedmineProducerController extends ProducerController<Event> {
     @Override
     protected void releaseResources() {
         // removes listeners from gitlabWebhookManager
-        // this.gitlabWebhookManager.close();
+        this.redmineWebhookManager.close();
     }
 
     /**
@@ -66,6 +62,6 @@ public class RedmineProducerController extends ProducerController<Event> {
      */
     @Override
     public void onWebhookRequest(HttpServletRequest request) {
-        // this.gitlabWebhookManager.onNewGitlabEvent(request);
+        this.redmineWebhookManager.onNewRedmineEvent(request);
     }
 }

@@ -1,7 +1,6 @@
 package it.unipd.dstack.butterfly.producer.redmine.webhookmanager;
 
 import it.unipd.dstack.butterfly.producer.avro.Event;
-import it.unipd.dstack.butterfly.producer.producer.OnWebhookEvent;
 import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.RedmineWebhookClient;
 import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.WebhookListener;
 import org.slf4j.Logger;
@@ -13,15 +12,22 @@ public class RedmineWebhookManager {
     private static final Logger logger = LoggerFactory.getLogger(RedmineWebhookManager.class);
 
     private final RedmineWebhookClient webHookManager;
-    // private final WebhookListener webHookListener;
+    private final WebhookListener webHookListener;
 
-    public RedmineWebhookManager(OnWebhookEvent<Event> listener) {
+    public RedmineWebhookManager(RedmineWebhookListener<Event> listener) {
         webHookManager = new RedmineWebhookClient();
-        // webHookManager.addListener(this.webHookListener);
+        this.webHookListener = new RedmineWebhookListenerObserver(listener);
+        webHookManager.addListener(this.webHookListener);
     }
 
-    public void handleEvent(HttpServletRequest request) throws RedmineWebhookException {
-
+    public void onNewRedmineEvent(HttpServletRequest request) throws RedmineWebhookException {
+        try {
+            webHookManager.handleEvent(request);
+            logger.info("NEW EVENT FROM " + request.getRequestURI());
+        } catch (RedmineWebhookException exception) {
+            logger.error("GITLAB API EXCEPTION " + exception.getStackTrace());
+            throw exception;
+        }
     }
 
     /**
@@ -29,6 +35,6 @@ public class RedmineWebhookManager {
      */
     public void close() {
         logger.info("CALLING CLOSE()");
-        // webHookManager.removeListener(this.webHookListener);
+        webHookManager.removeListener(this.webHookListener);
     }
 }
