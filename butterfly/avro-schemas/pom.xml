@@ -11,8 +11,6 @@
 
     <groupId>it.unipd.dstack.butterfly.producer.avro-schemas</groupId>
     <artifactId>avro-schemas</artifactId>
-    <version>1.0-SNAPSHOT</version>
-
     <build>
         <plugins>
             <plugin>

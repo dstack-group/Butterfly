@@ -31,8 +31,6 @@
 
     <groupId>it.unipd.dstack.butterfly.consumer</groupId>
     <artifactId>consumer</artifactId>
-    <version>1.0-SNAPSHOT</version>
-
     <name>consumer</name>
     <!-- FIXME change it to the project's website
     <url>http://www.example.com</url>
