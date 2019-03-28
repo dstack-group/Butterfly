@@ -2,19 +2,30 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <artifactId>butterfly</artifactId>
         <groupId>it.unipd.dstack.butterfly</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>it.unipd.dstack.butterfly.config</groupId>
-    <artifactId>config</artifactId>
+    <groupId>it.unipd.dstack.butterfly.common</groupId>
+    <artifactId>common</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <name>config</name>
     <!-- FIXME change it to the project's website
     <url>http://www.example.com</url>
      -->
+
+    <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+    <dependencies>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.5</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
 </project>

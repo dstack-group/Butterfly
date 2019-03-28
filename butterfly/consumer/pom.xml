@@ -5,8 +5,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>it.unipd.dstack.butterfly.config</groupId>
-            <artifactId>config</artifactId>
+            <groupId>it.unipd.dstack.butterfly.common</groupId>
+            <artifactId>common</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

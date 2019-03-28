@@ -49,7 +49,7 @@
     <modules>
         <module>producer</module>
         <module>consumer</module>
-        <module>config</module>
+        <module>common</module>
         <module>gitlab-producer</module>
         <module>redmine-producer</module>
         <module>sonarqube-producer</module>

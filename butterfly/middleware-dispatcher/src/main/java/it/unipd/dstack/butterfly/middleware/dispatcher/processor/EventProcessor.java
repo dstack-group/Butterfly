@@ -1,9 +1,8 @@
 package it.unipd.dstack.butterfly.middleware.dispatcher.processor;
 
 import it.unipd.dstack.butterfly.middleware.dispatcher.utils.Utils;
-import it.unipd.dstack.butterfly.middleware.json.JSONConverter;
-import it.unipd.dstack.butterfly.middleware.json.JSONConverterException;
-import it.unipd.dstack.butterfly.middleware.json.JSONConverterImpl;
+import it.unipd.dstack.butterfly.json.JSONConverter;
+import it.unipd.dstack.butterfly.json.JSONConverterException;
 import org.apache.avro.specific.SpecificRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

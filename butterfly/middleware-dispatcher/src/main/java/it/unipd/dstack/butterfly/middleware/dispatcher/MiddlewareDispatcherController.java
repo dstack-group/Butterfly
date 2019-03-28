@@ -10,7 +10,7 @@ import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponse
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponseData;
 import it.unipd.dstack.butterfly.middleware.dispatcher.processor.EventProcessor;
 import it.unipd.dstack.butterfly.middleware.dispatcher.utils.Utils;
-import it.unipd.dstack.butterfly.middleware.json.JSONConverterImpl;
+import it.unipd.dstack.butterfly.json.JSONConverterImpl;
 import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.producer.producer.Producer;
 import org.apache.avro.AvroRuntimeException;

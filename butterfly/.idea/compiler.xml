@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="avro-schemas" />
+        <module name="common" />
         <module name="config" />
         <module name="consumer" />
         <module name="email-consumer" />
@@ -19,6 +20,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="common" target="1.11" />
       <module name="telegram-consumer-old" target="1.11" />
     </bytecodeTargetLevel>
   </component>
