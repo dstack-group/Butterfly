@@ -1,0 +1,79 @@
+version: '3.5'
+
+services:
+  zookeepertest:
+    build:
+      context: ./zookeeper
+    hostname: zookeepertest
+    container_name: zookeeper-test
+    restart: always
+    ports:
+      - 2182:2182
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2182
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: 'zookeepertest:22889:23889'
+    volumes:
+      - zookeeper-data:/data
+      - zookeeper-datalog:/datalog
+    networks:
+      - kafka-network-test
+
+  kafkatest:
+    # Exposes 29093 for external connections to the broker
+    # Use kafka:9093 for connections internal on the docker network
+    # See https://rmoff.net/2018/08/02/kafka-listeners-explained/ for details
+    build:
+      context: ./kafka
+    hostname: kafkatest
+    container_name: kafka-test
+    restart: always
+    depends_on:
+      - zookeepertest
+    ports:
+      - 29093:29093
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_LOG4J_LOGGERS: 'kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO'
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeepertest:2182'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafkatest:9093,PLAINTEXT_HOST://localhost:29093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      # KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_SCHEMA_REGISTRY_URL: 'schema-registrytest:8083'
+      KAFKA_LOG_DIRS: /kafka/kafka-logs-2
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    networks:
+      - kafka-network-test
+
+  schema-registrytest:
+    build:
+      context: ./schema-registry
+    hostname: schema-registry-test
+    container_name: schema-registry-test
+    restart: always
+    depends_on:
+      - zookeepertest
+    ports:
+      - 18083:8083
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeepertest:2182'
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_LISTENERS: 'http://schema-registry-test:8083'
+    networks:
+      - kafka-network-test
+      
+volumes:
+  zookeeper-data:
+  zookeeper-datalog:
+  kafka-data:
+
+networks:
+  kafka-network-test:
+    name: kafka-network-test
