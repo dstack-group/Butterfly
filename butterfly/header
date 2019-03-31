@@ -1,27 +1,19 @@
-/**
- * @project: Butterfly
- * @author: DStack
- * @package: Nome del package
- * @fileName: Nome del file
- * @created: YYYY-MM-DD
- *
- * --------------------------------------------------------------------------------------------
- * Copyright (c) 2019 DStack Group.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * --------------------------------------------------------------------------------------------
- *
- * @description: breve descrizione del file
- * @changelog:
- * | Date       | Author                 | Commit message
- * | -----------+------------------------+-----------------------------------------------------
- * | YYYY-MM-DD | Lastname Firstname     + Brief but complete description about the edits of
- * |            |                        + the current class
- */
-
- ^package
-
- ^import
-
 ^/\*\*
-^ \*([^/]|$)
+^ \* @project: Butterfly
+^ \* @author: DStack
+^ \* @module: ([a-zA_Z][\\.\\w]*)
+^ \* @fileName: ([A-Z][a-z0-9]+)+[.](java)
+^ \* @created: \d\d\d\d-\d\d-\d\d
+^ \*
+^ \* --------------------------------------------------------------------------------------------
+^ \* Copyright [(]c[)] 2019 DStack Group.
+^ \* Licensed under the MIT License[.] See License.txt in the project root for license information[.]
+^ \* --------------------------------------------------------------------------------------------
+^ \*
+^ \* @description: [\\.\\w]*
+^ \* [\\.\\w]*
 ^ \*/
+
+^package
+
+^import

@@ -1,3 +1,20 @@
+/**
+ * @project: Butterfly
+ * @author: DStack
+ * @module: it.unipd.dstack.butterfly.config
+ * @fileName: ConfigManager.java
+ * @created: 2019-02-08
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description: ConfigManager is responsible of reading the configuration variables
+ * from environment. It also allows to specify the return type and a default value in
+ * case the variable isn't available in the system.
+ */
+
 package it.unipd.dstack.butterfly.config;
 
 import java.util.Optional;

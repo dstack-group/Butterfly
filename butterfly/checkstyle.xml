@@ -81,8 +81,9 @@
         <property name="eachLine" value="true"/>
         <property name="fileExtensions" value="java"/>
     </module>
-    <module name="Header">
+    <module name="RegexpHeader">
         <property name="headerFile" value="./header"/>
         <property name="fileExtensions" value="java"/>
+        <property name="multiLines" value="14, 19"/>
     </module>
 </module>

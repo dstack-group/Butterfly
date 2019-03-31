@@ -162,5 +162,23 @@
         "doc": "Avro Schema which contains the user info, the preferred contact platform and a contact ID"
       }
     ]
+  },
+  {
+    "namespace": "it.unipd.dstack.butterfly.consumer.avro",
+    "type": "record",
+    "name": "EmailWithContactRef",
+    "doc": "Avro Schema that aggregates the event to notify to the user, and the contact info of said user",
+    "fields": [
+      {
+        "name": "email",
+        "type": "string",
+        "doc": ""
+      },
+      {
+        "name": "contactRef",
+        "type": "string",
+        "doc": "The ID that identifies the user in the chosen contact platform"
+      }
+    ]
   }
 ]

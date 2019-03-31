@@ -11,11 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * GitlabWebhookListenerAggregator is a concrete implementation of the third-party interface WebHookListener.
+ * GitlabWebhookListenerObserver is a concrete implementation of the third-party interface WebHookListener.
  * Each time an event is fired, it converts it into an Event object that the given GitlabWebhookListener instance
  * is able to understand.
  */
-public class GitlabWebhookListenerObserver implements WebHookListener {
+class GitlabWebhookListenerObserver implements WebHookListener {
     private static final Logger logger = LoggerFactory.getLogger(GitlabWebhookListenerObserver.class);
 
     private final GitlabWebhookListener<Event> listener;
