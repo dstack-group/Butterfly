@@ -1,4 +1,4 @@
-package it.unipd.dstack.butterfly.json;
+package it.unipd.dstack.butterfly.common.json;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;

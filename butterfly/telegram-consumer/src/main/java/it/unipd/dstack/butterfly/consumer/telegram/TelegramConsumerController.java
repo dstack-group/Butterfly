@@ -1,6 +1,7 @@
 package it.unipd.dstack.butterfly.consumer.telegram;
 
-import it.unipd.dstack.butterfly.config.record.Record;
+import it.unipd.dstack.butterfly.common.config.ConfigManager;
+import it.unipd.dstack.butterfly.common.record.Record;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerFactory;
 import it.unipd.dstack.butterfly.consumer.consumer.controller.ConsumerController;
@@ -22,10 +23,11 @@ public class TelegramConsumerController extends ConsumerController<EventWithUser
     private final TelegramBot bot;
     private final FormatStrategy<EventWithUserContact> formatStrategy;
 
-    public TelegramConsumerController(ConsumerFactory<EventWithUserContact> consumerFactory,
+    public TelegramConsumerController(ConfigManager configManager,
+                                      ConsumerFactory<EventWithUserContact> consumerFactory,
                                       TelegramBot bot,
                                       FormatStrategy<EventWithUserContact> formatStrategy) {
-        super(consumerFactory);
+        super(configManager, consumerFactory);
         this.bot = bot;
         this.formatStrategy = formatStrategy;
     }

@@ -1,4 +1,4 @@
-package it.unipd.dstack.butterfly.middleware.dispatcher.processor;
+package it.unipd.dstack.butterfly.common.eventprocessor;
 
 public class UnprocessableEventException extends RuntimeException {
     public UnprocessableEventException(RuntimeException e) {

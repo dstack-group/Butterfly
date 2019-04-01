@@ -1,6 +1,5 @@
 package it.unipd.dstack.butterfly.consumer.telegram.telegrambot;
 
-import it.unipd.dstack.butterfly.config.ConfigManager;
 import it.unipd.dstack.butterfly.consumer.consumer.message.MessageSender;
 import it.unipd.dstack.butterfly.consumer.telegram.message.TelegramMessage;
 import org.slf4j.Logger;
@@ -20,9 +19,9 @@ public class TelegramBot extends TelegramLongPollingBot implements MessageSender
     private final String token;
     private final String botName;
 
-    public TelegramBot() {
-        this.token = ConfigManager.getStringProperty("TELEGRAM_TOKEN", "577704603:AAFWyfXNdZOXx8nx0y9jo-lIPljvSDvUyYY");
-        this.botName = ConfigManager.getStringProperty("TELEGRAM_BOT_NAME", "ProtoTelegramBot");
+    public TelegramBot(String token, String botName) {
+        this.token = token;
+        this.botName = botName;
     }
 
     public String getBotUsername() {

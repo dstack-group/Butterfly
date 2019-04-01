@@ -1,5 +1,6 @@
 package it.unipd.dstack.butterfly.producer.redmine;
 
+import it.unipd.dstack.butterfly.common.config.ConfigManager;
 import it.unipd.dstack.butterfly.producer.producer.OnWebhookEventFromTopic;
 import it.unipd.dstack.butterfly.producer.producer.Producer;
 import it.unipd.dstack.butterfly.producer.producer.controller.ProducerController;
@@ -19,8 +20,12 @@ public class RedmineProducerController extends ProducerController<Event> {
     private RedmineWebhookListener<Event> redmineWebhookListener;
     private RedmineWebhookManager redmineWebhookManager;
 
-    public RedmineProducerController(Producer<Event> producer, OnWebhookEventFromTopic<Event> onWebhookEventFromTopic) {
-        super(producer, onWebhookEventFromTopic, WebhookHandler.HTTPMethod.POST);
+    public RedmineProducerController(
+            ConfigManager configManager,
+            Producer<Event> producer,
+            OnWebhookEventFromTopic<Event> onWebhookEventFromTopic
+    ) {
+        super(configManager, producer, onWebhookEventFromTopic, WebhookHandler.HTTPMethod.POST);
 
         this.redmineWebhookListener = new RedmineWebhookListenerAggregator<>(this.onWebhookEvent);
         this.redmineWebhookManager = new RedmineWebhookManager(this.redmineWebhookListener);

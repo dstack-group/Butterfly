@@ -5,7 +5,7 @@ import it.unipd.dstack.butterfly.consumer.avro.UserSingleContact;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserContact;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponseData;
 import it.unipd.dstack.butterfly.producer.avro.Event;
-import it.unipd.dstack.butterfly.config.record.Record;
+import it.unipd.dstack.butterfly.common.record.Record;
 import org.apache.avro.specific.SpecificRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,17 +47,6 @@ public final class Utils {
                             });
                     return eventWithUserContactStream;
                 }).collect(Collectors.toList());
-    }
-
-    /**
-     * Given an Avro record, it returns its JSON representation encoded as a String.
-     *
-     * @param avroRecord The Avro record to be converted to JSON
-     * @param <T>        The type of avroRecord
-     * @return JSON version of avroRecord
-     */
-    public static <T extends SpecificRecord> String getJSONFromAvro(T avroRecord) {
-        return avroRecord.toString();
     }
 
     /**

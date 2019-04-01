@@ -1,4 +1,4 @@
-package it.unipd.dstack.butterfly.config.record;
+package it.unipd.dstack.butterfly.common.record;
 
 /**
  * Object that stores the topic in which the data should be sent, and the data itself

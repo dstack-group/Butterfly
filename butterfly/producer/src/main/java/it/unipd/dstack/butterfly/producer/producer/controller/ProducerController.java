@@ -1,7 +1,7 @@
 package it.unipd.dstack.butterfly.producer.producer.controller;
 
-import it.unipd.dstack.butterfly.config.ConfigManager;
-import it.unipd.dstack.butterfly.config.controller.Controller;
+import it.unipd.dstack.butterfly.common.config.ConfigManager;
+import it.unipd.dstack.butterfly.common.controller.Controller;
 import it.unipd.dstack.butterfly.producer.producer.OnWebhookEvent;
 import it.unipd.dstack.butterfly.producer.producer.OnWebhookEventFromTopic;
 import it.unipd.dstack.butterfly.producer.producer.Producer;
@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 public abstract class ProducerController<V> implements Controller {
     private static final Logger logger = LoggerFactory.getLogger(ProducerController.class);
 
+    protected final ConfigManager configManager;
     protected final String serviceName;
     private final String kafkaTopic;
     private final int serverPort;
@@ -25,14 +26,16 @@ public abstract class ProducerController<V> implements Controller {
     private Producer<V> producer;
 
     public ProducerController(
+            ConfigManager configManager,
             Producer<V> producer,
             OnWebhookEventFromTopic<V> onWebhookEventFromTopic,
             WebhookHandler.HTTPMethod httpMethod
     ) {
-        this.serviceName = ConfigManager.getStringProperty("SERVICE_NAME");
-        this.kafkaTopic = ConfigManager.getStringProperty("KAFKA_TOPIC");
-        this.serverPort = ConfigManager.getIntProperty("SERVER_PORT");
-        this.webhookEndpoint = ConfigManager.getStringProperty("WEBHOOK_ENDPOINT");
+        this.configManager = configManager;
+        this.serviceName = configManager.getStringProperty("SERVICE_NAME");
+        this.kafkaTopic = configManager.getStringProperty("KAFKA_TOPIC");
+        this.serverPort = configManager.getIntProperty("SERVER_PORT");
+        this.webhookEndpoint = configManager.getStringProperty("WEBHOOK_ENDPOINT");
 
         this.onWebhookEvent = (V event) -> {
             logger.info(serviceName + " Received event: " + event.toString());

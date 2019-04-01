@@ -1,7 +1,8 @@
 package it.unipd.dstack.butterfly.producer.producer;
 
-import it.unipd.dstack.butterfly.config.KafkaPropertiesFactory;
-import it.unipd.dstack.butterfly.config.record.Record;
+import it.unipd.dstack.butterfly.common.config.ConfigManager;
+import it.unipd.dstack.butterfly.common.config.KafkaPropertiesFactory;
+import it.unipd.dstack.butterfly.common.record.Record;
 import it.unipd.dstack.butterfly.producer.utils.ProducerUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -20,11 +21,12 @@ public class ProducerImpl<V> implements Producer<V> {
     private KafkaProducer<String, V> kafkaProducer;
     private CountDownLatch latch = new CountDownLatch(1);
 
-    public ProducerImpl() {
-        this.kafkaProducer = kafkaProducerFactory(KafkaPropertiesFactory.defaultKafkaProducerPropertiesFactory());
+    public ProducerImpl(ConfigManager configManager) {
+        this.kafkaProducer = kafkaProducerFactory(configManager);
     }
 
-    private static <K, V> KafkaProducer<K, V> kafkaProducerFactory(Properties properties) {
+    private static <K, V> KafkaProducer<K, V> kafkaProducerFactory(ConfigManager configManager) {
+        Properties properties = KafkaPropertiesFactory.defaultKafkaProducerPropertiesFactory(configManager);
         return new KafkaProducer<>(properties);
     }
 

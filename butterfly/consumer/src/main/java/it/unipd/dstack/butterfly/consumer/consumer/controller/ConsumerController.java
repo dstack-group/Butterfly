@@ -1,8 +1,8 @@
 package it.unipd.dstack.butterfly.consumer.consumer.controller;
 
-import it.unipd.dstack.butterfly.config.ConfigManager;
-import it.unipd.dstack.butterfly.config.controller.Controller;
-import it.unipd.dstack.butterfly.config.record.Record;
+import it.unipd.dstack.butterfly.common.config.ConfigManager;
+import it.unipd.dstack.butterfly.common.controller.Controller;
+import it.unipd.dstack.butterfly.common.record.Record;
 import it.unipd.dstack.butterfly.consumer.consumer.Consumer;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerFactory;
 import it.unipd.dstack.butterfly.consumer.utils.ConsumerUtils;
@@ -14,18 +14,24 @@ import java.util.List;
 public abstract class ConsumerController<T> implements Controller {
     private static final Logger logger = LoggerFactory.getLogger(ConsumerController.class);
 
+    protected final ConfigManager configManager;
     protected final String serviceName;
     protected final List<String> topicList;
     protected final Consumer consumer;
 
-    public ConsumerController(ConsumerFactory<T> consumerFactory) {
-        this(consumerFactory, ConsumerUtils.getListFromSingleton(ConfigManager.getStringProperty("KAFKA_TOPIC")));
+    public ConsumerController(ConfigManager configManager, ConsumerFactory<T> consumerFactory) {
+        this(
+                configManager,
+                consumerFactory,
+                ConsumerUtils.getListFromSingleton(configManager.getStringProperty("KAFKA_TOPIC"))
+        );
     }
 
-    public ConsumerController(ConsumerFactory<T> consumerFactory, List<String> topicList) {
-        this.serviceName = ConfigManager.getStringProperty("SERVICE_NAME");
+    public ConsumerController(ConfigManager configManager, ConsumerFactory<T> consumerFactory, List<String> topicList) {
+        this.configManager = configManager;
+        this.serviceName = configManager.getStringProperty("SERVICE_NAME");
         this.topicList = topicList;
-        this.consumer = consumerFactory.createConsumer(this::onMessageConsume, topicList);
+        this.consumer = consumerFactory.createConsumer(configManager, this::onMessageConsume, topicList);
 
         /**
          * Graceful shutdown

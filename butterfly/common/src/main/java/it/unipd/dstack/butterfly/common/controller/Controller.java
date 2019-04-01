@@ -1,4 +1,4 @@
-package it.unipd.dstack.butterfly.config.controller;
+package it.unipd.dstack.butterfly.common.controller;
 
 public interface Controller {
     /**

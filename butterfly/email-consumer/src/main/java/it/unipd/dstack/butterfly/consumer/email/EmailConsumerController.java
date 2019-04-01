@@ -1,7 +1,7 @@
 package it.unipd.dstack.butterfly.consumer.email;
 
-import it.unipd.dstack.butterfly.config.ConfigManager;
-import it.unipd.dstack.butterfly.config.record.Record;
+import it.unipd.dstack.butterfly.common.config.ConfigManager;
+import it.unipd.dstack.butterfly.common.record.Record;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerFactory;
 import it.unipd.dstack.butterfly.consumer.consumer.controller.ConsumerController;
@@ -19,13 +19,16 @@ public class EmailConsumerController extends ConsumerController<EventWithUserCon
     private final EmailSender emailSender;
     private final FormatStrategy<EventWithUserContact> formatStrategy;
 
-    public EmailConsumerController(ConsumerFactory<EventWithUserContact> consumerFactory,
-                                   FormatStrategy<EventWithUserContact> formatStrategy) {
-        super(consumerFactory);
+    public EmailConsumerController(
+            ConfigManager configManager,
+            ConsumerFactory<EventWithUserContact> consumerFactory,
+           FormatStrategy<EventWithUserContact> formatStrategy
+    ) {
+        super(configManager, consumerFactory);
 
-        String emailServer = ConfigManager.getStringProperty("EMAIL_SERVER");
-        String emailAddress = ConfigManager.getStringProperty("EMAIL_ADDRESS");
-        String password = ConfigManager.getStringProperty("EMAIL_PASSWORD");
+        String emailServer = configManager.getStringProperty("EMAIL_SERVER");
+        String emailAddress = configManager.getStringProperty("EMAIL_ADDRESS");
+        String password = configManager.getStringProperty("EMAIL_PASSWORD");
 
         this.emailSender = new EmailSender(emailServer, emailAddress, password);
         this.formatStrategy = formatStrategy;

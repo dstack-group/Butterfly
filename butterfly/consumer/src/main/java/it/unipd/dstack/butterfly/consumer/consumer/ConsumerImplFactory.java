@@ -1,5 +1,7 @@
 package it.unipd.dstack.butterfly.consumer.consumer;
 
+import it.unipd.dstack.butterfly.common.config.ConfigManager;
+
 import java.util.List;
 
 public class ConsumerImplFactory<T> implements ConsumerFactory<T> {
@@ -10,8 +12,11 @@ public class ConsumerImplFactory<T> implements ConsumerFactory<T> {
      * @return
      */
     @Override
-    public Consumer createConsumer(OnConsumedMessage<T> onConsumedMessage, List<String> topicList) {
-        var consumer = new ConsumerImpl<>(onConsumedMessage);
+    public Consumer createConsumer(
+            ConfigManager configManager,
+            OnConsumedMessage<T> onConsumedMessage,
+            List<String> topicList) {
+        var consumer = new ConsumerImpl<>(configManager, onConsumedMessage);
         consumer.subscribe(topicList);
         return consumer;
     }

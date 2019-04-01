@@ -1,16 +1,16 @@
 package it.unipd.dstack.butterfly.middleware.dispatcher;
 
-import it.unipd.dstack.butterfly.config.ConfigManager;
-import it.unipd.dstack.butterfly.config.record.Record;
+import it.unipd.dstack.butterfly.common.config.ConfigManager;
+import it.unipd.dstack.butterfly.common.record.Record;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerFactory;
 import it.unipd.dstack.butterfly.consumer.consumer.controller.ConsumerController;
 import it.unipd.dstack.butterfly.consumer.utils.ConsumerUtils;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponse;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponseData;
-import it.unipd.dstack.butterfly.middleware.dispatcher.processor.EventProcessor;
+import it.unipd.dstack.butterfly.common.eventprocessor.EventProcessor;
 import it.unipd.dstack.butterfly.middleware.dispatcher.utils.Utils;
-import it.unipd.dstack.butterfly.json.JSONConverterImpl;
+import it.unipd.dstack.butterfly.common.json.JSONConverterImpl;
 import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.producer.producer.Producer;
 import org.apache.avro.AvroRuntimeException;
@@ -25,9 +25,17 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
     private Producer<EventWithUserContact> producer;
     private EventProcessor eventProcessor;
 
-    MiddlewareDispatcherController(Producer<EventWithUserContact> producer, ConsumerFactory<Event> consumerFactory) {
-        super(consumerFactory, MiddlewareDispatcherController.getKafkaTopicList());
-        this.messageTopicPrefix = ConfigManager.getStringProperty("MESSAGE_TOPIC_PREFIX");
+    MiddlewareDispatcherController(
+            ConfigManager configManager,
+            Producer<EventWithUserContact> producer,
+            ConsumerFactory<Event> consumerFactory
+    ) {
+        super(
+                configManager,
+                consumerFactory,
+                MiddlewareDispatcherController.getKafkaTopicList(configManager.getStringProperty("KAFKA_TOPICS"))
+        );
+        this.messageTopicPrefix = configManager.getStringProperty("MESSAGE_TOPIC_PREFIX");
         this.producer = producer;
 
         this.setupEventProcessor();
@@ -54,8 +62,8 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
         this.producer.close();
     }
 
-    private static List<String> getKafkaTopicList() {
-        return ConsumerUtils.getListFromCommaSeparatedString(ConfigManager.getStringProperty("KAFKA_TOPICS"));
+    private static List<String> getKafkaTopicList(String kafkaTopics) {
+        return ConsumerUtils.getListFromCommaSeparatedString(kafkaTopics);
     }
 
     /**
@@ -63,9 +71,9 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
      * the list of users to notify and their contacts' info.
      */
     private void setupEventProcessor() {
-        String userManagerUrl = ConfigManager.getStringProperty("USER_MANAGER_URL");
-        int userManagerRequestTimeout = ConfigManager.getIntProperty("USER_MANAGER_REQUEST_TIMEOUT_MS");
-        int userManagerThreadsNumber = ConfigManager.getIntProperty("USER_MANAGER_THREADS");
+        String userManagerUrl = this.configManager.getStringProperty("USER_MANAGER_URL");
+        int userManagerRequestTimeout = this.configManager.getIntProperty("USER_MANAGER_REQUEST_TIMEOUT_MS");
+        int userManagerThreadsNumber = this.configManager.getIntProperty("USER_MANAGER_THREADS");
         this.eventProcessor = new EventProcessor.Builder()
                 .setUserManagerURL(userManagerUrl)
                 .setTimeoutInMs(userManagerRequestTimeout)

@@ -1,4 +1,4 @@
-package it.unipd.dstack.butterfly.json;
+package it.unipd.dstack.butterfly.common.json;
 
 import java.util.List;
 

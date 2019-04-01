@@ -18,9 +18,5 @@
         <module name="telegram-consumer" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="common" target="1.11" />
-      <module name="telegram-consumer-old" target="1.11" />
-    </bytecodeTargetLevel>
   </component>
 </project>

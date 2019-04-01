@@ -1,30 +1,41 @@
 package it.unipd.dstack.butterfly.consumer.consumer;
 
-import it.unipd.dstack.butterfly.config.ConfigManager;
-import it.unipd.dstack.butterfly.config.record.Record;
+import it.unipd.dstack.butterfly.common.config.ConfigManager;
+import it.unipd.dstack.butterfly.common.config.KafkaPropertiesFactory;
+import it.unipd.dstack.butterfly.common.record.Record;
 import it.unipd.dstack.butterfly.consumer.utils.ConsumerUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Properties;
 
 public class ConsumerImpl <V> implements Consumer {
     private static final Logger logger = LoggerFactory.getLogger(ConsumerImpl.class);
+
+    private final ConfigManager configManager;
     private List<String> topicList;
     private KafkaConsumer<String, V> kafkaConsumer;
     private final Duration pollDuration;
     private final OnConsumedMessage<V> onConsumedMessage;
     private boolean startConsumer = true;
 
-    public ConsumerImpl(OnConsumedMessage<V> onConsumedMessage) {
+    public ConsumerImpl(ConfigManager configManager, OnConsumedMessage<V> onConsumedMessage) {
+        this.configManager = configManager;
         this.onConsumedMessage = onConsumedMessage;
-        this.kafkaConsumer = ConsumerUtils.createConsumer();
+        this.kafkaConsumer = ConsumerImpl.kafkaConsumerFactory(configManager);
 
-        int pollDurationMs = ConfigManager.getIntProperty("KAFKA_POLL_DURATION_MS", 2000);
+        int pollDurationMs = configManager.getIntProperty("KAFKA_POLL_DURATION_MS", 2000);
         this.pollDuration = Duration.ofMillis(pollDurationMs);
+    }
+
+    private static <K, V> KafkaConsumer<K, V> kafkaConsumerFactory(ConfigManager configManager) {
+        Properties properties = KafkaPropertiesFactory.defaultKafkaConsumerPropertiesFactory(configManager);
+        return new KafkaConsumer<>(properties);
     }
 
     /**

@@ -1,7 +1,7 @@
 package it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient;
 
-import it.unipd.dstack.butterfly.json.JSONConverter;
-import it.unipd.dstack.butterfly.json.JSONConverterImpl;
+import it.unipd.dstack.butterfly.common.json.JSONConverter;
+import it.unipd.dstack.butterfly.common.json.JSONConverterImpl;
 import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.RedmineWebhookException;
 import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.model.*;
 import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.utils.HttpRequestUtils;

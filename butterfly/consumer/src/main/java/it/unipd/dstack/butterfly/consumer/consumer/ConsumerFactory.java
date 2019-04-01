@@ -1,5 +1,7 @@
 package it.unipd.dstack.butterfly.consumer.consumer;
 
+import it.unipd.dstack.butterfly.common.config.ConfigManager;
+
 import java.util.List;
 
 @FunctionalInterface
@@ -9,5 +11,7 @@ public interface ConsumerFactory<T> {
      * @param onConsumedMessage the callback invoked when a new message is read from the broker
      * @return
      */
-    Consumer createConsumer(OnConsumedMessage<T> onConsumedMessage, List<String> topicList);
+    Consumer createConsumer(ConfigManager configManager,
+                            OnConsumedMessage<T> onConsumedMessage,
+                            List<String> topicList);
 }
