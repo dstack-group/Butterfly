@@ -1,29 +1,17 @@
-package it.unipd.dstack.butterfly.common.config;
+package it.unipd.dstack.butterfly.producer.producer;
 
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
-import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
+import it.unipd.dstack.butterfly.common.config.ConfigManager;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Properties;
 
-import static io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
-import static io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG;
-import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG;
-import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
+class KafkaProducerProperties {
+    private KafkaProducerProperties() {}
 
-public class KafkaPropertiesFactory {
-
-    /**
-     * Provides the default property configuration for Apache Kafka.
-     * See https://docs.confluent.io/current/installation/configuration/producer-configs.html
-     *
-     * @return
-     */
-    public static Properties defaultKafkaProducerPropertiesFactory(ConfigManager configManager) {
+    static Properties getProducerProperties(ConfigManager configManager) {
         Properties props = new Properties();
 
         // A list of URLs to use for establishing the initial connection to the cluster.
@@ -89,36 +77,6 @@ public class KafkaPropertiesFactory {
 
         props.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG,
                 configManager.getStringProperty("AVRO_SCHEMA_REGISTRY_URL"));
-
-        return props;
-    }
-
-    public static Properties defaultKafkaConsumerPropertiesFactory(ConfigManager configManager) {
-        Properties props = new Properties();
-
-        // A list of URLs to use for establishing the initial connection to the cluster.
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                configManager.getStringProperty("KAFKA_BOOTSTRAP_SERVERS_CONFIG"));
-        props.put(ConsumerConfig.GROUP_ID_CONFIG,
-                configManager.getStringProperty("KAFKA_GROUP_ID_CONFIG"));
-        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
-                configManager.getStringProperty("KAFKA_AUTO_OFFSET_RESET_CONFIG", "earliest"));
-
-        /**
-         * For the moment this should default to true. this.consumer.commitSync() will throw a
-         * ConcurrentModificationException even if handled in a synchronized block. This will be inspected further
-         * during the RQ phase of the project.
-         */
-        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG,
-                configManager.getBooleanProperty("KAFKA_ENABLE_AUTO_COMMIT_CONFIG", true));
-
-        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG,
-                configManager.getIntProperty("KAFKA_MAX_POLL_RECORDS_CONFIG", 10));
-        props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        props.put(VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getName());
-        props.put(SPECIFIC_AVRO_READER_CONFIG, "true");
-        props.put(SCHEMA_REGISTRY_URL_CONFIG,
-                configManager.getStringProperty("AVRO_SCHEMA_REGISTRY_URL", "http://localhost:8081"));
 
         return props;
     }

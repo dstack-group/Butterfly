@@ -6,6 +6,6 @@ public class ConfigurationUndefinedException extends RuntimeException {
     }
 
     private static String getMessage(String property) {
-        return String.format("The property %s is null, but it should have at least a default value");
+        return String.format("The property %s is null, but it should have at least a default value", property);
     }
 }

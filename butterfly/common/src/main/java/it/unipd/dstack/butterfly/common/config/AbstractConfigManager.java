@@ -5,7 +5,7 @@ import java.util.function.Function;
 
 /**
  * AbstractConfigManager is an abstract class that defines some protected utilities for the classes that
- * will implement the ConfigManager interface.
+ * will implement the ConfigManager interface. It implements the Template Pattern via the readConfigValue method.
  */
 public abstract class AbstractConfigManager implements ConfigManager {
     /**

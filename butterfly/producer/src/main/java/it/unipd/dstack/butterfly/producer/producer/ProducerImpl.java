@@ -1,7 +1,6 @@
 package it.unipd.dstack.butterfly.producer.producer;
 
 import it.unipd.dstack.butterfly.common.config.ConfigManager;
-import it.unipd.dstack.butterfly.common.config.KafkaPropertiesFactory;
 import it.unipd.dstack.butterfly.common.record.Record;
 import it.unipd.dstack.butterfly.producer.utils.ProducerUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -22,11 +21,15 @@ public class ProducerImpl<V> implements Producer<V> {
     private CountDownLatch latch = new CountDownLatch(1);
 
     public ProducerImpl(ConfigManager configManager) {
-        this.kafkaProducer = kafkaProducerFactory(configManager);
+        this.kafkaProducer = createKafkaProducer(configManager);
     }
 
-    private static <K, V> KafkaProducer<K, V> kafkaProducerFactory(ConfigManager configManager) {
-        Properties properties = KafkaPropertiesFactory.defaultKafkaProducerPropertiesFactory(configManager);
+    /**
+     * Provides the default property configuration for Apache Kafka.
+     * See https://docs.confluent.io/current/installation/configuration/producer-configs.html
+     */
+    private static <K, V> KafkaProducer<K, V> createKafkaProducer(ConfigManager configManager) {
+        Properties properties = KafkaProducerProperties.getProducerProperties(configManager);
         return new KafkaProducer<>(properties);
     }
 

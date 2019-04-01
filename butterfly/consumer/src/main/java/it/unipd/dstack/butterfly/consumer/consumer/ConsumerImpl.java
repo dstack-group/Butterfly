@@ -1,12 +1,10 @@
 package it.unipd.dstack.butterfly.consumer.consumer;
 
 import it.unipd.dstack.butterfly.common.config.ConfigManager;
-import it.unipd.dstack.butterfly.common.config.KafkaPropertiesFactory;
 import it.unipd.dstack.butterfly.common.record.Record;
 import it.unipd.dstack.butterfly.consumer.utils.ConsumerUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,14 +25,14 @@ public class ConsumerImpl <V> implements Consumer {
     public ConsumerImpl(ConfigManager configManager, OnConsumedMessage<V> onConsumedMessage) {
         this.configManager = configManager;
         this.onConsumedMessage = onConsumedMessage;
-        this.kafkaConsumer = ConsumerImpl.kafkaConsumerFactory(configManager);
+        this.kafkaConsumer = ConsumerImpl.createKafkaConsumer(configManager);
 
         int pollDurationMs = configManager.getIntProperty("KAFKA_POLL_DURATION_MS", 2000);
         this.pollDuration = Duration.ofMillis(pollDurationMs);
     }
 
-    private static <K, V> KafkaConsumer<K, V> kafkaConsumerFactory(ConfigManager configManager) {
-        Properties properties = KafkaPropertiesFactory.defaultKafkaConsumerPropertiesFactory(configManager);
+    private static <K, V> KafkaConsumer<K, V> createKafkaConsumer(ConfigManager configManager) {
+        Properties properties = KafkaConsumerProperties.defaultKafkaConsumerPropertiesFactory(configManager);
         return new KafkaConsumer<>(properties);
     }
 
