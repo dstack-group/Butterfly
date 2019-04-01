@@ -10,8 +10,6 @@ import it.unipd.dstack.butterfly.consumer.telegram.message.TelegramMessage;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.TelegramBot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 public class TelegramConsumerController extends ConsumerController<EventWithUserContact> {
 
@@ -41,21 +39,11 @@ public class TelegramConsumerController extends ConsumerController<EventWithUser
     protected void onMessageConsume(Record<EventWithUserContact> record) {
         EventWithUserContact eventWithUserContact = record.getData();
         String message = this.formatStrategy.format(eventWithUserContact);
+        String contactRef = eventWithUserContact.getUserContact().getContactRef();
+        Long chatId = Long.valueOf(contactRef);
 
-        // TODO: retrieve from "eventWithUserContact.getUserContact().getContactRef()"
-        Long id = Long.valueOf(50736039);
-
-        logger.info("TelegramConsumer message: " + message);
-
-        TelegramMessage telegramMessage = new TelegramMessage(id.toString(), message);
-        try {
-            bot.sendMessage(telegramMessage);
-        } catch (TelegramApiException e) {
-            logger.error(String.format("Could not sendMessage message with chat_id={0} and content={1} "),
-                    telegramMessage.getRecipient(),
-                    telegramMessage.getContent());
-            logger.error(e.getMessage());
-        }
+        TelegramMessage telegramMessage = new TelegramMessage(contactRef, message);
+        this.bot.sendMessage(telegramMessage);
     }
 
     /**
@@ -63,10 +51,6 @@ public class TelegramConsumerController extends ConsumerController<EventWithUser
      */
     @Override
     protected void releaseResources() {
-        try {
-            this.bot.clearWebhook();
-        } catch (TelegramApiRequestException e) {
-            logger.error("Error releasing Telegram bot: " + e.getStackTrace());
-        }
+        this.bot.close();
     }
 }

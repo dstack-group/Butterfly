@@ -5,36 +5,32 @@ import it.unipd.dstack.butterfly.common.config.EnvironmentConfigManager;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerImplFactory;
 import it.unipd.dstack.butterfly.consumer.telegram.formatstrategy.TelegramFormatStrategy;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.TelegramBot;
+import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.TelegramBotAdapterImpl;
+import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.EmailCommand;
+import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.StartCommand;
+import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.CommandHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.telegram.telegrambots.ApiContextInitializer;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
         ConfigManager configManager = new EnvironmentConfigManager();
-
-        // TODO: move into a TelegramBot class
-        ApiContextInitializer.init();
-
         String token = configManager.getStringProperty("TELEGRAM_TOKEN", "577704603:AAFWyfXNdZOXx8nx0y9jo-lIPljvSDvUyYY");
         String botName = configManager.getStringProperty("TELEGRAM_BOT_NAME", "ProtoTelegramBot");
 
-        TelegramBot bot = new TelegramBot(token, botName);
-        TelegramBotsApi botsApi = new TelegramBotsApi();
-        try {
-            botsApi.registerBot(bot);
-        } catch (TelegramApiRequestException e) {
-            logger.error("TELEGRAM CONSUMER bot error", e.toString());
-        }
+        CommandHandler commandHandler = new CommandHandler();
+        commandHandler.register(new StartCommand());
+        commandHandler.register(new EmailCommand());
+
+        TelegramBot telegramBot = new TelegramBotAdapterImpl(token, botName, commandHandler);
+        telegramBot.init();
 
         TelegramFormatStrategy formatStrategy = new TelegramFormatStrategy();
 
         TelegramConsumerController telegramConsumerController =
-                new TelegramConsumerController(configManager, new ConsumerImplFactory<>(), bot, formatStrategy);
+                new TelegramConsumerController(configManager, new ConsumerImplFactory<>(), telegramBot, formatStrategy);
         telegramConsumerController.start();
     }
 }
