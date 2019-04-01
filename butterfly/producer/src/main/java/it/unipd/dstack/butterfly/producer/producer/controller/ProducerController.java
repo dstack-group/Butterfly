@@ -2,8 +2,8 @@ package it.unipd.dstack.butterfly.producer.producer.controller;
 
 import it.unipd.dstack.butterfly.config.ConfigManager;
 import it.unipd.dstack.butterfly.config.controller.Controller;
-import it.unipd.dstack.butterfly.config.record.Record;
 import it.unipd.dstack.butterfly.producer.producer.OnWebhookEvent;
+import it.unipd.dstack.butterfly.producer.producer.OnWebhookEventFromTopic;
 import it.unipd.dstack.butterfly.producer.producer.Producer;
 import it.unipd.dstack.butterfly.producer.webhookhandler.WebhookHandler;
 import org.slf4j.Logger;
@@ -19,15 +19,16 @@ public abstract class ProducerController<V> implements Controller {
     private final int serverPort;
     private final String webhookEndpoint;
 
-    /**
-     * This must be estracted somehow
-     */
     protected final OnWebhookEvent<V> onWebhookEvent;
     private final WebhookHandler webhookHandler;
 
     private Producer<V> producer;
 
-    public ProducerController(Producer<V> producer, WebhookHandler.HTTPMethod httpMethod) {
+    public ProducerController(
+            Producer<V> producer,
+            OnWebhookEventFromTopic<V> onWebhookEventFromTopic,
+            WebhookHandler.HTTPMethod httpMethod
+    ) {
         this.serviceName = ConfigManager.getStringProperty("SERVICE_NAME");
         this.kafkaTopic = ConfigManager.getStringProperty("KAFKA_TOPIC");
         this.serverPort = ConfigManager.getIntProperty("SERVER_PORT");
@@ -35,8 +36,8 @@ public abstract class ProducerController<V> implements Controller {
 
         this.onWebhookEvent = (V event) -> {
             logger.info(serviceName + " Received event: " + event.toString());
-            Record<V> record = new Record<>(kafkaTopic, event);
-            return this.producer.send(record);
+            return onWebhookEventFromTopic.onEvent(producer, this.kafkaTopic)
+                    .handleEvent(event);
         };
 
         this.webhookHandler = new WebhookHandler.Builder()

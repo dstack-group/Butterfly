@@ -3,6 +3,7 @@ package it.unipd.dstack.butterfly.producer.gitlab;
 import it.unipd.dstack.butterfly.config.ConfigManager;
 import it.unipd.dstack.butterfly.producer.gitlab.webhookmanager.GitlabWebhookListener;
 import it.unipd.dstack.butterfly.producer.gitlab.webhookmanager.GitlabWebhookListenerAggregator;
+import it.unipd.dstack.butterfly.producer.producer.OnWebhookEventFromTopic;
 import it.unipd.dstack.butterfly.producer.producer.Producer;
 import it.unipd.dstack.butterfly.producer.producer.controller.ProducerController;
 import it.unipd.dstack.butterfly.producer.webhookhandler.WebhookHandler;
@@ -20,9 +21,8 @@ public class GitlabProducerController extends ProducerController<Event> {
     private GitlabWebhookListener<Event> gitlabWebhookListener;
     private GitlabWebhookManager gitlabWebhookManager;
 
-    public GitlabProducerController(Producer<Event> producer) {
-        super(producer, WebhookHandler.HTTPMethod.POST);
-
+    public GitlabProducerController(Producer<Event> producer, OnWebhookEventFromTopic<Event> onWebhookEventFromTopic) {
+        super(producer, onWebhookEventFromTopic, WebhookHandler.HTTPMethod.POST);
         this.secretToken = ConfigManager.getStringProperty("SECRET_TOKEN");
 
         this.gitlabWebhookListener = new GitlabWebhookListenerAggregator<>(this.onWebhookEvent);
