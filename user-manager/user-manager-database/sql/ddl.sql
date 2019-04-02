@@ -109,13 +109,13 @@ ALTER SEQUENCE public.project_id_seq OWNED BY public.project.project_id;
 CREATE SEQUENCE public.user_id_seq;
 CREATE TABLE public.user (
 	user_id BIGINT NOT NULL DEFAULT nextval('public.user_id_seq'),
-	username VARCHAR(16) NOT NULL
-        UNIQUE, -- TODO: to remove
+	-- username VARCHAR(16) NOT NULL
+  --      UNIQUE, -- TODO: to remove
 	email VARCHAR(30) NOT NULL
         UNIQUE,
 	firstname VARCHAR(30) NOT NULL,
 	lastname VARCHAR(30) NOT NULL,
-	password VARCHAR(30) NOT NULL, -- TODO: for the future
+	-- password VARCHAR(30) NOT NULL, -- TODO: for the future
 	enabled BOOLEAN DEFAULT true NOT NULL,
 	created TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
 	modified TIMESTAMP WITH TIME ZONE DEFAULT NULL,
@@ -237,8 +237,8 @@ CREATE OR REPLACE VIEW public.v_filtered_users AS (
 		u.email,
 		u.firstname,
 		u.lastname
-	 FROM "user" u
-		 JOIN subscription s ON s.user_id = u.user_id
+	 FROM public.user u
+		 JOIN public.subscription s ON s.user_id = u.user_id
 	WHERE u.enabled = true
 );
 
@@ -428,13 +428,13 @@ BEGIN
 	INSERT INTO public.project(project_id, project_name, project_url) VALUES (3, 'Uber', '{"gitlab": "gitlab.uber.com/uber/uber.git"}');
 	INSERT INTO public.project(project_id, project_name, project_url) VALUES (4, 'Twitter', '{"sonarqube": "sonarqube.twitter.com/twitter/twitter.git", "gitlab": "gitlab.twitter.com/twitter/twitter.git"}');
 
-	INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (1, 'jkomyno', 'alberto.schiabel@gmail.com', 'Alberto', 'Schiabel', 'jkomyno');
-	INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (2, 'federicorispo', 'federico.rispo@gmail.com', 'Federico', 'Rispo', 'federicorispo');
-	INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (3, 'Dogemist', 'enrico.trinco@gmail.com', 'Enrico', 'Trinco', 'Dogemist');
-	INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (4, 'eleonorasignor', 'eleonorasignor@gmail.com', 'Eleonora', 'Signor', 'eleonorasignor');
-	INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (5, 'TheAlchemist97', 'TheAlchemist97@gmail.com', 'Niccolò', 'Vettorello', 'TheAlchemist97');
-	INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (6, 'elton97', 'elton97@gmail.com', 'Elton', 'Stafa', 'elton97');
-	INSERT INTO public.user(user_id, username, email, firstname, lastname, password) VALUES (7, 'singh', 'singh@gmail.com', 'Harwinder', 'Singh', 'singh');
+	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (1, 'alberto.schiabel@gmail.com', 'Alberto', 'Schiabel');
+	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (2, 'federico.rispo@gmail.com', 'Federico', 'Rispo');
+	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (3, 'enrico.trinco@gmail.com', 'Enrico', 'Trinco');
+	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (4, 'eleonorasignor@gmail.com', 'Eleonora', 'Signor');
+	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (5, 'TheAlchemist97@gmail.com', 'Niccolò', 'Vettorello');
+	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (6, 'elton97@gmail.com', 'Elton', 'Stafa');
+	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (7, 'singh@gmail.com', 'Harwinder', 'Singh');
 
 	INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (1, 'TELEGRAM', 'jkomyno');
 	INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (1, 'SLACK', 'jkomyno');
@@ -446,12 +446,13 @@ BEGIN
 	INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (4, 'TELEGRAM', 'mrossi');
 	INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (4, 'EMAIL', 'dstackgroup@gmail.com');
 
-	SELECT public.create_subscription(1, 'Butterfly', 'GITLAB_COMMIT_CREATED', 'TELEGRAM', 'HIGH', array['bug', 'fix', 'close']::text[]);
-	SELECT public.create_subscription(1, 'Butterfly', 'GITLAB_ISSUE_CREATED', 'TELEGRAM', 'HIGH', array[]::text[]);
-	SELECT public.create_subscription(1, 'Butterfly', 'GITLAB_COMMIT_CREATED', 'TELEGRAM', 'HIGH', array[]::text[]);
-	SELECT public.create_subscription(2, 'Amazon', 'GITLAB_ISSUE_CREATED', 'TELEGRAM', 'LOW', array['fix', 'bug', 'resolve']::text[]);
-	SELECT public.create_subscription(3, 'Amazon', 'GITLAB_ISSUE_CREATED', 'TELEGRAM', 'LOW', array['fix', 'bug', 'resolve']::text[]);
-	SELECT public.create_subscription(4, 'Amazon', 'GITLAB_ISSUE_CREATED', 'EMAIL', 'HIGH', array['fix', 'bug', 'revert']::text[]);
+  -- PERFORM is used when we're not interesting in the actual data returned from the called stored function.
+	PERFORM public.create_subscription(1, 'Butterfly', 'GITLAB_COMMIT_CREATED', 'TELEGRAM', 'HIGH', array['bug', 'fix', 'close']::text[]);
+	PERFORM public.create_subscription(1, 'Butterfly', 'GITLAB_ISSUE_CREATED', 'TELEGRAM', 'HIGH', array[]::text[]);
+	PERFORM public.create_subscription(1, 'Butterfly', 'REDMINE_TICKET_CREATED', 'TELEGRAM', 'HIGH', array[]::text[]);
+	PERFORM public.create_subscription(2, 'Amazon', 'GITLAB_ISSUE_CREATED', 'TELEGRAM', 'LOW', array['fix', 'bug', 'resolve']::text[]);
+	PERFORM public.create_subscription(3, 'Amazon', 'GITLAB_ISSUE_CREATED', 'TELEGRAM', 'LOW', array['fix', 'bug', 'resolve']::text[]);
+	PERFORM public.create_subscription(4, 'Amazon', 'GITLAB_ISSUE_CREATED', 'EMAIL', 'HIGH', array['fix', 'bug', 'revert']::text[]);
 
 END;
 $$;
