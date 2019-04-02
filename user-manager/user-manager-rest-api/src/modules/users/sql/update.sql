@@ -1,7 +1,15 @@
 /**
  * Returns the user that matches the given id
  */
-UPDATE ${schema~}.user u
-SET u.firstName = ${firstName},
-    u.lastName = ${lastName}
-WHERE u.user_id = ${userId}
+UPDATE ${schema~}.user
+SET firstname = ${firstName},
+    lastname = ${lastName}
+WHERE user_id = ${userId}
+RETURNING
+    user_id AS "userId",
+    email,
+    firstname,
+    lastname,
+    enabled,
+    created,
+    modified
