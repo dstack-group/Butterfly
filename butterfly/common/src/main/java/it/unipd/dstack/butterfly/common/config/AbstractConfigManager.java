@@ -11,7 +11,7 @@ public abstract class AbstractConfigManager implements ConfigManager {
     /**
      * Reads a value from a configuration resource.
      * @param property
-     * @return
+     * @return the configuration value corresponding to the given property.
      */
     protected abstract String readConfigValue(String property);
 
@@ -145,8 +145,8 @@ public abstract class AbstractConfigManager implements ConfigManager {
         } else {
             // if the variable is set, try to cast it
             try {
-                return mapper.apply(property);
-            } catch (ClassCastException e) {
+                return mapper.apply(propertyValue.get());
+            } catch (ClassCastException | NumberFormatException e) {
                 throw new ConfigurationCastException(property, propertyValue.get(), type);
             }
         }

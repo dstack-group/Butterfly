@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class ProducerController<V> implements Controller {
     private static final Logger logger = LoggerFactory.getLogger(ProducerController.class);
@@ -19,7 +20,7 @@ public abstract class ProducerController<V> implements Controller {
     private final String kafkaTopic;
     private final int serverPort;
     private final String webhookEndpoint;
-
+    private final OnWebhookEventFromTopic<V> onWebhookEventFromTopic;
     protected final OnWebhookEvent<V> onWebhookEvent;
     private final WebhookHandler webhookHandler;
 
@@ -36,12 +37,18 @@ public abstract class ProducerController<V> implements Controller {
         this.kafkaTopic = configManager.getStringProperty("KAFKA_TOPIC");
         this.serverPort = configManager.getIntProperty("SERVER_PORT");
         this.webhookEndpoint = configManager.getStringProperty("WEBHOOK_ENDPOINT");
+        this.onWebhookEventFromTopic = onWebhookEventFromTopic;
 
+        /*
         this.onWebhookEvent = (V event) -> {
             logger.info(serviceName + " Received event: " + event.toString());
             return onWebhookEventFromTopic.onEvent(producer, this.kafkaTopic)
                     .handleEvent(event);
         };
+        */
+
+        // this.onWebhookEvent = onWebhookEventFromTopic.onEvent(producer, this.kafkaTopic);
+        this.onWebhookEvent = new ProducerOnWebhookEvent();
 
         this.webhookHandler = new WebhookHandler.Builder()
                 .setRoute(this.webhookEndpoint)
@@ -102,5 +109,23 @@ public abstract class ProducerController<V> implements Controller {
      */
     protected void releaseResources() {
         // NO-OP if it isn't overridden
+    }
+
+    private class ProducerOnWebhookEvent implements OnWebhookEvent<V> {
+        private OnWebhookEvent<V> onWebhookEvent =
+                onWebhookEventFromTopic.onEvent(producer, ProducerController.this.kafkaTopic);
+
+        /**
+         * This method is called when a WebHook event has been received. The event object has info about the
+         * specific event type and its data.
+         *
+         * @param event
+         */
+        @Override
+        public CompletableFuture<Void> handleEvent(V event) {
+            logger.info(serviceName + " Received event: " + event.toString());
+            return this.onWebhookEvent
+                    .handleEvent(event);
+        }
     }
 }
