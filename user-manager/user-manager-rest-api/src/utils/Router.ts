@@ -1,6 +1,11 @@
-import { Middleware } from 'koa';
+import { Middleware, ParameterizedContext } from 'koa';
 import KoaRouter, { IRouterParamContext } from 'koa-router';
+import { RouteContextReplier } from '../modules/common/router/RouteContextReplier';
+import { KoaRouteContext } from './KoaRouteContext';
 
+export type Context<StateT = any, CustomT = {}> = ParameterizedContext<StateT, CustomT>;
+export type MiddlewareLambda<T> = (context: T, next?: () => Promise<any>) => any;
+// export type Middleware<StateT = any, CustomT = {}> = MiddlewareLambda<Context<StateT, CustomT>>;
 export type Middleware = Middleware;
 
 export type RouteMiddleware<StateT, CustomT> =

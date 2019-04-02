@@ -6,6 +6,7 @@ import { Logger } from '../config/logger';
 import { Database } from '../database';
 import { RoutesInjectionParams } from '../routes/RoutesInjectionParams';
 import { DatabaseConnection } from '@src/database/DatabaseConnection';
+import { RouteContextReplierFactory } from '@src/modules/common/router/RouteContextReplierFactory';
 
 export class Server {
   private app: Koa = new Koa();
@@ -14,11 +15,13 @@ export class Server {
   private database: Database;
   private server?: HTTPServer;
   private logger: Logger;
+  private routeContextReplierFactory: RouteContextReplierFactory;
 
   constructor(config: ServerConfig, databaseConnection: DatabaseConnection) {
     this.config = config;
     this.logger = config.logger;
     this.database = new Database(databaseConnection);
+    this.routeContextReplierFactory = config.routeContextReplierFactory;
   }
 
   createServer() {
@@ -86,6 +89,7 @@ export class Server {
     const injectionParams: RoutesInjectionParams = {
       database: this.database,
       logger: this.logger,
+      routeContextReplierFactory: this.routeContextReplierFactory,
     };
 
     this.config.routersFactory(injectionParams).forEach(router => {

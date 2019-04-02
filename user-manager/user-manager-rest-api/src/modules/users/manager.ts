@@ -1,14 +1,18 @@
 import { User } from './entity';
 import { UserRepository } from './repository';
-import { CreateUser } from './model';
+import { AbstractCRUDManager } from '../common/AbstractCRUDManager';
 
-export class UserManager {
-  private repository: UserRepository;
+export class UserManager extends AbstractCRUDManager<User, any, UserRepository> {
 
   constructor(repository: UserRepository) {
-    this.repository = repository;
+    super(repository);
   }
 
+  findByEmail(user: User): Promise<User> {
+    return this.repository.findByEmail(user);
+  }
+
+  /*
   async findById(id: string): Promise<User> {
     return this.repository.findById(id);
   }
@@ -32,4 +36,5 @@ export class UserManager {
   async list(offset: number, limit: number): Promise<User[]> {
     return this.repository.list(offset, limit);
   }
+  */
 }

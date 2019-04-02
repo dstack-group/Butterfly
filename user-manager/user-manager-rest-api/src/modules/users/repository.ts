@@ -1,8 +1,20 @@
 import { User } from './entity';
 import sqlProvider from './sql';
 import { Database } from '../../database';
-import { CreateUser } from './model';
+import { AbstractCRUDRepository } from '../common/repository/AbstractCRUDRepository';
+import { UserQueryProvider } from './UserQueryProvider';
 
+export class UserRepository extends AbstractCRUDRepository<User, UserQueryProvider> {
+  constructor(database: Database) {
+    super(database, sqlProvider);
+  }
+
+  findByEmail(user: User) {
+    return this.database.one(sqlProvider.findByEmail, user);
+  }
+}
+
+/*
 export class UserRepository {
   private database: Database;
 
@@ -43,3 +55,4 @@ export class UserRepository {
     return await this.database.one(sqlProvider.update, user);
   }
 }
+*/

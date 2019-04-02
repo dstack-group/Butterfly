@@ -1,15 +1,19 @@
 import { getSQLFile } from '../../../utils/getSQLFile';
+import { UserQueryProvider } from '../UserQueryProvider';
 
 const dirName = __dirname;
 
-export = {
+const queryProvider: UserQueryProvider = {
+  // list: sql('./list.sql'),
   create: sql('./create.sql'),
   delete: sql('./delete.sql'),
+  find: sql('find.sql'),
   findByEmail: sql('./findByEmail.sql'),
-  findById: sql('./findById.sql'),
-  list: sql('./list.sql'),
+  findOne: sql('findById.sql'),
   update: sql('./update.sql'),
 };
+
+export default queryProvider;
 
 function sql(relativeFilename: string) {
   return getSQLFile(dirName, relativeFilename);
