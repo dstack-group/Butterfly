@@ -1,5 +1,4 @@
 import pino from 'pino';
-import { config } from './index';
 
 /**
  * General logger contact
@@ -14,16 +13,18 @@ export interface Logger {
  */
 export class Log implements Logger {
   private logger: pino.Logger;
+  private appName: string;
 
-  constructor() {
+  constructor(appName: string) {
+    this.appName = appName;
     this.logger = pino();
   }
 
   error(message: string, ...params: any[]) {
-    this.logger.error(config.name, message, params);
+    this.logger.error(this.appName, message, params);
   }
 
   info(message: string, ...params: any[]) {
-    this.logger.info(config.name, message, params);
+    this.logger.info(this.appName, message, params);
   }
 }
