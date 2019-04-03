@@ -4,10 +4,15 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * AbstractConfigManager is an abstract class that defines some protected utilities for the classes that
- * will implement the ConfigManager interface. It implements the Template Pattern via the readConfigValue method.
+ * AbstractConfigManager is an abstract class that defines the contract for reading configuration properties, setting default values and explicitly
+ * cast them to the following types:
+ * - String;
+ * - Integer;
+ * - Boolean;
+ * It implements the Template Pattern via the readConfigValue method.
+ * In case of errors, an instance of <code>ConfigurationException</code> is thrown.
  */
-public abstract class AbstractConfigManager implements ConfigManager {
+public abstract class AbstractConfigManager {
     /**
      * Reads a value from a configuration resource.
      * @param property
@@ -23,7 +28,6 @@ public abstract class AbstractConfigManager implements ConfigManager {
      * @param property the configuration property name
      * @return the value of the specified configuration variable.
      */
-    @Override
     public String getStringProperty(String property) throws ConfigurationUndefinedException {
         return this.getStringProperty(property, null);
     }
@@ -38,7 +42,6 @@ public abstract class AbstractConfigManager implements ConfigManager {
      * @param defaultProperty
      * @return the value of the specified configuration variable, or defaultProperty if it isn't set.
      */
-    @Override
     public String getStringProperty(String property, String defaultProperty) throws ConfigurationUndefinedException {
         return this
                 .getConfigValue(property, defaultProperty, AbstractConfigManager.stringToStringMapper, String.class);
@@ -54,7 +57,6 @@ public abstract class AbstractConfigManager implements ConfigManager {
      * @param property the configuration property name
      * @return the value of the specified configuration variable.
      */
-    @Override
     public Boolean getBooleanProperty(String property) throws ConfigurationException {
         return this.getBooleanProperty(property, null);
     }
@@ -71,7 +73,6 @@ public abstract class AbstractConfigManager implements ConfigManager {
      * @param defaultProperty
      * @return the value of the specified configuration variable, or defaultProperty if it isn't set.
      */
-    @Override
     public Boolean getBooleanProperty(String property, Boolean defaultProperty) throws ConfigurationException {
         return this
                 .getConfigValue(property, defaultProperty, AbstractConfigManager.stringToBooleanMapper, Boolean.class);
@@ -87,7 +88,6 @@ public abstract class AbstractConfigManager implements ConfigManager {
      * @param property the configuration property name
      * @return the value of the specified configuration variable.
      */
-    @Override
     public Integer getIntProperty(String property) throws ConfigurationException {
         return this.getIntProperty(property, null);
     }
@@ -104,7 +104,6 @@ public abstract class AbstractConfigManager implements ConfigManager {
      * @param defaultProperty
      * @return the value of the specified configuration variable, or defaultProperty if it isn't set.
      */
-    @Override
     public Integer getIntProperty(String property, Integer defaultProperty) throws ConfigurationException {
         return this
                 .getConfigValue(property, defaultProperty, AbstractConfigManager.stringToIntegerMapper, Integer.class);
@@ -129,7 +128,8 @@ public abstract class AbstractConfigManager implements ConfigManager {
      * @param defaultProperty the value to be returned if <code>property</code> is not defined.
      * @param mapper          function used to cast the value of the configuration property to the desired type
      *                        <code>T</code>.
-     * @param type            class name of the destination type, used
+     * @param type            class name of the destination type, only used in case ConfigurationCastException is
+     *                        thrown.
      * @return the value of the variable casted to type <code>T</code>, or <code>defaultProperty</code> if the
      * variable is not defined in the system environment
      */

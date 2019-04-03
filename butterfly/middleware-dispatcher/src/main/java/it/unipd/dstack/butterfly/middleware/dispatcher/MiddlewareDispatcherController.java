@@ -1,6 +1,6 @@
 package it.unipd.dstack.butterfly.middleware.dispatcher;
 
-import it.unipd.dstack.butterfly.common.config.ConfigManager;
+import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
 import it.unipd.dstack.butterfly.common.record.Record;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerFactory;
@@ -26,7 +26,7 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
     private EventProcessor eventProcessor;
 
     MiddlewareDispatcherController(
-            ConfigManager configManager,
+            AbstractConfigManager configManager,
             Producer<EventWithUserContact> producer,
             ConsumerFactory<Event> consumerFactory
     ) {

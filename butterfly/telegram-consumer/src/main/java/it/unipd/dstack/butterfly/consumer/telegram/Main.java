@@ -1,6 +1,6 @@
 package it.unipd.dstack.butterfly.consumer.telegram;
 
-import it.unipd.dstack.butterfly.common.config.ConfigManager;
+import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
 import it.unipd.dstack.butterfly.common.config.EnvironmentConfigManager;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerImplFactory;
 import it.unipd.dstack.butterfly.consumer.telegram.formatstrategy.TelegramFormatStrategy;
@@ -16,7 +16,7 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-        ConfigManager configManager = new EnvironmentConfigManager();
+        AbstractConfigManager configManager = new EnvironmentConfigManager();
         String token = configManager.getStringProperty("TELEGRAM_TOKEN", "577704603:AAFWyfXNdZOXx8nx0y9jo-lIPljvSDvUyYY");
         String botName = configManager.getStringProperty("TELEGRAM_BOT_NAME", "ProtoTelegramBot");
 

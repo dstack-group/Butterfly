@@ -1,6 +1,6 @@
 package it.unipd.dstack.butterfly.consumer.consumer.controller;
 
-import it.unipd.dstack.butterfly.common.config.ConfigManager;
+import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
 import it.unipd.dstack.butterfly.common.controller.Controller;
 import it.unipd.dstack.butterfly.common.record.Record;
 import it.unipd.dstack.butterfly.consumer.consumer.Consumer;
@@ -14,12 +14,12 @@ import java.util.List;
 public abstract class ConsumerController<T> implements Controller {
     private static final Logger logger = LoggerFactory.getLogger(ConsumerController.class);
 
-    protected final ConfigManager configManager;
+    protected final AbstractConfigManager configManager;
     protected final String serviceName;
     protected final List<String> topicList;
     protected final Consumer<T> consumer;
 
-    public ConsumerController(ConfigManager configManager, ConsumerFactory<T> consumerFactory) {
+    public ConsumerController(AbstractConfigManager configManager, ConsumerFactory<T> consumerFactory) {
         this(
                 configManager,
                 consumerFactory,
@@ -27,11 +27,11 @@ public abstract class ConsumerController<T> implements Controller {
         );
     }
 
-    public ConsumerController(ConfigManager configManager, ConsumerFactory<T> consumerFactory, List<String> topicList) {
+    public ConsumerController(AbstractConfigManager configManager, ConsumerFactory<T> consumerFactory, List<String> topicList) {
         this.configManager = configManager;
         this.serviceName = configManager.getStringProperty("SERVICE_NAME");
         this.topicList = topicList;
-        this.consumer = consumerFactory.createConsumer(configManager, this::onMessageConsume, topicList);
+        this.consumer = consumerFactory.createConsumer(configManager, topicList);
 
         this.consumer.addObserver(this::onMessageConsume);
         this.consumer.addObserver(this::onMessageConsumeLog);
@@ -40,10 +40,6 @@ public abstract class ConsumerController<T> implements Controller {
          * Graceful shutdown
          */
         this.gracefulShutdown();
-    }
-
-    private void onMessageConsumeLog(Record<T> record) {
-        logger.info("New record received: " + record.getTopic());
     }
 
     /**
@@ -76,5 +72,9 @@ public abstract class ConsumerController<T> implements Controller {
      */
     protected void releaseResources() {
         // NO-OP if it isn't overridden
+    }
+
+    private void onMessageConsumeLog(Record<T> record) {
+        logger.info("New record received: " + record.getTopic());
     }
 }

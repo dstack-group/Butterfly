@@ -1,6 +1,6 @@
 package it.unipd.dstack.butterfly.producer.gitlab;
 
-import it.unipd.dstack.butterfly.common.config.ConfigManager;
+import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
 import it.unipd.dstack.butterfly.producer.gitlab.webhookmanager.GitlabWebhookListener;
 import it.unipd.dstack.butterfly.producer.gitlab.webhookmanager.GitlabWebhookListenerAggregator;
 import it.unipd.dstack.butterfly.producer.producer.OnWebhookEventFromTopic;
@@ -22,7 +22,7 @@ public class GitlabProducerController extends ProducerController<Event> {
     private GitlabWebhookManager gitlabWebhookManager;
 
     public GitlabProducerController(
-            ConfigManager configManager,
+            AbstractConfigManager configManager,
             Producer<Event> producer,
             OnWebhookEventFromTopic<Event> onWebhookEventFromTopic
     ) {

@@ -1,6 +1,6 @@
 package it.unipd.dstack.butterfly.consumer.email;
 
-import it.unipd.dstack.butterfly.common.config.ConfigManager;
+import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
 import it.unipd.dstack.butterfly.common.record.Record;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerFactory;
@@ -20,7 +20,7 @@ public class EmailConsumerController extends ConsumerController<EventWithUserCon
     private final FormatStrategy<EventWithUserContact> formatStrategy;
 
     public EmailConsumerController(
-            ConfigManager configManager,
+            AbstractConfigManager configManager,
             ConsumerFactory<EventWithUserContact> consumerFactory,
            FormatStrategy<EventWithUserContact> formatStrategy
     ) {

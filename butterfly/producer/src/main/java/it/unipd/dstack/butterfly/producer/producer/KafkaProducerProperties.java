@@ -2,7 +2,7 @@ package it.unipd.dstack.butterfly.producer.producer;
 
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
-import it.unipd.dstack.butterfly.common.config.ConfigManager;
+import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 
@@ -11,7 +11,7 @@ import java.util.Properties;
 class KafkaProducerProperties {
     private KafkaProducerProperties() {}
 
-    static Properties getProducerProperties(ConfigManager configManager) {
+    static Properties getProducerProperties(AbstractConfigManager configManager) {
         Properties props = new Properties();
 
         // A list of URLs to use for establishing the initial connection to the cluster.

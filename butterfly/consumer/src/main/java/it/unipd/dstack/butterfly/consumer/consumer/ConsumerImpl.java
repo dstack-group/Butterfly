@@ -1,6 +1,6 @@
 package it.unipd.dstack.butterfly.consumer.consumer;
 
-import it.unipd.dstack.butterfly.common.config.ConfigManager;
+import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
 import it.unipd.dstack.butterfly.common.record.Record;
 import it.unipd.dstack.butterfly.consumer.utils.ConsumerUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -15,13 +15,13 @@ import java.util.Properties;
 public class ConsumerImpl <V> extends AbstractSubject<V> implements Consumer<V> {
     private static final Logger logger = LoggerFactory.getLogger(ConsumerImpl.class);
 
-    private final ConfigManager configManager;
+    private final AbstractConfigManager configManager;
     private List<String> topicList;
     private KafkaConsumer<String, V> kafkaConsumer;
     private final Duration pollDuration;
     private boolean startConsumer = true;
 
-    public ConsumerImpl(ConfigManager configManager) {
+    public ConsumerImpl(AbstractConfigManager configManager) {
         this.configManager = configManager;
         this.kafkaConsumer = ConsumerImpl.createKafkaConsumer(configManager);
 
@@ -29,13 +29,9 @@ public class ConsumerImpl <V> extends AbstractSubject<V> implements Consumer<V> 
         this.pollDuration = Duration.ofMillis(pollDurationMs);
     }
 
-    private static <K, V> KafkaConsumer<K, V> createKafkaConsumer(ConfigManager configManager) {
+    private static <K, V> KafkaConsumer<K, V> createKafkaConsumer(AbstractConfigManager configManager) {
         Properties properties = KafkaConsumerProperties.defaultKafkaConsumerPropertiesFactory(configManager);
         return new KafkaConsumer<>(properties);
-    }
-
-    public void addOnConsumedMessageObserver(Observer<V> observer) {
-        super.addObserver(observer);
     }
 
     /**
