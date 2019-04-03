@@ -12,19 +12,17 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Properties;
 
-public class ConsumerImpl <V> implements Consumer {
+public class ConsumerImpl <V> extends AbstractSubject<V> implements Consumer<V> {
     private static final Logger logger = LoggerFactory.getLogger(ConsumerImpl.class);
 
     private final ConfigManager configManager;
     private List<String> topicList;
     private KafkaConsumer<String, V> kafkaConsumer;
     private final Duration pollDuration;
-    private final OnConsumedMessage<V> onConsumedMessage;
     private boolean startConsumer = true;
 
-    public ConsumerImpl(ConfigManager configManager, OnConsumedMessage<V> onConsumedMessage) {
+    public ConsumerImpl(ConfigManager configManager) {
         this.configManager = configManager;
-        this.onConsumedMessage = onConsumedMessage;
         this.kafkaConsumer = ConsumerImpl.createKafkaConsumer(configManager);
 
         int pollDurationMs = configManager.getIntProperty("KAFKA_POLL_DURATION_MS", 2000);
@@ -34,6 +32,10 @@ public class ConsumerImpl <V> implements Consumer {
     private static <K, V> KafkaConsumer<K, V> createKafkaConsumer(ConfigManager configManager) {
         Properties properties = KafkaConsumerProperties.defaultKafkaConsumerPropertiesFactory(configManager);
         return new KafkaConsumer<>(properties);
+    }
+
+    public void addOnConsumedMessageObserver(Observer<V> observer) {
+        super.addObserver(observer);
     }
 
     /**
@@ -54,7 +56,9 @@ public class ConsumerImpl <V> implements Consumer {
                 ConsumerRecords<String, V> consumerRecordList = kafkaConsumer.poll(this.pollDuration);
                 List<Record<V>> recordList = ConsumerUtils.consumerRecordsToList(consumerRecordList);
 
-                recordList.forEach(this.onConsumedMessage::apply);
+                // recordList.forEach(this.onConsumedMessage::apply);
+
+                recordList.forEach(super::notifyObservers);
 
             } catch (Exception e) {
                 logger.error("Error consuming from dispatcher: " + e.getMessage() + " " + e.getStackTrace());

@@ -16,7 +16,7 @@ public class ConsumerImplFactory<T> implements ConsumerFactory<T> {
             ConfigManager configManager,
             OnConsumedMessage<T> onConsumedMessage,
             List<String> topicList) {
-        var consumer = new ConsumerImpl<>(configManager, onConsumedMessage);
+        var consumer = new ConsumerImpl<>(configManager);
         consumer.subscribe(topicList);
         return consumer;
     }

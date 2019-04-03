@@ -17,7 +17,7 @@ public abstract class ConsumerController<T> implements Controller {
     protected final ConfigManager configManager;
     protected final String serviceName;
     protected final List<String> topicList;
-    protected final Consumer consumer;
+    protected final Consumer<T> consumer;
 
     public ConsumerController(ConfigManager configManager, ConsumerFactory<T> consumerFactory) {
         this(
@@ -33,10 +33,17 @@ public abstract class ConsumerController<T> implements Controller {
         this.topicList = topicList;
         this.consumer = consumerFactory.createConsumer(configManager, this::onMessageConsume, topicList);
 
+        this.consumer.addObserver(this::onMessageConsume);
+        this.consumer.addObserver(this::onMessageConsumeLog);
+
         /**
          * Graceful shutdown
          */
         this.gracefulShutdown();
+    }
+
+    private void onMessageConsumeLog(Record<T> record) {
+        logger.info("New record received: " + record.getTopic());
     }
 
     /**
