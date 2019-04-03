@@ -4,6 +4,8 @@ import it.unipd.dstack.butterfly.consumer.telegram.message.TelegramMessage;
 import it.unipd.dstack.butterfly.consumer.telegram.message.TelegramMessageSender;
 import it.unipd.dstack.butterfly.consumer.telegram.response.TelegramResponse;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.CommandHandler;
+import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.Command;
+import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.CommandRegister;
 import org.slf4j.Logger;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
@@ -22,15 +24,17 @@ class TelegramBotListener extends TelegramLongPollingBot {
     private CommandHandler commandHandler;
     private final String token;
     private final String botName;
+    private final CommandRegister commandRegister;
 
-    public TelegramBotListener(String token, String botName, CommandHandler commandHandler) {
+    public TelegramBotListener(String token, String botName, CommandRegister commandRegister) {
         this.token = token;
         this.botName = botName;
+        this.commandRegister = commandRegister;
 
-        this.commandHandler = commandHandler;
+        this.commandHandler = new CommandHandler();
     }
 
-     //, TelegramResponse response
+     // TelegramResponse response
 
     private TelegramMessageSender sender = (TelegramMessage message) -> {
         SendMessage answer = new SendMessage();
@@ -59,10 +63,12 @@ class TelegramBotListener extends TelegramLongPollingBot {
 
                     String commandName = commandSplit[0];
 
-
-                    TelegramResponse response = new TelegramResponse(message.getChatId().toString(), paramsList);
-                    commandHandler.executeCommand(commandName, sender, response);
-                    logger.info("command executed!");
+                    Command command = this.commandRegister.getCommand(commandName);
+                    if (command != null) {
+                        TelegramResponse response = new TelegramResponse(message.getChatId().toString(), paramsList);
+                        commandHandler.executeCommand(command, sender, response);
+                        logger.info("command executed!");
+                    }
                 }
             }
         }

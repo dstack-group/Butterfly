@@ -6,9 +6,10 @@ import it.unipd.dstack.butterfly.consumer.consumer.ConsumerImplFactory;
 import it.unipd.dstack.butterfly.consumer.telegram.formatstrategy.TelegramFormatStrategy;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.TelegramBot;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.TelegramBotAdapterImpl;
+import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.CommandRegister;
+import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.CommandRegisterImpl;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.EmailCommand;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.StartCommand;
-import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.CommandHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,11 +21,11 @@ public class Main {
         String token = configManager.getStringProperty("TELEGRAM_TOKEN", "577704603:AAFWyfXNdZOXx8nx0y9jo-lIPljvSDvUyYY");
         String botName = configManager.getStringProperty("TELEGRAM_BOT_NAME", "ProtoTelegramBot");
 
-        CommandHandler commandHandler = new CommandHandler();
-        commandHandler.register(new StartCommand());
-        commandHandler.register(new EmailCommand());
+        CommandRegister commandRegister = new CommandRegisterImpl();
+        commandRegister.register(new StartCommand());
+        commandRegister.register(new EmailCommand());
 
-        TelegramBot telegramBot = new TelegramBotAdapterImpl(token, botName, commandHandler);
+        TelegramBot telegramBot = new TelegramBotAdapterImpl(token, botName, commandRegister);
         telegramBot.init();
 
         TelegramFormatStrategy formatStrategy = new TelegramFormatStrategy();
