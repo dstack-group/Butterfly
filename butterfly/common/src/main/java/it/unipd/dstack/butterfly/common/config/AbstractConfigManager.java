@@ -28,7 +28,7 @@ public abstract class AbstractConfigManager {
      * @param property the configuration property name
      * @return the value of the specified configuration variable.
      */
-    public String getStringProperty(String property) throws ConfigurationUndefinedException {
+    public final String getStringProperty(String property) throws ConfigurationUndefinedException {
         return this.getStringProperty(property, null);
     }
 
@@ -42,7 +42,7 @@ public abstract class AbstractConfigManager {
      * @param defaultProperty
      * @return the value of the specified configuration variable, or defaultProperty if it isn't set.
      */
-    public String getStringProperty(String property, String defaultProperty) throws ConfigurationUndefinedException {
+    public final String getStringProperty(String property, String defaultProperty) throws ConfigurationUndefinedException {
         return this
                 .getConfigValue(property, defaultProperty, AbstractConfigManager.stringToStringMapper, String.class);
     }
@@ -57,7 +57,7 @@ public abstract class AbstractConfigManager {
      * @param property the configuration property name
      * @return the value of the specified configuration variable.
      */
-    public Boolean getBooleanProperty(String property) throws ConfigurationException {
+    public final Boolean getBooleanProperty(String property) throws ConfigurationException {
         return this.getBooleanProperty(property, null);
     }
 
@@ -73,7 +73,7 @@ public abstract class AbstractConfigManager {
      * @param defaultProperty
      * @return the value of the specified configuration variable, or defaultProperty if it isn't set.
      */
-    public Boolean getBooleanProperty(String property, Boolean defaultProperty) throws ConfigurationException {
+    public final Boolean getBooleanProperty(String property, Boolean defaultProperty) throws ConfigurationException {
         return this
                 .getConfigValue(property, defaultProperty, AbstractConfigManager.stringToBooleanMapper, Boolean.class);
     }
@@ -88,7 +88,7 @@ public abstract class AbstractConfigManager {
      * @param property the configuration property name
      * @return the value of the specified configuration variable.
      */
-    public Integer getIntProperty(String property) throws ConfigurationException {
+    public final Integer getIntProperty(String property) throws ConfigurationException {
         return this.getIntProperty(property, null);
     }
 
@@ -104,7 +104,7 @@ public abstract class AbstractConfigManager {
      * @param defaultProperty
      * @return the value of the specified configuration variable, or defaultProperty if it isn't set.
      */
-    public Integer getIntProperty(String property, Integer defaultProperty) throws ConfigurationException {
+    public final Integer getIntProperty(String property, Integer defaultProperty) throws ConfigurationException {
         return this
                 .getConfigValue(property, defaultProperty, AbstractConfigManager.stringToIntegerMapper, Integer.class);
     }
@@ -133,7 +133,7 @@ public abstract class AbstractConfigManager {
      * @return the value of the variable casted to type <code>T</code>, or <code>defaultProperty</code> if the
      * variable is not defined in the system environment
      */
-    protected <T> T getConfigValue(String property, T defaultProperty, Function<String, T> mapper, Class<?> type) {
+    private <T> T getConfigValue(String property, T defaultProperty, Function<String, T> mapper, Class<?> type) {
         Optional<String> propertyValue = this.getOptionalConfigValue(property);
         if (propertyValue.isEmpty()) {
             if (defaultProperty == null) {
