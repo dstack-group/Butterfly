@@ -6,4 +6,9 @@ public interface Subject<T> {
      * @param observer
      */
     void addObserver(Observer<T> observer);
+
+    /**
+     * Stops updating the previously registered observers.
+     */
+    void removeObservers();
 }

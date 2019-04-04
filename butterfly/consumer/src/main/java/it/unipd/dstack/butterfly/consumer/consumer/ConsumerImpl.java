@@ -52,8 +52,6 @@ public class ConsumerImpl <V> extends AbstractSubject<V> implements Consumer<V> 
                 ConsumerRecords<String, V> consumerRecordList = kafkaConsumer.poll(this.pollDuration);
                 List<Record<V>> recordList = ConsumerUtils.consumerRecordsToList(consumerRecordList);
 
-                // recordList.forEach(this.onConsumedMessage::apply);
-
                 recordList.forEach(super::notifyObservers);
 
             } catch (Exception e) {
@@ -69,5 +67,6 @@ public class ConsumerImpl <V> extends AbstractSubject<V> implements Consumer<V> 
     public void close() {
         this.startConsumer = false;
         this.kafkaConsumer.close();
+        super.removeObservers();
     }
 }

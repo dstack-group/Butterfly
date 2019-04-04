@@ -12,7 +12,21 @@ public abstract class AbstractSubject<T> implements Subject<T> {
         observerList.forEach(observer -> observer.update(record));
     }
 
+    /**
+     * Adds a new observer to the current event subject.
+     *
+     * @param observer
+     */
+    @Override
     public void addObserver(Observer<T> observer) {
         this.observerList.add(observer);
+    }
+
+    /**
+     * Stops updating the previously registered observers.
+     */
+    @Override
+    public void removeObservers() {
+        this.observerList.clear();
     }
 }
