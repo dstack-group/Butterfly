@@ -20,8 +20,6 @@ public class EmailCommand implements Command {
     public void execute(TelegramMessageSender sender, TelegramResponse response) throws Exception {
         String emailAddress = response.getCommandArguments().get(0);
 
-        this.onExecution();
-
         String messageContent;
         if (EmailValidator.isValidEmailAddress(emailAddress)) {
             messageContent = "Ciao, ho inserito la mail " + emailAddress;
@@ -45,13 +43,5 @@ public class EmailCommand implements Command {
     @Override
     public String getCommandName() {
         return "EMAIL";
-    }
-
-    /**
-     * This method is called when execute() is called
-     */
-    @Override
-    public void onExecution() {
-
     }
 }

@@ -15,11 +15,4 @@ public interface Command {
      * @return
      */
     String getCommandName();
-
-    /**
-     * This method is called when execute() is called
-     */
-    default void onExecution() {
-
-    }
 }
