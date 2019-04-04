@@ -4,7 +4,6 @@ import it.unipd.dstack.butterfly.consumer.telegram.message.TelegramMessageSender
 import it.unipd.dstack.butterfly.consumer.telegram.response.TelegramResponse;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.Command;
 
-
 public class CommandHandler {
     public CommandHandler() {}
 

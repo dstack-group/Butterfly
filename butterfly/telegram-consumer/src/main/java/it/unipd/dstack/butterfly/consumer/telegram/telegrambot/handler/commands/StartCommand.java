@@ -14,7 +14,9 @@ public class StartCommand implements Command {
      */
     @Override
     public void execute(TelegramMessageSender sender, TelegramResponse response) throws Exception {
-
+        //stampa messaggio introduttivo:
+        //breve introduzione
+        //lista di comandi disponibili
     }
 
     /**
