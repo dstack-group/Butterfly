@@ -2,6 +2,8 @@ package it.unipd.dstack.butterfly.consumer.telegram;
 
 import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
 import it.unipd.dstack.butterfly.common.config.EnvironmentConfigManager;
+import it.unipd.dstack.butterfly.common.eventprocessor.EventProcessor;
+import it.unipd.dstack.butterfly.common.json.JSONConverterImpl;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerImplFactory;
 import it.unipd.dstack.butterfly.consumer.telegram.formatstrategy.TelegramFormatStrategy;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.TelegramBot;
@@ -21,12 +23,22 @@ public class Main {
         String token = configManager.getStringProperty("TELEGRAM_TOKEN", "577704603:AAFWyfXNdZOXx8nx0y9jo-lIPljvSDvUyYY");
         String botName = configManager.getStringProperty("TELEGRAM_BOT_NAME", "ProtoTelegramBot");
 
+        String userManagerUrl = configManager.getStringProperty("USER_MANAGER_URL");
+        int userManagerRequestTimeout = configManager.getIntProperty("USER_MANAGER_REQUEST_TIMEOUT_MS");
+        int userManagerThreadsNumber = configManager.getIntProperty("USER_MANAGER_THREADS");
+
+        EventProcessor eventProcessor = new EventProcessor.Builder()
+                .setUserManagerURL(userManagerUrl)
+                .setTimeoutInMs(userManagerRequestTimeout)
+                .setThreadsNumber(userManagerThreadsNumber)
+                .setJsonConverter(new JSONConverterImpl())
+                .build();
+
         CommandRegister commandRegister = new CommandRegisterImpl();
         commandRegister.register(new StartCommand());
-        commandRegister.register(new EmailCommand());
+        commandRegister.register(new EmailCommand(eventProcessor));
 
         TelegramBot telegramBot = new TelegramBotAdapterImpl(token, botName, commandRegister);
-        telegramBot.init();
 
         TelegramFormatStrategy formatStrategy = new TelegramFormatStrategy();
 

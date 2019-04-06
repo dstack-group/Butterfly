@@ -1,7 +1,6 @@
 package it.unipd.dstack.butterfly.consumer.telegram.telegrambot;
 
 import it.unipd.dstack.butterfly.consumer.telegram.message.TelegramMessage;
-import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.CommandHandler;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.CommandRegister;
 import org.slf4j.Logger;
 import org.telegram.telegrambots.ApiContextInitializer;
@@ -15,15 +14,16 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class TelegramBotAdapterImpl implements TelegramBot {
     private static final Logger logger = getLogger(TelegramBotAdapterImpl.class);
-    final TelegramLongPollingBot bot;
+    private TelegramLongPollingBot bot;
 
     public TelegramBotAdapterImpl(String token, String botName, CommandRegister commandRegister) {
-        this.bot = new TelegramBotListener(token, botName, commandRegister);
+        this.init(token, botName, commandRegister);
     }
 
-    public void init() {
+    private void init(String token, String botName, CommandRegister commandRegister) {
         ApiContextInitializer.init();
         TelegramBotsApi botsApi = new TelegramBotsApi();
+        this.bot = new TelegramBotListener(token, botName, commandRegister);
         try {
             botsApi.registerBot(this.bot);
         } catch (TelegramApiRequestException e) {
