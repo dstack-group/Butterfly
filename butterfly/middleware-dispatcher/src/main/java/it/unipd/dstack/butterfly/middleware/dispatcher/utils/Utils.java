@@ -5,7 +5,7 @@ import it.unipd.dstack.butterfly.consumer.avro.UserSingleContact;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserContact;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponseData;
 import it.unipd.dstack.butterfly.producer.avro.Event;
-import it.unipd.dstack.butterfly.common.record.Record;
+import it.unipd.dstack.butterfly.controller.record.Record;
 import org.apache.avro.specific.SpecificRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

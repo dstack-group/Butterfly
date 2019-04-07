@@ -1,4 +1,4 @@
-package it.unipd.dstack.butterfly.eventprocessor.json;
+package it.unipd.dstack.butterfly.jsonconverter;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;

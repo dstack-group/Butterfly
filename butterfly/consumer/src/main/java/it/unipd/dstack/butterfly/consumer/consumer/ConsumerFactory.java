@@ -1,6 +1,6 @@
 package it.unipd.dstack.butterfly.consumer.consumer;
 
-import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
+import it.unipd.dstack.butterfly.config.AbstractConfigManager;
 
 import java.util.List;
 

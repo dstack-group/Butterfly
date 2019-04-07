@@ -1,6 +1,6 @@
 package it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands;
 
-import it.unipd.dstack.butterfly.common.eventprocessor.EventProcessor;
+import it.unipd.dstack.butterfly.eventprocessor.EventProcessor;
 import it.unipd.dstack.butterfly.consumer.avro.EmailWithContactRef;
 import it.unipd.dstack.butterfly.consumer.telegram.message.TelegramMessage;
 import it.unipd.dstack.butterfly.consumer.telegram.message.TelegramMessageSender;

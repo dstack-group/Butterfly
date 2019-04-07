@@ -1,4 +1,4 @@
-package it.unipd.dstack.butterfly.common.config;
+package it.unipd.dstack.butterfly.config;
 
 /**
  * EnvironmentConfigManager gives the user the possibility to read configuration properties among the environment

@@ -49,7 +49,7 @@
     <modules>
         <module>producer</module>
         <module>consumer</module>
-        <module>common</module>
+        <module>config</module>
         <module>gitlab-producer</module>
         <module>redmine-producer</module>
         <module>sonarqube-producer</module>
@@ -57,6 +57,9 @@
         <module>telegram-consumer</module>
         <module>avro-schemas</module>
         <module>email-consumer</module>
+        <module>event-processor</module>
+        <module>controller</module>
+        <module>json-converter</module>
     </modules>
 
     <developers>

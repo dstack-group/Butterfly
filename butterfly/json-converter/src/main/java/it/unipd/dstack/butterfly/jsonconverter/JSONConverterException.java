@@ -1,4 +1,4 @@
-package it.unipd.dstack.butterfly.eventprocessor.json;
+package it.unipd.dstack.butterfly.jsonconverter;
 
 public class JSONConverterException extends RuntimeException {
     public JSONConverterException(RuntimeException e) {

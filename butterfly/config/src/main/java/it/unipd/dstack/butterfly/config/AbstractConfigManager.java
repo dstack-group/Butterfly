@@ -1,11 +1,15 @@
-package it.unipd.dstack.butterfly.common.config;
+package it.unipd.dstack.butterfly.config;
+
+import it.unipd.dstack.butterfly.config.exception.ConfigurationCastException;
+import it.unipd.dstack.butterfly.config.exception.ConfigurationException;
+import it.unipd.dstack.butterfly.config.exception.ConfigurationUndefinedException;
 
 import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * AbstractConfigManager is an abstract class that defines the contract for reading configuration properties, setting default values and explicitly
- * cast them to the following types:
+ * AbstractConfigManager is an abstract class that defines the contract for reading configuration properties,
+ * setting default values and explicitly cast them to the following types:
  * - String;
  * - Integer;
  * - Boolean;
@@ -153,16 +157,17 @@ public abstract class AbstractConfigManager {
     }
 
     /**
-     * stringToStringMapperUnchecked returns an identity.
+     * stringToStringMapper returns an identity.
      */
     private static Function<String, String> stringToStringMapper = Function.identity();
+
     /**
-     * stringToBooleanMapperUnchecked attempts to casts a String value to Boolean.
+     * stringToBooleanMapper attempts to casts a String value to Boolean.
      */
     private static Function<String, Boolean> stringToBooleanMapper = (String value) -> Boolean.valueOf(value);
 
     /**
-     * stringToIntegerMapperUnchecked attempts to cast a String value to Integer.
+     * stringToIntegerMapper attempts to cast a String value to Integer.
      */
     private static Function<String, Integer> stringToIntegerMapper = (String value) -> Integer.valueOf(value);
 }

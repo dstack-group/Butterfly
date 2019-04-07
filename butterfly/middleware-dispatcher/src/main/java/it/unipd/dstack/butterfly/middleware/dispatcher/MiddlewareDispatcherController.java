@@ -1,16 +1,15 @@
 package it.unipd.dstack.butterfly.middleware.dispatcher;
 
-import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
-import it.unipd.dstack.butterfly.common.record.Record;
+import it.unipd.dstack.butterfly.config.AbstractConfigManager;
+import it.unipd.dstack.butterfly.controller.record.Record;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerFactory;
 import it.unipd.dstack.butterfly.consumer.consumer.controller.ConsumerController;
 import it.unipd.dstack.butterfly.consumer.utils.ConsumerUtils;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponse;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponseData;
-import it.unipd.dstack.butterfly.common.eventprocessor.EventProcessor;
+import it.unipd.dstack.butterfly.eventprocessor.EventProcessor;
 import it.unipd.dstack.butterfly.middleware.dispatcher.utils.Utils;
-import it.unipd.dstack.butterfly.common.json.JSONConverterImpl;
 import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.producer.producer.Producer;
 import org.apache.avro.AvroRuntimeException;
@@ -78,7 +77,6 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
                 .setUserManagerURL(userManagerUrl)
                 .setTimeoutInMs(userManagerRequestTimeout)
                 .setThreadsNumber(userManagerThreadsNumber)
-                .setJsonConverter(new JSONConverterImpl())
                 .build();
     }
 

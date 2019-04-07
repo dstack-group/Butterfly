@@ -1,4 +1,4 @@
-package it.unipd.dstack.butterfly.common.config;
+package it.unipd.dstack.butterfly.config.exception;
 
 public class ConfigurationCastException extends ConfigurationException {
     public ConfigurationCastException(String property, String value, Class<?> type) {

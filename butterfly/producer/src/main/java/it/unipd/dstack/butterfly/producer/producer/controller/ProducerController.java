@@ -1,7 +1,7 @@
 package it.unipd.dstack.butterfly.producer.producer.controller;
 
-import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
-import it.unipd.dstack.butterfly.common.controller.Controller;
+import it.unipd.dstack.butterfly.config.AbstractConfigManager;
+import it.unipd.dstack.butterfly.controller.Controller;
 import it.unipd.dstack.butterfly.producer.producer.OnWebhookEvent;
 import it.unipd.dstack.butterfly.producer.producer.OnWebhookEventFromTopic;
 import it.unipd.dstack.butterfly.producer.producer.Producer;

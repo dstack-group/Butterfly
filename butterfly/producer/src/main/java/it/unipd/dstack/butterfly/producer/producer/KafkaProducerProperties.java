@@ -2,7 +2,7 @@ package it.unipd.dstack.butterfly.producer.producer;
 
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
-import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
+import it.unipd.dstack.butterfly.config.AbstractConfigManager;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 

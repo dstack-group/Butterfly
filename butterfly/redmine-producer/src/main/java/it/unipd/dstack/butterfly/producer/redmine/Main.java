@@ -1,7 +1,7 @@
 package it.unipd.dstack.butterfly.producer.redmine;
 
-import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
-import it.unipd.dstack.butterfly.common.config.EnvironmentConfigManager;
+import it.unipd.dstack.butterfly.config.AbstractConfigManager;
+import it.unipd.dstack.butterfly.config.EnvironmentConfigManager;
 import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.producer.producer.OnWebhookEventFromTopic;
 import it.unipd.dstack.butterfly.producer.producer.OnWebhookEventFromTopicImpl;

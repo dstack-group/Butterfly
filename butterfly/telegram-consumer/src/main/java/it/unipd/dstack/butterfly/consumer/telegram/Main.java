@@ -1,7 +1,7 @@
 package it.unipd.dstack.butterfly.consumer.telegram;
 
-import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
-import it.unipd.dstack.butterfly.common.config.EnvironmentConfigManager;
+import it.unipd.dstack.butterfly.config.AbstractConfigManager;
+import it.unipd.dstack.butterfly.config.EnvironmentConfigManager;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerImplFactory;
 import it.unipd.dstack.butterfly.consumer.telegram.formatstrategy.TelegramFormatStrategy;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.TelegramBot;
@@ -10,6 +10,7 @@ import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.CommandRegisterImpl;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.EmailCommand;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.StartCommand;
+import it.unipd.dstack.butterfly.eventprocessor.EventProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +22,14 @@ public class Main {
         String token = configManager.getStringProperty("TELEGRAM_TOKEN", "577704603:AAFWyfXNdZOXx8nx0y9jo-lIPljvSDvUyYY");
         String botName = configManager.getStringProperty("TELEGRAM_BOT_NAME", "ProtoTelegramBot");
 
+        EventProcessor eventProcessor = new EventProcessor.Builder()
+                .setUserManagerURL("")
+                .setTimeoutInMs(2500)
+                .build();
+
         CommandRegister commandRegister = new CommandRegisterImpl();
         commandRegister.register(new StartCommand());
-        commandRegister.register(new EmailCommand());
+        commandRegister.register(new EmailCommand(eventProcessor));
 
         TelegramBot telegramBot = new TelegramBotAdapterImpl(token, botName, commandRegister);
         telegramBot.init();

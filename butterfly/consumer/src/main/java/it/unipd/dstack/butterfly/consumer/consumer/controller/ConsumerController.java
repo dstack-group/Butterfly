@@ -1,8 +1,8 @@
 package it.unipd.dstack.butterfly.consumer.consumer.controller;
 
-import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
-import it.unipd.dstack.butterfly.common.controller.Controller;
-import it.unipd.dstack.butterfly.common.record.Record;
+import it.unipd.dstack.butterfly.config.AbstractConfigManager;
+import it.unipd.dstack.butterfly.controller.Controller;
+import it.unipd.dstack.butterfly.controller.record.Record;
 import it.unipd.dstack.butterfly.consumer.consumer.Consumer;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerFactory;
 import it.unipd.dstack.butterfly.consumer.utils.ConsumerUtils;

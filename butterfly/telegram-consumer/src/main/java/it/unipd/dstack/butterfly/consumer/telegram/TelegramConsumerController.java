@@ -1,7 +1,7 @@
 package it.unipd.dstack.butterfly.consumer.telegram;
 
-import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
-import it.unipd.dstack.butterfly.common.record.Record;
+import it.unipd.dstack.butterfly.config.AbstractConfigManager;
+import it.unipd.dstack.butterfly.controller.record.Record;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerFactory;
 import it.unipd.dstack.butterfly.consumer.consumer.controller.ConsumerController;

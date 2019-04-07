@@ -1,6 +1,6 @@
 package it.unipd.dstack.butterfly.producer.producer;
 
-import it.unipd.dstack.butterfly.common.record.Record;
+import it.unipd.dstack.butterfly.controller.record.Record;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

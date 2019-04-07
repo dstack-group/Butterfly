@@ -7,10 +7,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="avro-schemas" />
-        <module name="common" />
+        <module name="config" />
         <module name="consumer" />
+        <module name="controller" />
         <module name="email-consumer" />
+        <module name="event-processor" />
         <module name="gitlab-producer" />
+        <module name="json-converter" />
         <module name="middleware-dispatcher" />
         <module name="producer" />
         <module name="redmine-producer" />

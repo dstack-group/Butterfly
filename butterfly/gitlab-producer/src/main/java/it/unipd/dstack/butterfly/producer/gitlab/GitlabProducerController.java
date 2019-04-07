@@ -1,6 +1,6 @@
 package it.unipd.dstack.butterfly.producer.gitlab;
 
-import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
+import it.unipd.dstack.butterfly.config.AbstractConfigManager;
 import it.unipd.dstack.butterfly.producer.gitlab.webhookmanager.GitlabWebhookListener;
 import it.unipd.dstack.butterfly.producer.gitlab.webhookmanager.GitlabWebhookListenerAggregator;
 import it.unipd.dstack.butterfly.producer.producer.OnWebhookEventFromTopic;

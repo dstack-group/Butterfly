@@ -1,7 +1,7 @@
 package it.unipd.dstack.butterfly.consumer.consumer;
 
-import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
-import it.unipd.dstack.butterfly.common.record.Record;
+import it.unipd.dstack.butterfly.config.AbstractConfigManager;
+import it.unipd.dstack.butterfly.controller.record.Record;
 import it.unipd.dstack.butterfly.consumer.utils.ConsumerUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;

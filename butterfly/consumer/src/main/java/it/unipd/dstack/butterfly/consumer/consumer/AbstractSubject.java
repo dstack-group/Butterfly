@@ -1,6 +1,6 @@
 package it.unipd.dstack.butterfly.consumer.consumer;
 
-import it.unipd.dstack.butterfly.common.record.Record;
+import it.unipd.dstack.butterfly.controller.record.Record;
 
 import java.util.ArrayList;
 import java.util.List;

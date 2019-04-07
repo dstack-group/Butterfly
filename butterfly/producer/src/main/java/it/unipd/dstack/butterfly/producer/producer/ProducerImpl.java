@@ -1,7 +1,7 @@
 package it.unipd.dstack.butterfly.producer.producer;
 
-import it.unipd.dstack.butterfly.common.config.AbstractConfigManager;
-import it.unipd.dstack.butterfly.common.record.Record;
+import it.unipd.dstack.butterfly.config.AbstractConfigManager;
+import it.unipd.dstack.butterfly.controller.record.Record;
 import it.unipd.dstack.butterfly.producer.utils.ProducerUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;

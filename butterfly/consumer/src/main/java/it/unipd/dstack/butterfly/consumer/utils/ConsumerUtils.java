@@ -1,6 +1,6 @@
 package it.unipd.dstack.butterfly.consumer.utils;
 
-import it.unipd.dstack.butterfly.common.record.Record;
+import it.unipd.dstack.butterfly.controller.record.Record;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 import java.util.ArrayList;
