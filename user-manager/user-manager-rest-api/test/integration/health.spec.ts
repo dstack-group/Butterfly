@@ -1,27 +1,38 @@
-import { app, server } from '../../src/index';
+import { setupTests } from '../init';
 import supertest from 'supertest';
+import { Server as AppServer } from '../../src/server';
+import { Server } from 'http';
+
+let app: AppServer;
+let server: Server;
 
 describe('Server API', () => {
-  it('/health', async () => {
-    const response = await supertest(server)
-      .get('/health');
-
-    expect(response.status).toBe(204);
-    expect(response.body).toEqual({});
+  beforeAll(() => {
+    const setup = setupTests();
+    app = setup.app;
+    server = setup.server;
   });
 
-  it('/health/metrics', async () => {
-    const response = await supertest(server)
-      .get('/health/metrics');
-
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('data');
-    expect(response.body.data).toHaveProperty('freeMemory');
-    expect(response.body.data).toHaveProperty('platform');
-    expect(response.body.data).toHaveProperty('uptime');
+  it('/health', done => {
+    supertest(server)
+      .get('/health')
+      .expect(204, {}, done);
   });
 
-  afterAll(async () => {
-    await app.closeServer();
-  }, 10000);
+  it('/health/metrics', done => {
+    supertest(server)
+      .get('/health/metrics')
+      .expect('Content-Type', /application\/json/)
+      .expect(response => {
+        expect(response.body).toHaveProperty('data');
+        expect(response.body.data).toHaveProperty('freeMemory');
+        expect(response.body.data).toHaveProperty('platform');
+        expect(response.body.data).toHaveProperty('uptime');
+      })
+      .expect(200, done);
+  });
+
+  afterAll(done => {
+    app.closeServer().then(done);
+  });
 });
