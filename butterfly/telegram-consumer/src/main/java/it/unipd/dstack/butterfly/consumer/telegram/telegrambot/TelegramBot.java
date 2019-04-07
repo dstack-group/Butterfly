@@ -5,11 +5,6 @@ import it.unipd.dstack.butterfly.consumer.telegram.message.TelegramMessage;
 
 public interface TelegramBot {
     /**
-     * Initializes the Telegram bot.
-     */
-    void init();
-
-    /**
      * Sends message to Telegram
      * @param message the message to send
      */
