@@ -1,5 +1,5 @@
 import * as Joi from 'joi';
-import { Middleware } from '../utils/Router';
+import { Middleware } from '../router/Router';
 import { FieldValidationError } from '../errors';
 import { ValidationErrorItem } from './ValidationErrorItem';
 

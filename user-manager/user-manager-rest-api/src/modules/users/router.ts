@@ -1,4 +1,4 @@
-import { Router } from '../../utils/Router';
+import { Router } from '../../router/Router';
 import { UserManager } from './manager';
 import { UserRepository } from './repository';
 import { RoutesInjectionParams } from '../../routes/RoutesInjectionParams';

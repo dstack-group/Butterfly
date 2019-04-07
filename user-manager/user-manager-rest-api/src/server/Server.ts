@@ -2,11 +2,11 @@ import Koa from 'koa';
 import { Server as HTTPServer } from 'http';
 import { ServerConfig } from './';
 // import { asyncRetry } from '../utils/asyncRetry';
-import { Logger } from '../config/logger';
-import { Database } from '../database';
+import { Logger } from '../logger';
+import { Database, DatabaseConnection } from '../database';
 import { RoutesInjectionParams } from '../routes/RoutesInjectionParams';
-import { DatabaseConnection } from '@src/database/DatabaseConnection';
-import { RouteContextReplierFactory } from '@src/modules/common/router/RouteContextReplierFactory';
+import { MetricsProvider } from '../common/metrics/MetricsProvider';
+import { RouteContextReplierFactory } from '../router/RouteContextReplierFactory';
 
 export class Server {
   private app: Koa = new Koa();
@@ -15,6 +15,7 @@ export class Server {
   private database: Database;
   private server?: HTTPServer;
   private logger: Logger;
+  private metricsProvider: MetricsProvider;
   private routeContextReplierFactory: RouteContextReplierFactory;
 
   constructor(config: ServerConfig, databaseConnection: DatabaseConnection) {
@@ -22,6 +23,7 @@ export class Server {
     this.logger = config.logger;
     this.database = new Database(databaseConnection);
     this.routeContextReplierFactory = config.routeContextReplierFactory;
+    this.metricsProvider = config.metricsProvider;
   }
 
   createServer() {
@@ -89,6 +91,7 @@ export class Server {
     const injectionParams: RoutesInjectionParams = {
       database: this.database,
       logger: this.logger,
+      metricsProvider: this.metricsProvider,
       routeContextReplierFactory: this.routeContextReplierFactory,
     };
 

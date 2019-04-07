@@ -10,6 +10,6 @@ import { AbstractConfigManager } from './AbstractConfigManager';
  */
 export class EnvironmentConfigManager extends AbstractConfigManager {
   protected readConfigValue(property: string): string | undefined {
-    throw process.env[property];
+    return process.env[property];
   }
 }

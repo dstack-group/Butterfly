@@ -1,8 +1,7 @@
-import { ConfigManager } from './ConfigManager';
 import { ConfigurationCastException } from './errors/ConfigurationCastException';
 import { ConfigurationUndefinedException } from './errors/ConfigurationUndefinedException';
 
-export abstract class AbstractConfigManager implements ConfigManager {
+export abstract class AbstractConfigManager {
   /**
    * Reads a value from a configuration resource.
    * @param property the configuration property name.
@@ -11,7 +10,7 @@ export abstract class AbstractConfigManager implements ConfigManager {
   protected abstract readConfigValue(property: string): string | undefined;
 
   /**
-   *  Returns the value of the configuration variable specified by `property`, or the value specified by
+   * Returns the value of the configuration variable specified by `property`, or the value specified by
    * `defaultProperty` if `property` isn't set.
    * If the configuration variable identified by `property` isn't set and `defaultProperty` is null,
    * an instance of `ConfigurationUndefinedException` is thrown.
@@ -24,7 +23,7 @@ export abstract class AbstractConfigManager implements ConfigManager {
   }
 
   /**
-   *  Returns the value of the configuration variable specified by `property` casted to boolean, or the
+   * Returns the value of the configuration variable specified by `property` casted to boolean, or the
    * value specified by `defaultProperty` if `property` isn't set.
    * If the configuration variable identified by `property` isn't set and `defaultProperty` is null,
    * an instance of `ConfigurationUndefinedException` is thrown.
@@ -39,7 +38,7 @@ export abstract class AbstractConfigManager implements ConfigManager {
   }
 
   /**
-   *  Returns the value of the configuration variable specified by `property` casted to integer, or the
+   * Returns the value of the configuration variable specified by `property` casted to integer, or the
    * value specified by `defaultProperty` if `property` isn't set.
    * If the configuration variable identified by `property` isn't set and `defaultProperty` is null,
    * an instance of `ConfigurationUndefinedException` is thrown.
@@ -78,25 +77,41 @@ export abstract class AbstractConfigManager implements ConfigManager {
       // if the variable is set, try to cast it
       try {
         return mapper(propertyValue);
-      } catch (err) {
+      } catch (_) {
         throw new ConfigurationCastException(property, propertyValue, type);
       }
     }
   }
 
+  /**
+   * stringToStringMapper returns an identity.
+   */
   private static stringToStringMapper(value: string): string {
     return value;
   }
 
+  /**
+   * stringToBooleanMapper attempts to casts a String value to Boolean.
+   */
   private static stringToBooleanMapper(value: string): boolean {
-    if (value.toLowerCase() === 'true') {
+    const valueLowerCase = value.toLowerCase();
+    if (valueLowerCase === 'true') {
       return true;
-    } else {
+    } else if (valueLowerCase === 'false') {
       return false;
+    } else {
+      throw new TypeError();
     }
   }
 
+  /**
+   * stringToIntegerMapper attempts to cast a String value to Integer.
+   */
   private static stringToIntegerMapper(value: string): number {
-    return Number.parseInt(value, 10);
+    const result = Number.parseInt(value, 10);
+    if (Number.isNaN(result)) {
+      throw new TypeError();
+    }
+    return result;
   }
 }

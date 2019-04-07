@@ -1,39 +1,22 @@
-import { Server } from './server/Server';
-import { getAppConfig } from './config/index';
-import * as middlewares from './middlewares/index';
-import { routersFactory, routeContextReplierFactory } from './routes/index';
-import { ServerConfig } from './server/ServerConfig';
-import { Log } from './config/logger';
+import { Log } from './logger';
 import { registerProcessEvents } from './utils/registerProcessEvents';
-import { getDatabaseConfig } from './config/database';
-import { PgDatabaseConnection } from './database/PgDatabaseConnection';
-import { EnvironmentConfigManager } from './config/EnvironmentConfigManager';
-import { ConfigManager } from './config/ConfigManager';
-import { DatabaseConfig } from './database';
+import { getDatabaseConfig, DatabaseConfig, PgDatabaseConnection } from './database';
+import { EnvironmentConfigManager } from './config';
+import { OSMetricsProvider } from './common/metrics/OSMetricsProvider';
+import { setup } from './setup';
 
-const configManager: ConfigManager = new EnvironmentConfigManager();
-const config = getAppConfig(configManager);
-const logger = new Log(config.name);
-
-const middlewareList = [
-  middlewares.compress(),
-  middlewares.logRouteRequest(logger),
-  middlewares.errorHandler(logger),
-];
-
+const configManager = new EnvironmentConfigManager();
+const logger = new Log();
+const metricsProvider = new OSMetricsProvider();
 const databaseConfig: DatabaseConfig = getDatabaseConfig(configManager);
-const serverConfig: ServerConfig = {
-  databaseConfig,
-  logger,
-  middlewares: middlewareList,
-  port: config.port,
-  routeContextReplierFactory,
-  routersFactory,
-};
-
 const databaseConnection = new PgDatabaseConnection(databaseConfig);
-export const app = new Server(serverConfig, databaseConnection);
-export const server = app.createServer();
+
+const { app, server } = setup({
+  configManager,
+  databaseConnection,
+  logger,
+  metricsProvider,
+});
 
 registerProcessEvents(logger, app);
 

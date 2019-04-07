@@ -1,10 +1,9 @@
 import * as HttpStatus from 'http-status-codes';
 import { UserManager } from './manager';
-import { RouteController } from '../common/controller/RouteController';
-import { RouteContextReplierFactory } from '../common/router/RouteContextReplierFactory';
+import { RouteController } from '../../common/controller/RouteController';
+import { RouteContextReplierFactory } from '../../router/RouteContextReplierFactory';
 import { User } from './entity';
-import { RouteCommand } from '../common/router/RouteCommand';
-import { UserModel } from './model';
+import { RouteCommand } from '../../router/RouteCommand';
 
 export class UserController extends RouteController {
   private manager: UserManager;

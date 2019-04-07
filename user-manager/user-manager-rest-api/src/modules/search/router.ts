@@ -1,10 +1,10 @@
 import * as HttpStatus from 'http-status-codes';
-import { Router } from '../../utils/Router';
+import { Router } from '../../router/Router';
 import { SearchManager } from './manager';
 import { SearchRepository } from './repository';
 import { RoutesInjectionParams } from '../../routes/RoutesInjectionParams';
 import * as middlewares from '../../middlewares';
-import { Event } from '../common/Event';
+import { Event } from '../../common/Event';
 
 export const getSearchRouter = (routesParams: RoutesInjectionParams) => {
   const SearchRouter = new Router('/search');

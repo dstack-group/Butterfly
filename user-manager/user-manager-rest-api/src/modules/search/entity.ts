@@ -1,5 +1,5 @@
 import { User } from '../users/entity';
-import { ThirdPartyContactService } from '../common/ThirdPartyContactService';
+import { ThirdPartyContactService } from '../../common/ThirdPartyContactService';
 
 export type ContactInfo = {
   readonly [key in ThirdPartyContactService]: {

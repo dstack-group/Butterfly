@@ -20,14 +20,14 @@ export interface DatabaseConnection {
    * @param query the SQL string that contains the query to be run
    * @param values the named value parameters to be passed to the query
    */
-  one<T = any>(query: string, values?: DatabaseConnectionValues): Promise<T>;
+  one<T>(query: string, values?: DatabaseConnectionValues): Promise<T>;
 
   /**
    * Executes a query that expects any number of rows.
    * @param query the SQL string that contains the query to be run
    * @param values the named value parameters to be passed to the query
    */
-  any<T = any>(query: string, values?: DatabaseConnectionValues): Promise<T[]>;
+  any<T>(query: string, values?: DatabaseConnectionValues): Promise<T[]>;
 
   /**
    * Executes a query against a stored procedure via its name.

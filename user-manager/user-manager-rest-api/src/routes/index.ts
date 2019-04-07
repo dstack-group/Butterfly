@@ -2,13 +2,13 @@ import { RoutesInjectionParams } from './RoutesInjectionParams';
 import { getHealthRouter } from '../modules/health';
 import { getUserRouter } from '../modules/users/router';
 import { getSearchRouter } from '../modules/search/router';
-import { KoaRouteContext } from '../utils/KoaRouteContext';
-import { Context } from '../utils/Router';
-import { RouteContextReplier } from '../modules/common/router/RouteContextReplier';
+import { KoaRouteContext } from '../router/KoaRouteContext';
+import { Context } from '../router/Router';
+import { RouteContextReplier } from '../router/RouteContextReplier';
 
 export const routersFactory = (routesParams: RoutesInjectionParams) => {
   const routers = [
-    getHealthRouter(),
+    getHealthRouter(routesParams),
     getUserRouter(routesParams),
     getSearchRouter(routesParams),
   ];

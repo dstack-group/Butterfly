@@ -1,7 +1,7 @@
 import { EventWithRecipients } from './entity';
 import sqlProvider from './sql';
 import { Database } from '../../database';
-import { Event } from '../common/Event';
+import { Event } from '../../common/Event';
 
 export class SearchRepository {
   private database: Database;

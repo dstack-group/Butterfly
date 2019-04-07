@@ -1,6 +1,6 @@
 import { EventWithRecipients } from './entity';
 import { SearchRepository } from './repository';
-import { Event } from '../common/Event';
+import { Event } from '../../common/Event';
 
 export class SearchManager {
   private repository: SearchRepository;

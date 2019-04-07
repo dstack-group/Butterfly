@@ -9,7 +9,7 @@ const queryProvider: UserQueryProvider = {
   delete: sql('./delete.sql'),
   find: sql('find.sql'),
   findByEmail: sql('./findByEmail.sql'),
-  findOne: sql('findById.sql'),
+  findOne: sql('./findByOne.sql'),
   update: sql('./update.sql'),
 };
 

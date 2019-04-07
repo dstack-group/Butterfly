@@ -1,4 +1,4 @@
-import { Logger } from '../config/logger';
+import { Logger } from '../logger';
 import { Server } from '../server/Server';
 
 /**

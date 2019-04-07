@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { QueryFile, TQueryFileOptions } from 'pg-promise';
+import { as, QueryFile, TQueryFileOptions } from 'pg-promise';
 
 export function getSQLFile(directoryName: string, relativeFilename: string, schema = 'public'): string {
   const fullPath = path.join(directoryName, relativeFilename);
@@ -21,5 +21,6 @@ export function getSQLFile(directoryName: string, relativeFilename: string, sche
     console.error(queryFile.error);
   }
 
-  return queryFile.toPostgres(queryFile);
+  // @ts-ignore
+  return queryFile[as.ctf.toPostgres]; // queryFile.toPostgres(queryFile);
 }

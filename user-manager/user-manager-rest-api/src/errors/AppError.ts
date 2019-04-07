@@ -5,7 +5,7 @@ export interface ErrorToJSON {
   message: ErrorParams['message'];
 }
 
-export class AppError extends Error {
+export abstract class AppError extends Error {
   readonly errorKey: ErrorParams['errorKey'];
   readonly code: ErrorParams['code'];
   readonly error?: ErrorParams['error'];

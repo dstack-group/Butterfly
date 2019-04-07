@@ -1,6 +1,6 @@
 import { BAD_REQUEST } from 'http-status-codes';
-import { Middleware } from '../utils/Router';
-import { Logger } from '../config/logger';
+import { Middleware } from '../router/Router';
+import { Logger } from '../logger';
 
 /**
  * Utility middleware that logs each request.
