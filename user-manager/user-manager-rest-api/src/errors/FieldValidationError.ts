@@ -1,5 +1,5 @@
-import { AppError, ErrorToJSON } from './AppError';
-import { ErrorType } from './errorCodeMap';
+import { AppError } from './AppError';
+import { ErrorType, ErrorToJSON } from '../common/errors';
 import { ValidationErrorItem } from '../middlewares/ValidationErrorItem';
 
 export interface FieldValidationErrorToJSON extends ErrorToJSON {

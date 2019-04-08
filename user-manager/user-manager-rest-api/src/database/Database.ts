@@ -49,15 +49,6 @@ export class Database implements DatabaseConnection {
   }
 
   /**
-   * Executes a query against a stored procedure via its name.
-   * @param procedureName the name of the stored procedure to call
-   * @param values the named value parameters to be passed to the stored procedure
-   */
-  async proc(procedureName: string, values?: DatabaseConnectionValues): Promise<void> {
-    await this.connection.proc(procedureName, values);
-  }
-
-  /**
    * Shuts down all connection pools created in the process, so it can terminate without delay.
    */
   async close(): Promise<void> {

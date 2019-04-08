@@ -11,11 +11,11 @@ export class Log implements Logger {
     this.logger = pino();
   }
 
-  error(message: string, ...params: any[]) {
+  error(message: string, ...params: unknown[]) {
     this.logger.error(message, params);
   }
 
-  info(message: string, ...params: any[]) {
+  info(message: string, ...params: unknown[]) {
     this.logger.info(message, params);
   }
 }

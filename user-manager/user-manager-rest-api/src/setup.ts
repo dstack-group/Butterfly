@@ -27,7 +27,11 @@ export function setup(params: SetupParams) {
   const middlewareList = [
     middlewares.compress(),
     middlewares.logRouteRequest(logger),
-    middlewares.errorHandler(logger),
+    middlewares.errorHandler({
+      isProduction: config.isProduction,
+      logger,
+      routeContextReplierFactory,
+    }),
   ];
 
   const databaseConfig: DatabaseConfig = getDatabaseConfig(configManager);

@@ -30,7 +30,14 @@ export class KoaRouteContext implements RouteContextReplier {
    * Returns the request body.
    */
   getRequestBody() {
-    return this.context.body;
+    return this.context.request.body;
+  }
+
+  /**
+   * Returns the request headers.
+   */
+  getRequestHeaders(): unknown {
+    return this.context.request.headers;
   }
 
   /**
@@ -40,10 +47,18 @@ export class KoaRouteContext implements RouteContextReplier {
    */
   reply<T>(body: T, status = 200) {
     this.context.status = status;
-    if (status === 204) {
+    if (status === 204) { // NO_CONTENT
       this.context.body = {};
     } else {
-      this.context.body = { data: body };
+      const isError = status >= 400;
+
+      /**
+       * If we're in an error situation, a complete error object has already been built
+       * by `errorHandler`, and we must simply return it as it is.
+       * If, instead, the response is a successful one, it must be set as the value for the
+       * `data` top-level key.
+       */
+      this.context.body = isError ? body : { data: body };
       this.context.set('Content-Type', 'application/json');
     }
   }

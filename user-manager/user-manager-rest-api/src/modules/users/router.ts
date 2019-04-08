@@ -13,7 +13,7 @@ export const getUserRouter = (routesParams: RoutesInjectionParams) => {
   const userController = new UserController(routesParams.routeContextReplierFactory, userManager);
 
   userRouter
-    .get('/', userController.getUsers)
+    .get('/', userController.getUsers())
     /*
     .get('/',
       async ctx => {
@@ -27,11 +27,13 @@ export const getUserRouter = (routesParams: RoutesInjectionParams) => {
     */
     .post('/',
       middlewares.bodyParser(),
+      /*
       middlewares.validateRequest({
         body: validator.createUser,
       }),
-      userController.createUser)
-    .get('/:email', userController.getUserByEmail)
+      */
+      userController.createUser())
+    .get('/:email', userController.getUserByEmail())
     /*
     .put('/:email',
       middlewares.bodyParser(),
@@ -44,7 +46,7 @@ export const getUserRouter = (routesParams: RoutesInjectionParams) => {
         ctx.status = HttpStatus.OK;
       })
     */
-    .delete('/:email', userController.deleteUserByEmail);
+    .delete('/:email', userController.deleteUserByEmail());
 
   return userRouter;
 };

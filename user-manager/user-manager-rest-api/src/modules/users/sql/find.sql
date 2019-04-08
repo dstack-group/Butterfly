@@ -1,5 +1,5 @@
 /**
- * Returns the user that matches the given id
+ * Returns the list of users
  */
 SELECT user_id AS "userId",
     email,
@@ -9,4 +9,4 @@ SELECT user_id AS "userId",
     created,
     modified
 FROM ${schema~}.user
-WHERE user_id = ${userId}
+ORDER BY user_id ASC

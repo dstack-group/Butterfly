@@ -6,14 +6,11 @@ export function getAppConfig(configManager: AbstractConfigManager) {
   const APP_HOST = configManager.getStringProperty('APP_HOST');
   const APP_PORT = configManager.getIntProperty('APP_PORT');
 
-  const configs = {
-    base: {
-      env: NODE_ENV,
-      host: APP_HOST,
-      name: APP_NAME,
-      port: APP_PORT,
-    },
+  return {
+    env: NODE_ENV,
+    host: APP_HOST,
+    isProduction: NODE_ENV === 'production',
+    name: APP_NAME,
+    port: APP_PORT,
   };
-
-  return configs.base;
 }

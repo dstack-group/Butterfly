@@ -32,5 +32,5 @@ export function setupTests() {
     metricsProvider,
   });
 
-  return { app, server };
+  return { app, server, databaseConnection };
 }

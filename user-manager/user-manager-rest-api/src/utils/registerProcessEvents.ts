@@ -22,7 +22,7 @@ export function registerProcessEvents(
    * Emitted when a Promise terminates unexpectly and no `catch` clause
    * has been applied
    */
-  process.on('unhandledRejection', (reason: any, promise: any) => {
+  process.on('unhandledRejection', <T>(reason: unknown, promise: Promise<T>) => {
     logger.error('unhandledRejection ' + reason);
   });
 

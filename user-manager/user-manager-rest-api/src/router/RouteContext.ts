@@ -17,4 +17,9 @@ export interface RouteContext {
    * Returns the request body.
    */
   getRequestBody(): unknown;
+
+  /**
+   * Returns the request headers.
+   */
+  getRequestHeaders(): unknown;
 }

@@ -25,7 +25,7 @@ services:
       - "5432:5432"
     volumes:
       # for the production database, no demo data should be inserted
-      - ./user-manager-database/ddl.sql:/docker-entrypoint-initdb.d/ddl.sql
+      - ./user-manager-database/sql/ddl.sql:/docker-entrypoint-initdb.d/ddl.sql
       - pg_data:/var/lib/postgresql/data/
     environment:
       POSTGRES_PASSWORD: "butterfly_user"
@@ -46,10 +46,10 @@ services:
       - postgres
     env_file: ./user-manager-rest-api/.user-manager-rest-api.env
     environment:
-      NODE_ENV: "development"
+      NODE_ENV: "production"
     networks:
       - user-manager-network
-      - middleware-dispatcher-network
+      # - middleware-dispatcher-network
 
 volumes:
   pg_data:
@@ -57,6 +57,6 @@ volumes:
 networks:
   user-manager-network:
     name: user-manager-network
-  middleware-dispatcher-network:
-    external:
-      name: middleware-dispatcher-network
+  # middleware-dispatcher-network:
+  #   external:
+  #     name: middleware-dispatcher-network

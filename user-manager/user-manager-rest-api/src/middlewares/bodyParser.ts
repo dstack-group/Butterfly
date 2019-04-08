@@ -6,5 +6,8 @@ import { Middleware } from '../router/Router';
  * PUT, POST, PATCH HTTP requests.
  */
 export function bodyParser(): Middleware {
-  return koaBodyParser();
+  return koaBodyParser({
+    enableTypes: ['json'],
+    strict: true,
+  });
 }

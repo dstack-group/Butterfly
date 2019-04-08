@@ -9,4 +9,4 @@ SELECT user_id AS "userId",
     created,
     modified
 FROM ${schema~}.user
-WHERE user_id = ${id}
+WHERE user_id = ${userId}

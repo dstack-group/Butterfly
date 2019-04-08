@@ -5,11 +5,16 @@ export const createUser: Joi.SchemaMap = {
     .email()
     .trim()
     .required(),
-  firstName: Joi.string().required(),
-  lastName: Joi.string().required(),
+  firstname: Joi.string().required(),
+  lastname: Joi.string().required(),
 };
 
 export const updateUser: Joi.SchemaMap = {
-  firstName: Joi.string().required(),
-  lastName: Joi.string().required(),
+  email: Joi.string()
+    .email()
+    .trim()
+    .required(),
+  enabled: Joi.boolean(),
+  firstname: Joi.string(),
+  lastname: Joi.string(),
 };

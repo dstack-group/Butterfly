@@ -3,47 +3,39 @@ version: '3.5'
 services:
   postgres-test:
     image: "postgres:11-alpine"
-    restart: always
+    restart: "no"
     ports:
       - "5432:5432"
     volumes:
       # for the test database, no demo data should be inserted
       - ./user-manager-database/sql/ddl.sql:/docker-entrypoint-initdb.d/ddl.sql
-      - pg_test_data:/var/lib/postgresql/data/
     environment:
       POSTGRES_PASSWORD: "butterfly_user"
       POSTGRES_USER: "butterfly_user"
       POSTGRES_DB: "butterfly"
     networks:
-      - user-manager-network
+      - user-manager-test-network
 
-  user-manager:
-    build:
-      context: ./user-manager-rest-api
+  staging:
+    image: node:10.15.3-alpine
+    volumes:
+      - ./user-manager-rest-api:/usr/app
+    working_dir: /usr/app
     restart: "no"
     ports:
       - "5000:5000"
-    links:
-      # 'postgres' will be an alias for the 'postgres-test' service
-      - postgres-test:postgres
     depends_on:
       - postgres-test
     env_file: ./user-manager-rest-api/.user-manager-rest-api.env
     environment:
       NODE_ENV: "test"
+      DATABASE_HOST: "postgres-test"
     networks:
-      - user-manager-network
-      - middleware-dispatcher-network
+      - user-manager-test-network
     entrypoint:
-      - npm
+      - yarn
       - test
 
-volumes:
-  pg_test_data:
-
 networks:
-  user-manager-network:
-    name: user-manager-network
-  middleware-dispatcher-network:
-    external:
-      name: middleware-dispatcher-network
+  user-manager-test-network:
+    name: user-manager-test-network

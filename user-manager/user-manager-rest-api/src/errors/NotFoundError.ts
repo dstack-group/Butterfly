@@ -1,5 +1,5 @@
 import { AppError } from './AppError';
-import { ErrorType } from './errorCodeMap';
+import { ErrorType } from '../common/errors';
 
 /**
  * Error thrown when a certain resource doesn't exist.

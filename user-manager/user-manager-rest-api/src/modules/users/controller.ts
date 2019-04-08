@@ -4,6 +4,7 @@ import { RouteController } from '../../common/controller/RouteController';
 import { RouteContextReplierFactory } from '../../router/RouteContextReplierFactory';
 import { User } from './entity';
 import { RouteCommand } from '../../router/RouteCommand';
+import { Middleware } from '../../router/Router';
 
 export class UserController extends RouteController {
   private manager: UserManager;
@@ -54,19 +55,19 @@ export class UserController extends RouteController {
     };
   }
 
-  getUsers() {
+  getUsers(): Middleware {
     return this.execute(this.getUsersCommand);
   }
 
-  createUser() {
+  createUser(): Middleware {
     return this.execute(this.createUserCommand);
   }
 
-  getUserByEmail() {
+  getUserByEmail(): Middleware {
     return this.execute(this.getUserByEmailCommand);
   }
 
-  deleteUserByEmail() {
+  deleteUserByEmail(): Middleware {
     return this.execute(this.deleteUserByEmailCommand);
   }
 }

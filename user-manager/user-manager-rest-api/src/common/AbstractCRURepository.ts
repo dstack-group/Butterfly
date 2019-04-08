@@ -15,6 +15,7 @@ export abstract class AbstractCRURepository
   }
 
   find<V>(params: V): Promise<T[]> {
+    // console.log('QUERYPROVIDER_FIND', this.queryProvider.find);
     return this.database.any(this.queryProvider.find, params);
   }
 

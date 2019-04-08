@@ -22,12 +22,14 @@ export interface RequestSchema {
  * @param schema
  */
 export function validateRequest(schema: RequestSchema): Middleware {
+  schema.params = schema.params || undefined;
+  schema.queryString = schema.queryString || undefined;
   return async (ctx, next) => {
     const { request } = ctx;
     const abstractedContext = {
       body: request.body,
-      params: ctx.params,
-      queryString: request.querystring,
+      // params: ctx.params,
+      // queryString: request.querystring,
     };
 
     const valResult = Joi.validate(abstractedContext, schema, {

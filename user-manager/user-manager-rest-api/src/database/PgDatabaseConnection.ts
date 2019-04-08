@@ -1,6 +1,12 @@
-import pgPromiseFactory, { IMain, IDatabase } from 'pg-promise';
+import pgPromiseFactory, { IMain, IDatabase, ITask } from 'pg-promise';
 import { DatabaseConnection, DatabaseConnectionValues } from './DatabaseConnection';
 import { DatabaseConfig } from './DatabaseConfig';
+
+export interface AnyQuery<T> {
+  any: (query: string, values?: DatabaseConnectionValues) => Promise<T[]>;
+}
+
+export type GetQueries<T> = (t: AnyQuery<T>) => Array<Promise<T[]>>;
 
 /**
  * PgDatabaseConnection is a Postgres-oriented implementation of DatabaseConnection.
@@ -33,7 +39,7 @@ export class PgDatabaseConnection implements DatabaseConnection {
    * @param query the SQL string that contains the query to be run
    * @param values the named value parameters to be passed to the query
    */
-  async one<T = any>(query: string, values?: DatabaseConnectionValues): Promise<T> {
+  async one<T>(query: string, values?: DatabaseConnectionValues): Promise<T> {
     return this.database.one(query, values);
   }
 
@@ -42,17 +48,8 @@ export class PgDatabaseConnection implements DatabaseConnection {
    * @param query the SQL string that contains the query to be run
    * @param values the named value parameters to be passed to the query
    */
-  async any<T = any>(query: string, values?: DatabaseConnectionValues): Promise<T[]> {
+  async any<T>(query: string, values?: DatabaseConnectionValues): Promise<T[]> {
     return this.database.any(query, values);
-  }
-
-  /**
-   * Executes a query against a stored procedure via its name.
-   * @param procedureName the name of the stored procedure to call
-   * @param values the named value parameters to be passed to the stored procedure
-   */
-  async proc(procedureName: string, values?: DatabaseConnectionValues): Promise<void> {
-    await this.database.proc(procedureName, values);
   }
 
   /**
@@ -61,5 +58,22 @@ export class PgDatabaseConnection implements DatabaseConnection {
   async close(): Promise<void> {
     await this.database.$pool.end();
     await this.pgPromise.end();
+  }
+
+  /**
+   * Executes a batch of queries sharing the same database connection.
+   * This method should only be used for test purposes.
+   * @param getQueries method that given a task objects, returns a list of queries to execute sharing the
+   * same database connection.
+   */
+  async transaction(getQueries: GetQueries<unknown>) {
+    return new Promise<void>((resolve, reject) => {
+      this.database.tx(t => {
+        const queries = getQueries(t as AnyQuery<unknown>);
+        return t.batch(queries);
+      })
+        .then(_ => resolve())
+        .catch(error => reject(error));
+    });
   }
 }

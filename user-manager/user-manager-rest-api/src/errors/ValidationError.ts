@@ -1,5 +1,5 @@
 import { AppError } from './AppError';
-import { ErrorType } from './errorCodeMap';
+import { ErrorType } from '../common/errors';
 
 export class ValidationError extends AppError {
   constructor(message: string) {

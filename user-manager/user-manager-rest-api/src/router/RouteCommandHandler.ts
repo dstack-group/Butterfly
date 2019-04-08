@@ -8,7 +8,7 @@ import { RouteContextReplierFactory } from './RouteContextReplierFactory';
  * result to an implementation of RouteContextReplier, which is responsible of responding to the HTTP request
  * with the result of said computation.
  */
-export type RouteCommandHandler = <T>(command: RouteCommand<T>) => Middleware;
+export type RouteCommandHandler = <T>(routeCommandCreator: RouteCommand<T>) => Middleware;
 
 /**
  * RouteCommandHandlerCreator creates a RouteCommandHandler given a RouteContextReplierFactory, which
@@ -17,9 +17,9 @@ export type RouteCommandHandler = <T>(command: RouteCommand<T>) => Middleware;
 export type RouteCommandHandlerCreator = (contextReplierFactory: RouteContextReplierFactory) => RouteCommandHandler;
 
 export const createRouteCommandHandler: RouteCommandHandlerCreator = contextReplierFactory =>
-  command =>
+  routeCommandCreator =>
     async context => {
       const contextWrapper: RouteContextReplier = contextReplierFactory(context);
-      const { data, status } = await command(contextWrapper);
+      const { data, status } = await routeCommandCreator(contextWrapper);
       contextWrapper.reply(data, status);
     };

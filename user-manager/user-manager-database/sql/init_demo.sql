@@ -1,1 +1,1 @@
-CALL public.init_demo_data();
+-- CALL public.init_demo_data();
