@@ -1,4 +1,5 @@
 import { PgDatabaseConnection, GetQueries } from '../../src/database';
+import { User } from '../../src/modules/users/entity';
 
 const query = `INSERT INTO public.user(user_id, email, firstname, lastname)
                VALUES($[userId], $[email], $[firstname], $[lastname])`;
@@ -8,8 +9,13 @@ const commonValues = {
   modified: null,
 };
 
-export function createUser(database: PgDatabaseConnection) {
-  const userResult = {
+export interface CreateUserResult {
+  result: User;
+  transaction: Promise<void>;
+}
+
+export function createUser(database: PgDatabaseConnection): CreateUserResult {
+  const userResult: User = {
     email: 'alberto.schiabel@gmail.com',
     firstname: 'Alberto',
     lastname: 'Schiabel',
@@ -17,15 +23,8 @@ export function createUser(database: PgDatabaseConnection) {
     ...commonValues,
   };
 
-  const getUserQuery: GetQueries<unknown> = t => {
-    const { email, firstname, lastname, userId } = userResult;
-    const createUserQuery = t.any(query, {
-      email,
-      firstname,
-      lastname,
-      userId,
-    });
-
+  const getUserQuery: GetQueries<User> = t => {
+    const createUserQuery = t.any(query, userResult);
     return [createUserQuery];
   };
 
@@ -35,8 +34,13 @@ export function createUser(database: PgDatabaseConnection) {
   };
 }
 
-export function createUsers(database: PgDatabaseConnection) {
-  const userResults = [
+export interface CreateUsersResult {
+  results: User[];
+  transaction: Promise<void>;
+}
+
+export function createUsers(database: PgDatabaseConnection): CreateUsersResult {
+  const userResults: User[] = [
     {
       email: 'alberto.schiabel@gmail.com',
       firstname: 'Alberto',
@@ -82,18 +86,8 @@ export function createUsers(database: PgDatabaseConnection) {
     },
   ];
 
-  const getUserQueries: GetQueries<unknown> = t => {
-    const createUserQueries: Array<Promise<Array<unknown>>> =
-      userResults.map(({ email, firstname, lastname, userId }) => {
-        return t.any(query, {
-          email,
-          firstname,
-          lastname,
-          userId,
-        });
-      });
-
-    return createUserQueries;
+  const getUserQueries: GetQueries<User> = t => {
+    return userResults.map(user => t.any(query, user));
   };
 
   return {

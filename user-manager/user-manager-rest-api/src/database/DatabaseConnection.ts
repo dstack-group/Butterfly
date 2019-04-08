@@ -30,6 +30,13 @@ export interface DatabaseConnection {
   any<T>(query: string, values?: DatabaseConnectionValues): Promise<T[]>;
 
   /**
+   * Executes a query and returns the number of rows affected.
+   * @param query the SQL string that contains the query to be run
+   * @param values the named value parameters to be passed to the query
+   */
+  result(query: string, values?: DatabaseConnectionValues): Promise<number>;
+
+  /**
    * Shuts down all connection pools created in the process, so it can terminate without delay.
    */
   close(): Promise<void>;

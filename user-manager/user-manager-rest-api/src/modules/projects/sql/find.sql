@@ -1,6 +1,16 @@
 /**
  * Returns a paginated list of projects. The following structur is returned:
- *
+ */
+
+SELECT project_id AS "projectId",
+    project_name AS "projectName",
+    project_url AS "projectURL",
+    created,
+    modified
+FROM ${schema~}.project p
+ORDER BY p.project_id
+
+/*
 {
   data: Array<{
     project_id: string;
@@ -9,13 +19,13 @@
   }>;
   n_pages: number; // total number of pages
 }
- */
+
 WITH project_list AS (
 	SELECT p.*
 	FROM ${schema~}.project p
 	ORDER BY p.project_id
 	LIMIT ${limit}
-	OFFSET ${offset} -- (page - 1) * n_rows
+  OFFSET ${offset} -- (page - 1) * n_rows
 ),
 n_pages AS (
 	SELECT CEILING(COUNT(p.*) / 3) AS n_pages
@@ -27,3 +37,4 @@ SELECT json_build_object(
 	'n_pages', (SELECT n_pages FROM n_pages)
 ) AS result
 FROM project_list pl
+*/

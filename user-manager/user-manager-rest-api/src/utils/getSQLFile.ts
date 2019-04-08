@@ -22,8 +22,5 @@ export function getSQLFile(directoryName: string, relativeFilename: string, sche
   }
 
   // @ts-ignore
-  // console.log('queryFile[as.ctf.toPostgres]()', queryFile[as.ctf.toPostgres]());
-
-  // @ts-ignore
-  return queryFile[as.ctf.toPostgres](); // queryFile.toPostgres(queryFile);
+  return queryFile[as.ctf.toPostgres]();
 }

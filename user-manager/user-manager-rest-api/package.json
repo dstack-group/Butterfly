@@ -5,10 +5,10 @@
   "main": "dist/index.js",
   "scripts": {
     "clean": "rimraf ./dist ./coverage",
-    "test": "jest --verbose=false --coverage",
+    "test": "yarn test:unit && yarn test:integration",
     "test:cov": "jest -c ./jest.converage.config.js --coverage",
     "test:unit": "jest -c ./jest.unit.config.js",
-    "test:integration": "jest -c ./jest.integration.config.js",
+    "test:integration": "jest -c ./jest.integration.config.js --runInBand",
     "build": "tsc",
     "postbuild": "yarn assets",
     "lint": "tslint -c tslint.json -p tsconfig.json",
@@ -53,6 +53,7 @@
     "cp-file": "^6.0.0",
     "fast-glob": "^2.2.6",
     "jest": "^24.7.1",
+    "rimraf": "^2.6.3",
     "strip-json-comments": "^2.0.1",
     "ts-jest": "^24.0.2",
     "tslint": "^5.15.0"

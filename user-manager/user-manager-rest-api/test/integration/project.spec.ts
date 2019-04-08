@@ -4,9 +4,10 @@ import { Server as AppServer } from '../../src/server';
 import { Server } from 'http';
 import { truncData } from '../fixtures/truncData';
 import { PgDatabaseConnection } from '../../src/database';
-import { createUsers, createUser } from '../fixtures/createUsers';
+import { createProjects, createProject } from '../fixtures/createProjects';
 import { isValidDate } from '../isValidDate';
-import { User } from '../../src/modules/users/entity';
+import { Project } from '../../src/modules/projects/entity';
+import { ThirdPartyProducerService } from '../../src/common/ThirdPartyProducerService';
 
 let app: AppServer;
 let server: Server;
@@ -29,13 +30,13 @@ afterEach(done => {
   app.closeServer().then(done);
 });
 
-describe(`GET /users`, () => {
+describe(`GET /projects`, () => {
   it(`The response data should be ordered by id and match the objects inserted into the database`, done => {
-    const { transaction, results } = createUsers(databaseConnection);
+    const { transaction, results } = createProjects(databaseConnection);
     transaction
       .then(() => {
         supertest(server)
-          .get('/users')
+          .get('/projects')
           .expect('Content-Type', /application\/json/)
           .expect(response => {
             expect(response.body).toHaveProperty('data');
@@ -53,9 +54,9 @@ describe(`GET /users`, () => {
       });
   });
 
-  it(`The response data should be an empty array if no user is saved`, done => {
+  it(`The response data should be an empty array if no project is saved`, done => {
     supertest(server)
-      .get('/users')
+      .get('/projects')
       .expect('Content-Type', /application\/json/)
       .expect(response => {
         expect(response.body).toHaveProperty('data');
@@ -65,20 +66,21 @@ describe(`GET /users`, () => {
   });
 });
 
-describe(`POST /users`, () => {
-  it(`Should fail if another user with the same email address already exists`, done => {
-    const { transaction, result } = createUser(databaseConnection);
-    const { email } = result;
-    const user: User = {
-      email,
-      firstname: 'NEW_USER',
-      lastname: 'NEW_USER',
+describe(`POST /projects`, () => {
+  it(`Should fail if another project with the same name already exists`, done => {
+    const { transaction, result } = createProject(databaseConnection);
+    const { projectName } = result;
+    const project: Project = {
+      projectName,
+      projectURL: {
+        GITLAB: 'http://gitlab',
+      },
     };
     transaction
       .then(() => {
         supertest(server)
-          .post('/users')
-          .send(user)
+          .post('/projects')
+          .send(project)
           .expect('Content-Type', /application\/json/)
           .expect(response => {
             expect(response.body).not.toHaveProperty('data');
@@ -92,24 +94,25 @@ describe(`POST /users`, () => {
       });
   });
 
-  it(`Should return the newly inserted user if the INSERT operation is successful`, done => {
-    const user: User = {
-      email: 'email@email.com',
-      firstname: 'NEW_USER',
-      lastname: 'NEW_USER',
+  it(`Should return the newly inserted project if the INSERT operation is successful`, done => {
+    const project: Project = {
+      projectName: 'PROJECT_NAME',
+      projectURL: {
+        GITLAB: 'http://gitlab',
+      },
     };
     supertest(server)
-      .post('/users')
-      .send(user)
+      .post('/projects')
+      .send(project)
       .expect('Content-Type', /application\/json/)
       .expect(response => {
         expect(response.body).toHaveProperty('data');
         expect(response.body.data).toMatchObject({
-          email: user.email,
-          firstname: user.firstname,
-          lastname: user.lastname,
-          enabled: true,
           modified: null,
+          projectName: 'PROJECT_NAME',
+          projectURL: {
+            GITLAB: 'http://gitlab',
+          },
         });
 
         /**
@@ -119,24 +122,24 @@ describe(`POST /users`, () => {
         expect(isValidDate(response.body.data.created)).toBe(true);
 
         /**
-         * data.userId should be of type string.
+         * data.projectId should be of type string.
          */
-        expect(response.body.data).toHaveProperty('userId');
-        expect(typeof response.body.data.userId).toBe('string');
+        expect(response.body.data).toHaveProperty('projectId');
+        expect(typeof response.body.data.projectId).toBe('string');
       })
     .expect(201, done);
   });
 });
 
-describe(`DELETE /users`, () => {
-  it(`Should delete a user if it exists`, done => {
-    const { transaction, result } = createUser(databaseConnection);
-    const { email } = result;
+describe(`DELETE /projects/:projectName`, () => {
+  it(`Should delete a project if it exists`, done => {
+    const { transaction, result } = createProject(databaseConnection);
+    const { projectName } = result;
 
     transaction
       .then(() => {
         supertest(server)
-          .delete(`/users/${email}`)
+          .delete(`/projects/${projectName}`)
           .expect('Content-Type', /application\/json/)
           .expect(response => {
             expect(response.body).toHaveProperty('data');
@@ -149,9 +152,50 @@ describe(`DELETE /users`, () => {
       });
   });
 
-  it(`Should return a NotFoundError if attempting to delete a user that doesn't exist`, done => {
+  it(`Should return a NotFoundError if attempting to delete a project that doesn't exist`, done => {
     supertest(server)
-      .delete(`/users/PROJECT_NAME`)
+      .delete(`/projects/PROJECT_NAME`)
+      .expect('Content-Type', /application\/json/)
+      .expect(response => {
+        expect(response.body).not.toHaveProperty('data');
+        expect(response.body).toHaveProperty('error');
+        expect(response.body.error).toBe(true);
+      })
+      .expect(404, done);
+  });
+});
+
+describe(`DELETE /projects/:projectName/:producerService`, () => {
+  it(`Should delete a project if it exists`, done => {
+    const { transaction, result } = createProject(databaseConnection);
+    const { projectId, projectName, projectURL } = result;
+
+    transaction
+      .then(() => {
+        supertest(server)
+          .delete(`/projects/${projectName}/${ThirdPartyProducerService.GITLAB}`)
+          .expect('Content-Type', /application\/json/)
+          .expect(response => {
+            expect(response.body).toHaveProperty('data');
+            expect(response.body.data).toMatchObject({
+              projectId,
+              projectName,
+              projectURL: {
+                [ThirdPartyProducerService.REDMINE]: projectURL![ThirdPartyProducerService.REDMINE]!,
+              },
+            });
+          })
+          .expect(200, done);
+      })
+      .catch(e => {
+        expect(e).toBe(undefined);
+      });
+  });
+
+  it(`Should return a NotFoundError if attempting to delete a service URL from a project
+      that doesn't exist`, done => {
+    supertest(server)
+      .delete(`/projects/PROJECT_NAME/${ThirdPartyProducerService.GITLAB}`)
       .expect('Content-Type', /application\/json/)
       .expect(response => {
         expect(response.body).not.toHaveProperty('data');

@@ -1,5 +1,5 @@
 /**
- * Removes the project with the given name
+ * Deletes the project with the given name
  */
 DELETE
 FROM ${schema~}.project

@@ -47,11 +47,11 @@ export class UserController extends RouteController {
   private deleteUserByEmailCommand: RouteCommand<User> = async routeContext => {
     const { email } = routeContext.getNamedParams() as { email: string };
     const userParams = { email };
-    const deleted = await this.manager.delete(userParams as User);
+    await this.manager.delete(userParams as User);
 
     return {
       data: null,
-      status: deleted ? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND,
+      status: HttpStatus.OK,
     };
   }
 

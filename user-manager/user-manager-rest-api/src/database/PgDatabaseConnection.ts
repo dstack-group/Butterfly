@@ -53,10 +53,19 @@ export class PgDatabaseConnection implements DatabaseConnection {
   }
 
   /**
+   * Executes a query and returns the number of rows affected.
+   * @param query the SQL string that contains the query to be run
+   * @param values the named value parameters to be passed to the query
+   */
+  async result(query: string, values?: DatabaseConnectionValues): Promise<number> {
+    return this.database.result(query, values, count => count.rowCount);
+  }
+
+  /**
    * Shuts down all connection pools created in the process, so it can terminate without delay.
    */
   async close(): Promise<void> {
-    await this.database.$pool.end();
+    // await this.database.$pool.end();
     await this.pgPromise.end();
   }
 
@@ -66,10 +75,10 @@ export class PgDatabaseConnection implements DatabaseConnection {
    * @param getQueries method that given a task objects, returns a list of queries to execute sharing the
    * same database connection.
    */
-  async transaction(getQueries: GetQueries<unknown>) {
+  async transaction<T>(getQueries: GetQueries<T>) {
     return new Promise<void>((resolve, reject) => {
       this.database.tx(t => {
-        const queries = getQueries(t as AnyQuery<unknown>);
+        const queries = getQueries(t as AnyQuery<T>);
         return t.batch(queries);
       })
         .then(_ => resolve())

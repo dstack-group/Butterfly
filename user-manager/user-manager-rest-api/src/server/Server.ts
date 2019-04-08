@@ -35,7 +35,7 @@ export class Server {
     return this.server;
   }
 
-  closeServer(): Promise<void> {
+  async closeServer(): Promise<void> {
     this.logger.info('Closing server');
     /*
     try {
@@ -49,19 +49,24 @@ export class Server {
     }
     */
 
-    return this.stopServerProcesses();
+    await this.stopServerProcesses();
   }
 
   private stopServerProcesses() {
     return new Promise<void>((resolve, reject) => {
-      this.server!.close(async () => {
-        try {
-          await this.database.close();
-          resolve();
-        } catch (err) {
-          reject(err);
-        }
-      });
+      if (!this.server) {
+        this.logger.info('No server to stop');
+        resolve();
+      } else {
+        this.server.close(() => {
+          this.database.close()
+            .then(() => {
+              this.logger.info('Closed database connection');
+            })
+            .then(resolve)
+            .catch(reject);
+        });
+      }
     });
   }
 

@@ -9,7 +9,7 @@ export class UserRepository extends AbstractCRUDRepository<User, UserQueryProvid
     super(database, sqlProvider);
   }
 
-  findByEmail(user: User) {
+  findByEmail(user: User): Promise<User> {
     return this.database.one(sqlProvider.findByEmail, user);
   }
 }

@@ -3,4 +3,4 @@
  */
 DELETE
 FROM ${schema~}.user
-WHERE user_id = ${userId}
+WHERE email = ${email}

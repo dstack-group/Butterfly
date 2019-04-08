@@ -49,6 +49,15 @@ export class Database implements DatabaseConnection {
   }
 
   /**
+   * Executes a query and returns the number of rows affected.
+   * @param query the SQL string that contains the query to be run
+   * @param values the named value parameters to be passed to the query
+   */
+  async result(query: string, values?: DatabaseConnectionValues): Promise<number> {
+    return this.connection.result(query, values);
+  }
+
+  /**
    * Shuts down all connection pools created in the process, so it can terminate without delay.
    */
   async close(): Promise<void> {

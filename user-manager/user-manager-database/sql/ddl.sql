@@ -100,6 +100,8 @@ CREATE TABLE public.project (
 	project_id BIGINT NOT NULL DEFAULT nextval('public.project_id_seq'),
 	project_name VARCHAR(30) NOT NULL,
 	project_url jsonb,
+	created TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+	modified TIMESTAMP WITH TIME ZONE DEFAULT NULL,
 	CONSTRAINT project_pkey PRIMARY KEY (project_id),
 	CONSTRAINT project_project_name_unique
         UNIQUE (project_name)
@@ -352,6 +354,13 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION public.trigger_update_modified_field()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.modified = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
 ----------------- PROCEDURES -----------------
 
@@ -423,10 +432,10 @@ CREATE OR REPLACE PROCEDURE public.init_demo_data()
 LANGUAGE plpgsql
 AS $$
 BEGIN
-	INSERT INTO public.project(project_id, project_name, project_url) VALUES (1, 'Butterfly', '{"redmine": "redmine.dstackgroup.com/butterfly/butterfly.git", "gitlab": "https://localhost:10443/dstack/butterfly.git"}');
-	INSERT INTO public.project(project_id, project_name, project_url) VALUES (2, 'Amazon', '{"gitlab": "gitlab.amazon.com/amazon/amazon.git"}');
-	INSERT INTO public.project(project_id, project_name, project_url) VALUES (3, 'Uber', '{"gitlab": "gitlab.uber.com/uber/uber.git"}');
-	INSERT INTO public.project(project_id, project_name, project_url) VALUES (4, 'Twitter', '{"sonarqube": "sonarqube.twitter.com/twitter/twitter.git", "gitlab": "gitlab.twitter.com/twitter/twitter.git"}');
+	INSERT INTO public.project(project_id, project_name, project_url) VALUES (1, 'Butterfly', '{"REDMINE": "redmine.dstackgroup.com/butterfly/butterfly.git", "GITLAB": "https://localhost:10443/dstack/butterfly.git"}');
+	INSERT INTO public.project(project_id, project_name, project_url) VALUES (2, 'Amazon', '{"GITLAB": "gitlab.amazon.com/amazon/amazon.git"}');
+	INSERT INTO public.project(project_id, project_name, project_url) VALUES (3, 'Uber', '{"GITLAB": "gitlab.uber.com/uber/uber.git"}');
+	INSERT INTO public.project(project_id, project_name, project_url) VALUES (4, 'Twitter', '{"SONARQUBE": "sonarqube.twitter.com/twitter/twitter.git", "GITLAB": "gitlab.twitter.com/twitter/twitter.git"}');
 
 	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (1, 'alberto.schiabel@gmail.com', 'Alberto', 'Schiabel');
 	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (2, 'federico.rispo@gmail.com', 'Federico', 'Rispo');
@@ -457,6 +466,18 @@ BEGIN
 END;
 $$;
 
+------------------ TRIGGER ------------------
+
+CREATE TRIGGER update_project_timestamp
+BEFORE UPDATE ON public.project
+FOR EACH ROW
+EXECUTE PROCEDURE public.trigger_update_modified_field();
+
+CREATE TRIGGER update_user_timestamp
+BEFORE UPDATE ON public.user
+FOR EACH ROW
+EXECUTE PROCEDURE public.trigger_update_modified_field();
+
 ------------------ EXECUTE ------------------
 
 CALL public.trunc_data();
@@ -484,7 +505,7 @@ EVENT_PROJECT AS (
 	FROM public.project p,
 		EVENT_RECORD r
 	WHERE p.project_name = r.project_name
-		AND p.project_url @> ('{"' || LOWER(r.service::text) || '": "' || r.project_url || '"}')::jsonb
+		AND p.project_url @> ('{"' || r.service::text || '": "' || r.project_url || '"}')::jsonb
 ),
 EVENT_TYPE_ID AS (
 	SELECT xset.x_service_event_type_id
@@ -622,7 +643,7 @@ USERS_WITH_SAME_PROJECT_URL AS (
 	SELECT uwp.*
 	FROM public.v_filtered_users_project uwp
 	JOIN EVENT_RECORD r ON TRUE
-	WHERE uwp.project_url @> ('{"' || LOWER(r.service::text) || '": "' || r.project_url || '"}')::jsonb
+	WHERE uwp.project_url @> ('{"' || r.service::text || '": "' || r.project_url || '"}')::jsonb
 ),
 USERS_WITH_SAME_EMAIL AS (
 	SELECT uwp.*
