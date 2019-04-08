@@ -34,7 +34,7 @@ services:
       - user-manager-test-network
     entrypoint:
       - yarn
-      - test
+      - test:ci
 
 networks:
   user-manager-test-network:
