@@ -1,0 +1,10 @@
+version: '3.5'
+
+services:
+  install:
+    image: node:10.15.3-alpine
+    volumes:
+      - ./user-manager-rest-api:/usr/app
+    working_dir: /usr/app
+    entrypoint:
+      - yarn
