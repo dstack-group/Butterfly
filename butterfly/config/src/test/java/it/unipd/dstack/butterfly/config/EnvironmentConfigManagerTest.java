@@ -20,9 +20,9 @@ public class EnvironmentConfigManagerTest {
     @Test
     public void shouldReturnSome() {
 
-        String homeEnvVar = System.getenv("HOME");
-        assertEquals(homeEnvVar, manager.readConfigValue("HOME"));
-        assertEquals(homeEnvVar, manager.getStringProperty("HOME"));
+        String homeEnvVar = System.getenv("JAVA_HOME");
+        assertEquals(homeEnvVar, manager.readConfigValue("JAVA_HOME"));
+        assertEquals(homeEnvVar, manager.getStringProperty("JAVA_HOME"));
     }
 
 
@@ -37,16 +37,9 @@ public class EnvironmentConfigManagerTest {
     @Test
     public void shouldReturnRightStringProperty() {
 
-        String homeEnvVar = System.getenv("HOME");
-        assertEquals(homeEnvVar, manager.readConfigValue("HOME"));
-        assertEquals(homeEnvVar, manager.getStringProperty("HOME"));
-
-        /*
-         * Setting a property doesn't work because getStringProperty check an environment variable and
-         *  not a property :(
-         */
-        //System.setProperty("testing_string_property", "Test");
-        //assertEquals("Test", manager.getStringProperty(""));
+        String homeEnvVar = System.getenv("JAVA_HOME");
+        assertEquals(homeEnvVar, manager.readConfigValue("JAVA_HOME"));
+        assertEquals(homeEnvVar, manager.getStringProperty("JAVA_HOME"));
     }
 
 }
