@@ -36,10 +36,10 @@ describe(`Application errors`, () => {
   });
 
   it(`getHTTPStatusFromErrorCode should map internal code errors to HTTP error codes`, () => {
-    expect(getHTTPStatusFromErrorCode('FIELD_VALIDATION_ERROR')).toBe(400);
+    expect(getHTTPStatusFromErrorCode('FIELD_VALIDATION_ERROR')).toBe(422);
     expect(getHTTPStatusFromErrorCode('INTERNAL_SERVER_ERROR')).toBe(500);
     expect(getHTTPStatusFromErrorCode('NOT_FOUND_ERROR')).toBe(404);
     expect(getHTTPStatusFromErrorCode('VALIDATION_ERROR')).toBe(400);
     expect(getHTTPStatusFromErrorCode('UNIQUE_CONSTRAINT_ERROR')).toBe(409);
-  })
+  });
 });
