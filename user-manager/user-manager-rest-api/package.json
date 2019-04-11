@@ -6,10 +6,12 @@
   "scripts": {
     "clean": "rimraf ./dist ./coverage",
     "test": "yarn test:unit && yarn test:integration --coverage",
+    "pretest:ci": "yarn build",
     "test:ci": "jest -c ./jest.ci.config.js --coverage --runInBand",
     "test:cov": "jest -c ./jest.converage.config.js --coverage",
     "test:unit": "jest -c ./jest.unit.config.js",
     "test:integration": "jest -c ./jest.integration.config.js --runInBand",
+    "prebuild": "yarn lint",
     "build": "tsc",
     "postbuild": "yarn assets",
     "lint": "tslint -c tslint.json -p tsconfig.json",

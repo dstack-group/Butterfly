@@ -19,7 +19,6 @@ COPY --from=base /usr/app/node_modules ./node_modules
 ADD . /usr/app
 # Add devDependencies
 RUN yarn
-RUN yarn lint
 RUN yarn test:unit
 RUN yarn build
 

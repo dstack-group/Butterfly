@@ -1,7 +1,7 @@
 import { Project } from './entity';
 import { ProjectRepository } from './repository';
 import { AbstractCRUDManager } from '../../common/AbstractCRUDManager';
-import { NotFoundError } from '@src/errors';
+import { NotFoundError } from '../../errors';
 
 export class ProjectManager extends AbstractCRUDManager<Project, any, ProjectRepository> {
 
