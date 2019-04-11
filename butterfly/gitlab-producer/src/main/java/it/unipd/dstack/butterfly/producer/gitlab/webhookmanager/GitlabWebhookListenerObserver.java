@@ -4,15 +4,11 @@ import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.producer.avro.ServiceEventTypes;
 import it.unipd.dstack.butterfly.producer.avro.Services;
 import org.apache.avro.AvroRuntimeException;
-import org.gitlab4j.api.webhook.EventLabel;
 import org.gitlab4j.api.webhook.IssueEvent;
 import org.gitlab4j.api.webhook.PushEvent;
 import org.gitlab4j.api.webhook.WebHookListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * GitlabWebhookListenerObserver is a concrete implementation of the third-party interface WebHookListener.
@@ -115,7 +111,7 @@ class GitlabWebhookListenerObserver implements WebHookListener {
             eventBuilder.setUserEmail(issueEvent.getUser().getEmail());
             eventBuilder.setTitle(issueEvent.getObjectAttributes().getTitle());
             eventBuilder.setDescription(issueEvent.getObjectAttributes().getDescription());
-            eventBuilder.setTags(this.getStringsFromIssueLabels(issueEvent.getLabels()));
+            // eventBuilder.setTags(this.getStringsFromIssueLabels(issueEvent.getLabels()));
             Event event = eventBuilder.build();
 
             if (isIssueEditedEvent) {
@@ -130,9 +126,11 @@ class GitlabWebhookListenerObserver implements WebHookListener {
         }
     }
 
+    /*
     protected List<String> getStringsFromIssueLabels(List<EventLabel> eventLabelList) {
         return eventLabelList.stream()
             .map(EventLabel::getDescription)
             .collect(Collectors.toList());
     }
+    */
 }
