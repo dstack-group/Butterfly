@@ -1,43 +1,41 @@
 package it.unipd.dstack.butterfly.consumer.email.sender;
 
+import it.unipd.dstack.butterfly.consumer.config.EmailConfig;
 import it.unipd.dstack.butterfly.consumer.consumer.message.MessageSender;
 import it.unipd.dstack.butterfly.consumer.email.message.EmailMessage;
-
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.util.Properties;
+import org.simplejavamail.email.Email;
+import org.simplejavamail.email.EmailBuilder;
+import org.simplejavamail.mailer.Mailer;
+import org.simplejavamail.mailer.MailerBuilder;
+import org.simplejavamail.mailer.config.TransportStrategy;
 
 public class EmailSender implements MessageSender<EmailMessage> {
-    private final Properties mailServerProperties;
-    private final String server;
-    private final String email;
-    private final String password;
-    private Session mailSession;
+    private final Mailer mailer;
 
-    public EmailSender(String server, String email, String password) {
-        this.server = server;
-        this.email = email;
-        this.password = password;
-        
-        this.mailServerProperties = System.getProperties();
-        mailServerProperties.put("mail.smtp.port", "587");
-        mailServerProperties.put("mail.smtp.auth", true);
-        mailServerProperties.put("mail.smtp.starttls.enable", "true");
+    private final EmailConfig emailConfig;
 
-        this.mailSession = Session.getDefaultInstance(mailServerProperties, null);
+    public EmailSender(EmailConfig emailConfig) {
+        this.emailConfig = emailConfig;
+
+        this.mailer = MailerBuilder
+                .withSMTPServer(
+                        emailConfig.getHost(),
+                        emailConfig.getPort(),
+                        emailConfig.getUsername(),
+                        emailConfig.getPassword()
+                )
+                .withTransportStrategy(TransportStrategy.SMTP)
+                .withSessionTimeout(emailConfig.getSessionTimeoutMS())
+                .clearEmailAddressCriteria() // turns off email validation
+                .withDebugLogging(emailConfig.isDebugEnabled())
+                .buildMailer();
     }
 
-    private Message buildEmailMessage(EmailMessage emailMessage) throws MessagingException {
-        Message message = new MimeMessage(this.mailSession);
-
-        InternetAddress[] fromArray = new InternetAddress[1];
-        fromArray[0] = new InternetAddress("noreply-butterfly@unipd.it");
-        message.addFrom(fromArray);
-        message.addRecipient(Message.RecipientType.TO, new InternetAddress(emailMessage.getRecipient()));
-        message.setSubject(emailMessage.getSubject());
-        message.setContent(emailMessage.getContent(), "text/html");
-        return message;
+    /**
+     * TODO: it should probably be moved to MessageSender
+     */
+    public void testConnection() {
+        this.mailer.testConnection();
     }
 
     /**
@@ -46,16 +44,14 @@ public class EmailSender implements MessageSender<EmailMessage> {
      * @param message
      */
     @Override
-    public void sendMessage(EmailMessage message) throws MessagingException {
-        Transport transport = null;
-        try {
-            transport = this.mailSession.getTransport("smtp");
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        }
-        transport.connect(this.server, this.email, this.password);
-        var mailMessage = this.buildEmailMessage(message);
-        transport.sendMessage(mailMessage, mailMessage.getAllRecipients());
-        transport.close();
+    public void sendMessage(EmailMessage message) {
+        Email email = EmailBuilder.startingBlank()
+                .from("Butterfly Bot", "noreply-butterfly@unipd.it")
+                .to(message.getRecipient())
+                .withSubject(message.getSubject())
+                .withHTMLText(message.getContent())
+                .buildEmail();
+
+        this.mailer.sendMail(email, true);
     }
 }
