@@ -47,8 +47,8 @@ public abstract class ProducerController<V> implements Controller {
         };
         */
 
-        // this.onWebhookEvent = onWebhookEventFromTopic.onEvent(producer, this.kafkaTopic);
-        this.onWebhookEvent = new ProducerOnWebhookEvent();
+        this.onWebhookEvent = onWebhookEventFromTopic.onEvent(producer, this.kafkaTopic);
+        // this.onWebhookEvent = new ProducerOnWebhookEvent(producer);
 
         this.webhookHandler = new WebhookHandler.Builder()
                 .setRoute(this.webhookEndpoint)
@@ -111,21 +111,21 @@ public abstract class ProducerController<V> implements Controller {
         // NO-OP if it isn't overridden
     }
 
-    private class ProducerOnWebhookEvent implements OnWebhookEvent<V> {
-        private OnWebhookEvent<V> onWebhookEvent =
-                onWebhookEventFromTopic.onEvent(producer, ProducerController.this.kafkaTopic);
-
-        /**
-         * This method is called when a WebHook event has been received. The event object has info about the
-         * specific event type and its data.
-         *
-         * @param event
-         */
-        @Override
-        public CompletableFuture<Void> handleEvent(V event) {
-            logger.info(serviceName + " Received event: " + event.toString());
-            return this.onWebhookEvent
-                    .handleEvent(event);
-        }
-    }
+    //private class ProducerOnWebhookEvent implements OnWebhookEvent<V> {
+    //    private OnWebhookEvent<V> onWebhookEvent =
+    //            onWebhookEventFromTopic.onEvent(producer, ProducerController.this.kafkaTopic);
+    //
+    //    /**
+    //     * This method is called when a WebHook event has been received. The event object has info about the
+    //     * specific event type and its data.
+    //     *
+    //     * @param event
+    //     */
+    //    @Override
+    //    public CompletableFuture<Void> handleEvent(V event) {
+    //        logger.info(serviceName + " Received event: " + event.toString());
+    //        return this.onWebhookEvent
+    //                .handleEvent(event);
+    //    }
+    //}
 }

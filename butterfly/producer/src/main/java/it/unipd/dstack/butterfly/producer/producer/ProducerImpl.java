@@ -43,6 +43,7 @@ public class ProducerImpl<V> implements Producer<V> {
     public CompletableFuture<Void> send(Record<V> record) {
         return ProducerUtils.getCompletableFuture(callback -> {
             var kafkaRecord = new ProducerRecord<String, V>(record.getTopic(), record.getData());
+            logger.info("KafkaRecord being sent to topic " + kafkaRecord.topic());
             this.kafkaProducer.send(kafkaRecord, callback);
         });
     }
