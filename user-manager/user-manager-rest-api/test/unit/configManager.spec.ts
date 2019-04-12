@@ -56,15 +56,15 @@ describe(`Config manager`, () => {
     expect(() => {
       configManager.getStringProperty(SERVICE_NAME_KEY);
     })
-      .not.toThrow(ConfigurationUndefinedException);
+      .not.toThrow(ConfigurationCastException);
     expect(() => {
       configManager.getStringProperty(ENABLE_CACHE_KEY);
     })
-      .not.toThrow(ConfigurationUndefinedException);
+      .not.toThrow(ConfigurationCastException);
     expect(() => {
       configManager.getStringProperty(SERVER_PORT_KEY);
     })
-      .not.toThrow(ConfigurationUndefinedException);
+      .not.toThrow(ConfigurationCastException);
     expect(() => {
       configManager.getBooleanProperty(SERVICE_NAME_KEY);
     })
@@ -78,7 +78,7 @@ describe(`Config manager`, () => {
     })
       .toThrow(new ConfigurationCastException(SERVICE_NAME_KEY, 'user-manager', 'number'));
     expect(() => {
-      configManager.getIntProperty(SERVICE_NAME_KEY);
+      configManager.getIntProperty(SERVICE_NAME_KEY, 5432);
     })
       .toThrow(new ConfigurationCastException(SERVICE_NAME_KEY, 'user-manager', 'number'));
   });

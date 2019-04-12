@@ -24,9 +24,13 @@ public class GitlabWebhookManager {
     public void onNewGitlabEvent(HttpServletRequest request) throws GitlabWebhookException {
         try {
             webHookManager.handleEvent(request);
-            logger.info("NEW EVENT FROM " + request.getRequestURI());
+            if (logger.isInfoEnabled()) {
+                logger.info(String.format("NEW EVENT FROM %s", request.getRequestURI()));
+            }
         } catch (GitLabApiException exception) {
-            logger.error("GITLAB API EXCEPTION " + exception.getStackTrace());
+            if (logger.isErrorEnabled()) {
+                logger.error(String.format("GITLAB API EXCEPTION %s", exception.getStackTrace()));
+            }
             throw new GitlabWebhookException(exception);
         }
     }

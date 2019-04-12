@@ -1,5 +1,7 @@
 package it.unipd.dstack.butterfly.producer.webhookhandler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
@@ -8,9 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.function.Consumer;
 
 public class WebhookHandler {
+    private static Logger logger = LoggerFactory.getLogger(WebhookHandler.class);
+
     private final String route;
     private final HTTPMethod method;
-    private final Consumer<Exception> exceptionConsumer;
     private final Consumer<HttpServletRequest> webhookConsumer;
 
     private WebhookHandler(String route,
@@ -19,7 +22,6 @@ public class WebhookHandler {
                            Consumer<HttpServletRequest> webhookConsumer) {
         this.route = route;
         this.method = method;
-        this.exceptionConsumer = exceptionConsumer;
         this.webhookConsumer = webhookConsumer;
 
         Spark.initExceptionHandler(exceptionConsumer);
@@ -65,7 +67,10 @@ public class WebhookHandler {
     public static class Builder {
         private String route = "/";
         private HTTPMethod method = HTTPMethod.POST;
-        private Consumer<Exception> exceptionConsumer = (e) -> {
+        private Consumer<Exception> exceptionConsumer = e -> {
+            if (logger.isErrorEnabled()) {
+                logger.error(String.format("Default ExceptionConsumer %s", e));
+            }
         };
 
         private Consumer<HttpServletRequest> webhookConsumer;

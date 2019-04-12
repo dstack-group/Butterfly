@@ -8,16 +8,9 @@ import it.unipd.dstack.butterfly.consumer.consumer.controller.ConsumerController
 import it.unipd.dstack.butterfly.consumer.consumer.formatstrategy.FormatStrategy;
 import it.unipd.dstack.butterfly.consumer.telegram.message.TelegramMessage;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.TelegramBot;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TelegramConsumerController extends ConsumerController<EventWithUserContact> {
 
-    private static final Logger logger = LoggerFactory.getLogger(TelegramConsumerController.class);
-
-    /**
-     * TODO: this should become an Adapter
-     */
     private final TelegramBot bot;
     private final FormatStrategy<EventWithUserContact> formatStrategy;
 
@@ -40,7 +33,6 @@ public class TelegramConsumerController extends ConsumerController<EventWithUser
         EventWithUserContact eventWithUserContact = record.getData();
         String message = this.formatStrategy.format(eventWithUserContact);
         String contactRef = eventWithUserContact.getUserContact().getContactRef();
-        Long chatId = Long.valueOf(contactRef);
 
         TelegramMessage telegramMessage = new TelegramMessage(contactRef, message);
         this.bot.sendMessage(telegramMessage);

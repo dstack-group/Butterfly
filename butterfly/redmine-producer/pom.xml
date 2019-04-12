@@ -11,7 +11,6 @@
     <groupId>it.unipd.dstack.butterfly.producer.redmine-producer</groupId>
     <artifactId>redmine-producer</artifactId>
     <name>redmine-producer</name>
-    <!-- FIXME change it to the project's website -->
     <url>http://www.example.com</url>
 
     <dependencies>

@@ -85,6 +85,7 @@ public class ProducerImpl<V> implements Producer<V> {
             logger.info("Awaiting on latch");
             this.latch.await();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // set interrupt flag
             logger.error("InterruptingException error: " + e);
             error = e;
         } catch (RuntimeException e) {

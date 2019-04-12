@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.concurrent.CompletableFuture;
 
 public abstract class ProducerController<V> implements Controller {
     private static final Logger logger = LoggerFactory.getLogger(ProducerController.class);
@@ -20,7 +19,6 @@ public abstract class ProducerController<V> implements Controller {
     private final String kafkaTopic;
     private final int serverPort;
     private final String webhookEndpoint;
-    private final OnWebhookEventFromTopic<V> onWebhookEventFromTopic;
     protected final OnWebhookEvent<V> onWebhookEvent;
     private final WebhookHandler webhookHandler;
 
@@ -37,18 +35,7 @@ public abstract class ProducerController<V> implements Controller {
         this.kafkaTopic = configManager.getStringProperty("KAFKA_TOPIC");
         this.serverPort = configManager.getIntProperty("SERVER_PORT");
         this.webhookEndpoint = configManager.getStringProperty("WEBHOOK_ENDPOINT");
-        this.onWebhookEventFromTopic = onWebhookEventFromTopic;
-
-        /*
-        this.onWebhookEvent = (V event) -> {
-            logger.info(serviceName + " Received event: " + event.toString());
-            return onWebhookEventFromTopic.onEvent(producer, this.kafkaTopic)
-                    .handleEvent(event);
-        };
-        */
-
         this.onWebhookEvent = onWebhookEventFromTopic.onEvent(producer, this.kafkaTopic);
-        // this.onWebhookEvent = new ProducerOnWebhookEvent(producer);
 
         this.webhookHandler = new WebhookHandler.Builder()
                 .setRoute(this.webhookEndpoint)
@@ -68,22 +55,30 @@ public abstract class ProducerController<V> implements Controller {
     /**
      * Spins up the controller.
      */
-    final public void start() {
-        logger.info(this.serviceName + " started");
+    public final void start() {
         this.webhookHandler.listen(this.serverPort);
-        logger.info(this.serviceName + " listening on port: " + serverPort);
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("%s started", this.serviceName));
+            logger.info(String.format("%s listening on port: %s", this.serviceName, this.serverPort));
+        }
         this.producer.awaitUntilError(this::onProduceException);
     }
 
     /**
      * Closes the controller and releases resources.
      */
-    final public void close() {
-        logger.info("Closing " + this.serviceName);
+    public final void close() {
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("Closing %s", this.serviceName));
+        }
+
         // terminates the production process
         this.producer.close();
         this.releaseResources();
-        logger.info("Released resources " + this.serviceName);
+
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("Released resources %s", this.serviceName));
+        }
     }
 
     /**
@@ -110,22 +105,4 @@ public abstract class ProducerController<V> implements Controller {
     protected void releaseResources() {
         // NO-OP if it isn't overridden
     }
-
-    //private class ProducerOnWebhookEvent implements OnWebhookEvent<V> {
-    //    private OnWebhookEvent<V> onWebhookEvent =
-    //            onWebhookEventFromTopic.onEvent(producer, ProducerController.this.kafkaTopic);
-    //
-    //    /**
-    //     * This method is called when a WebHook event has been received. The event object has info about the
-    //     * specific event type and its data.
-    //     *
-    //     * @param event
-    //     */
-    //    @Override
-    //    public CompletableFuture<Void> handleEvent(V event) {
-    //        logger.info(serviceName + " Received event: " + event.toString());
-    //        return this.onWebhookEvent
-    //                .handleEvent(event);
-    //    }
-    //}
 }

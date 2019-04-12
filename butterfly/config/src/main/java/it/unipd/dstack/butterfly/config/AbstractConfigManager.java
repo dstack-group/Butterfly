@@ -32,7 +32,7 @@ public abstract class AbstractConfigManager {
      * @param property the configuration property name
      * @return the value of the specified configuration variable.
      */
-    public final String getStringProperty(String property) throws ConfigurationUndefinedException {
+    public final String getStringProperty(String property) {
         return this.getStringProperty(property, null);
     }
 
@@ -46,7 +46,7 @@ public abstract class AbstractConfigManager {
      * @param defaultProperty
      * @return the value of the specified configuration variable, or defaultProperty if it isn't set.
      */
-    public final String getStringProperty(String property, String defaultProperty) throws ConfigurationUndefinedException {
+    public final String getStringProperty(String property, String defaultProperty) {
         return this
                 .getConfigValue(property, defaultProperty, AbstractConfigManager.stringToStringMapper, String.class);
     }
@@ -61,7 +61,7 @@ public abstract class AbstractConfigManager {
      * @param property the configuration property name
      * @return the value of the specified configuration variable.
      */
-    public final Boolean getBooleanProperty(String property) throws ConfigurationException {
+    public final Boolean getBooleanProperty(String property) {
         return this.getBooleanProperty(property, null);
     }
 
@@ -77,9 +77,9 @@ public abstract class AbstractConfigManager {
      * @param defaultProperty
      * @return the value of the specified configuration variable, or defaultProperty if it isn't set.
      */
-    public final Boolean getBooleanProperty(String property, Boolean defaultProperty) throws ConfigurationException {
+    public final Boolean getBooleanProperty(String property, Boolean defaultProperty) {
         return this
-                .getConfigValue(property, defaultProperty, AbstractConfigManager.stringToBooleanMapper, Boolean.class);
+                .getConfigValue(property, defaultProperty, AbstractConfigManager::stringToBooleanMapper, Boolean.class);
     }
 
     /**
@@ -92,7 +92,7 @@ public abstract class AbstractConfigManager {
      * @param property the configuration property name
      * @return the value of the specified configuration variable.
      */
-    public final Integer getIntProperty(String property) throws ConfigurationException {
+    public final Integer getIntProperty(String property) {
         return this.getIntProperty(property, null);
     }
 
@@ -108,9 +108,9 @@ public abstract class AbstractConfigManager {
      * @param defaultProperty
      * @return the value of the specified configuration variable, or defaultProperty if it isn't set.
      */
-    public final Integer getIntProperty(String property, Integer defaultProperty) throws ConfigurationException {
+    public final Integer getIntProperty(String property, Integer defaultProperty) {
         return this
-                .getConfigValue(property, defaultProperty, AbstractConfigManager.stringToIntegerMapper, Integer.class);
+                .getConfigValue(property, defaultProperty, AbstractConfigManager::stringToIntegerMapper, Integer.class);
     }
 
     /**
@@ -139,7 +139,7 @@ public abstract class AbstractConfigManager {
      */
     private <T> T getConfigValue(String property, T defaultProperty, Function<String, T> mapper, Class<?> type) {
         Optional<String> propertyValue = this.getOptionalConfigValue(property);
-        if (propertyValue.isEmpty()) {
+        if (!propertyValue.isPresent()) {
             if (defaultProperty == null) {
                 throw new ConfigurationUndefinedException(property);
             } else {
@@ -164,10 +164,21 @@ public abstract class AbstractConfigManager {
     /**
      * stringToBooleanMapper attempts to casts a String value to Boolean.
      */
-    private static Function<String, Boolean> stringToBooleanMapper = (String value) -> Boolean.valueOf(value);
+    private static Boolean stringToBooleanMapper(String value) {
+        String valueLowerCase = value.toLowerCase();
+        if (valueLowerCase.equals("true")) {
+            return true;
+        } else if (valueLowerCase.equals("false")) {
+            return false;
+        } else {
+            throw new ClassCastException();
+        }
+    }
 
     /**
      * stringToIntegerMapper attempts to cast a String value to Integer.
      */
-    private static Function<String, Integer> stringToIntegerMapper = (String value) -> Integer.valueOf(value);
+    private static Integer stringToIntegerMapper(String value) {
+        return Integer.valueOf(value);
+    }
 }

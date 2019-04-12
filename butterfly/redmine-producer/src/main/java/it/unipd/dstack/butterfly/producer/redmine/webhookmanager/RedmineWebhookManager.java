@@ -23,9 +23,13 @@ public class RedmineWebhookManager {
     public void onNewRedmineEvent(HttpServletRequest request) throws RedmineWebhookException {
         try {
             webHookManager.handleEvent(request);
-            logger.info("NEW EVENT FROM " + request.getRequestURI());
+            if (logger.isInfoEnabled()) {
+                logger.info(String.format("NEW EVENT FROM %s", request.getRequestURI()));
+            }
         } catch (RedmineWebhookException exception) {
-            logger.error("GITLAB API EXCEPTION " + exception.getStackTrace());
+            if (logger.isErrorEnabled()) {
+                logger.error(String.format("REDMINE API EXCEPTION %s", exception.getStackTrace()));
+            }
             throw exception;
         }
     }

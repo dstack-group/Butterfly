@@ -11,12 +11,8 @@ import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.CommandRegisterImpl;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.EmailCommand;
 import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.StartCommand;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Main {
-    private static final Logger logger = LoggerFactory.getLogger(Main.class);
-
     public static void main(String[] args) {
         AbstractConfigManager configManager = new EnvironmentConfigManager();
         String token = configManager.getStringProperty("TELEGRAM_TOKEN", "577704603:AAFWyfXNdZOXx8nx0y9jo-lIPljvSDvUyYY");

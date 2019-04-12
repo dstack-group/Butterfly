@@ -15,14 +15,11 @@ import java.util.Properties;
 public class ConsumerImpl <V> extends AbstractSubject<V> implements Consumer<V> {
     private static final Logger logger = LoggerFactory.getLogger(ConsumerImpl.class);
 
-    private final AbstractConfigManager configManager;
-    private List<String> topicList;
     private KafkaConsumer<String, V> kafkaConsumer;
     private final Duration pollDuration;
     private boolean startConsumer = true;
 
     public ConsumerImpl(AbstractConfigManager configManager) {
-        this.configManager = configManager;
         this.kafkaConsumer = ConsumerImpl.createKafkaConsumer(configManager);
 
         int pollDurationMs = configManager.getIntProperty("KAFKA_POLL_DURATION_MS", 2000);
@@ -41,7 +38,6 @@ public class ConsumerImpl <V> extends AbstractSubject<V> implements Consumer<V> 
      */
     @Override
     public void subscribe(List<String> topicList) {
-        this.topicList = topicList;
         this.kafkaConsumer.subscribe(topicList);
     }
 
@@ -55,7 +51,7 @@ public class ConsumerImpl <V> extends AbstractSubject<V> implements Consumer<V> 
                 recordList.forEach(super::notifyObservers);
 
             } catch (Exception e) {
-                logger.error("Error consuming from dispatcher: " + e.getMessage() + " " + e.getStackTrace());
+                logger.error(String.format("Error consuming in dispatcher: %s %s", e.getMessage(), e.getStackTrace()));
             }
         }
     }

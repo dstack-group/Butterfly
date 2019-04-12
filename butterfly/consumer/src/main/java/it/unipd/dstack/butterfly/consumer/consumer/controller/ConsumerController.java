@@ -45,20 +45,27 @@ public abstract class ConsumerController<T> implements Controller {
     /**
      * Spins up the controller
      */
-    final public void start() {
-        logger.info(this.serviceName + " started");
+    public final void start() {
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("%s started", this.serviceName));
+        }
         this.consumer.start();
     }
 
     /**
      * Closes the controller and releases resources.
      */
-    final public void close() {
-        logger.info("Closing " + this.serviceName);
+    public final void close() {
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("Closing %s", this.serviceName));
+        }
         // terminates the production process
         this.consumer.close();
         this.releaseResources();
-        logger.info("Released resources " + this.serviceName);
+
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("Released resources %s", this.serviceName));
+        }
     }
 
     /**
@@ -75,6 +82,8 @@ public abstract class ConsumerController<T> implements Controller {
     }
 
     private void onMessageConsumeLog(Record<T> record) {
-        logger.info("New record received: " + record.getTopic());
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("New record received: %s", record.getTopic()));
+        }
     }
 }

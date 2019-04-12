@@ -4,8 +4,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 public class HttpRequestUtils {
+    private HttpRequestUtils() {}
+
     /**
      * Reads the POST data from a request into a String and returns it.
      *
@@ -15,7 +18,7 @@ public class HttpRequestUtils {
      */
     public static String getPostDataAsString(HttpServletRequest request) throws IOException {
 
-        try (InputStreamReader reader = new InputStreamReader(request.getInputStream(), "UTF-8")) {
+        try (InputStreamReader reader = new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8)) {
             return (getReaderContentAsString(reader));
         }
     }

@@ -12,11 +12,7 @@ import org.simplejavamail.mailer.config.TransportStrategy;
 public class EmailSender implements MessageSender<EmailMessage> {
     private final Mailer mailer;
 
-    private final EmailConfig emailConfig;
-
     public EmailSender(EmailConfig emailConfig) {
-        this.emailConfig = emailConfig;
-
         this.mailer = MailerBuilder
                 .withSMTPServer(
                         emailConfig.getHost(),

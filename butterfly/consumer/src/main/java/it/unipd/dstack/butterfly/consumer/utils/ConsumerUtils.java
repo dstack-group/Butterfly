@@ -17,9 +17,9 @@ public final class ConsumerUtils {
 
     public static <T> List<Record<T>> consumerRecordsToList(ConsumerRecords<String, T> consumerRecordList) {
         List<Record<T>> recordList = new ArrayList<>();
-        consumerRecordList.iterator().forEachRemaining(consumerRecord -> {
-            recordList.add(new Record<>(consumerRecord.topic(), consumerRecord.value()));
-        });
+        consumerRecordList.iterator().forEachRemaining(consumerRecord ->
+            recordList.add(new Record<>(consumerRecord.topic(), consumerRecord.value()))
+        );
         return recordList;
     }
 

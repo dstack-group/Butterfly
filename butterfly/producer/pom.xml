@@ -11,9 +11,7 @@
     <groupId>it.unipd.dstack.butterfly.producer</groupId>
     <artifactId>producer</artifactId>
     <name>producer</name>
-    <!-- FIXME change it to the project's website
-    <url>http://www.example.com</url>
-     -->
+
     <dependencies>
         <!-- HTTP microframework -->
         <dependency>

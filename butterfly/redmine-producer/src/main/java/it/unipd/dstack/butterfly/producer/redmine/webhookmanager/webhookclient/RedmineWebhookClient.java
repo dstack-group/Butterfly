@@ -58,10 +58,10 @@ public class RedmineWebhookClient {
              * HTTP header, so a first JSON deserialization is needed in order to determine the
              * even type of the current HTTP request.
              */
-            if (action == "opened") {
+            if (action.equals("opened")) {
                 event = jsonConverter.fromJson(postData, IssueCreatedEvent.class);
                 event.setEventKind(IssueCreatedEvent.eventKind);
-            } else if (action == "updated") {
+            } else if (action.equals("updated")) {
                 event = jsonConverter.fromJson(postData, IssueEditedEvent.class);
                 event.setEventKind(IssueEditedEvent.EventKind);
             } else {

@@ -1,10 +1,7 @@
 package it.unipd.dstack.butterfly.config;
 
-import it.unipd.dstack.butterfly.config.EnvironmentConfigManager;
-
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EnvironmentConfigManagerTest {
 

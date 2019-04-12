@@ -7,6 +7,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class ProducerUtils {
+    private ProducerUtils() {}
+
     public static <T> CompletableFuture<Void> composeFutureList(List<CompletableFuture<T>> completableFutureList) {
         CompletableFuture<T>[] completableFutureArray =
                 new CompletableFuture[completableFutureList.size()];

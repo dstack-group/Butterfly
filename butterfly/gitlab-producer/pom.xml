@@ -11,7 +11,6 @@
     <groupId>it.unipd.dstack.butterfly.producer.gitlab-producer</groupId>
     <artifactId>gitlab-producer</artifactId>
     <name>gitlab-producer</name>
-    <!-- FIXME change it to the project's website -->
     <url>http://www.example.com</url>
 
     <dependencies>

@@ -11,7 +11,6 @@
     <groupId>it.unipd.dstack.butterfly.producer.sonarqube-producer</groupId>
     <artifactId>sonarqube-producer</artifactId>
     <name>sonarqube-producer</name>
-    <!-- FIXME change it to the project's website -->
     <url>http://www.example.com</url>
 
     <properties>

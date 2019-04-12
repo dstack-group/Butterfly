@@ -58,8 +58,12 @@ class GitlabWebhookListenerObserver implements WebHookListener {
      *
      * @param pushEvent the PushEvent instance
      */
+    @Override
     public void onPushEvent(PushEvent pushEvent) {
-        logger.info("Creating AVRO Event onPushEvent");
+        if (logger.isInfoEnabled()) {
+            logger.info("Creating AVRO Event onPushEvent");
+        }
+
         var commits = pushEvent.getCommits();
 
         commits.stream().map(commit -> {
@@ -76,7 +80,10 @@ class GitlabWebhookListenerObserver implements WebHookListener {
             eventBuilder.setDescription(commit.getMessage());
             return eventBuilder.build();
         }).forEach(this.listener::onCommitCreatedEvent);
-        logger.info("Created AVRO Event after onPushEvent");
+
+        if (logger.isInfoEnabled()) {
+            logger.info("Created AVRO Event after onPushEvent");
+        }
     }
 
     /**
@@ -85,8 +92,12 @@ class GitlabWebhookListenerObserver implements WebHookListener {
      *
      * @param issueEvent the IssueEvent instance
      */
+    @Override
     public void onIssueEvent(IssueEvent issueEvent) {
-        logger.info("Creating AVRO Event onIssueEvent " + issueEvent.toString());
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("Creating AVRO Event onIssueEvent %s", issueEvent.toString()));
+        }
+
         var createdAt = issueEvent.getObjectAttributes().getCreatedAt().getTime();
         var updatedAt = issueEvent.getObjectAttributes().getUpdatedAt().getTime();
 
@@ -120,9 +131,11 @@ class GitlabWebhookListenerObserver implements WebHookListener {
                 this.listener.onIssueCreatedEvent(event);
             }
 
-            logger.info("Created AVRO Event after onIssueEvent");
+            if (logger.isInfoEnabled()) {
+                logger.info("Created AVRO Event after onIssueEvent");
+            }
         } catch (AvroRuntimeException e) {
-            logger.error("AvroRuntimeException: " + e.getMessage() + " " + e.getStackTrace());
+            logger.error(String.format("AvroRuntimeException: %s %s", e.getMessage(), e.getStackTrace()));
         }
     }
 
