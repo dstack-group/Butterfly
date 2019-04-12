@@ -25,10 +25,10 @@ This is a useful tool to inspect Redmine responses. Add a webhook to a Redmine p
 - Reset: `./gitlab.sh reset`
 - Logs: `./gitlab.sh logs`
 
-After some seconds, open [http://localhost:15001](http://localhost:15001) and insert the following credentials:
+After some seconds, open [https://localhost:10443](https://localhost:10443) and insert the following credentials:
 
-- username: **butterfly**
-- password: **butterfly**
+- username: **root**
+- password: **admin**
 
 # Sonarqube
 

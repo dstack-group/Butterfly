@@ -13,7 +13,7 @@ import java.util.function.Function;
  * - String;
  * - Integer;
  * - Boolean;
- * It implements the Template Pattern via the readConfigValue method.
+ * It implements the Template Method Pattern via the readConfigValue method.
  * In case of errors, an instance of <code>ConfigurationException</code> is thrown.
  */
 public abstract class AbstractConfigManager {
