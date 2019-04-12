@@ -29,11 +29,21 @@ tags:
   # - name: CRUD
   #  description: Operations related to creating, reading, updating or deleting resources
   - name: USERS
+    description: >-
+      Operations that concern the User module. When a user is removed from the database,
+      its contact account and its subscriptions should be removed as well.
   - name: USER-CONTACTS
+    description: >-
+      Operations that link a user to a contaact account of a certain contact platform.
+      Before creating a user contact, it's necessary that a valid user exists.
   - name: PROJECTS
+    description: Operations that concern the Project module
   - name: SUBSCRIPTIONS
-  - name: Query
-    description: Operations which take in queries to perform a piece of work. For example matching users to alerts.
+    description: >-
+      Operations that expresses the interest of a user for a particular event emitted by a project
+  - name: SEARCH
+    description: >-
+      Operations which take in queries to perform a piece of work. For example matching users to alerts.
 
 # paths define the API exposed endpoints
 paths:
@@ -896,71 +906,13 @@ paths:
                     type: boolean
                     description: error message
 
-##  /users/{user_id}/keywords:
-##    get:
-##      operationId: getUserKeywords
-##      summary: Returns the list of keywords defined by the current user
-##      tags: [ 'USERS' ]
-##      parameters:
-##        - in: path
-##          name: user_id
-##          schema:
-##            type: string
-##          required: true
-##      responses:
-##        '200':
-##          description: OK, returns list of user keywords
-##          content:
-##            application/json:
-##              schema:
-##                type: object
-##                properties:
-##                  error:
-##                    type: string
-##                    description: error message
-##        '404':
-##          description: Error, the user does not exist
-##
-##    patch:
-##      operationId: setUserKeywords
-##      summary: Sets the new list of keywords defined by the current user
-##      tags: [ 'USERS' ]
-##      parameters:
-##        - in: path
-##          name: user_id
-##          schema:
-##            type: string
-##          required: true
-##      requestBody:
-##        description: User keywords
-##        required: true
-##        content:
-##          application/x-www-form-urlencoded:
-##            schema:
-##              type: object
-##              properties:
-##                color:
-##                  type: array
-##                  items:
-##                    type: string
-##      responses:
-##        '200':
-##          description: OK, user keywords updated. Returns the list of keywords
-##          content:
-##            application/json:
-##              schema:
-##                type: object
-##                properties:
-##                  color:
-##                    type: array
-##                    items:
-##                      type: string
-
-  /search/alerts/users:
+  /search/receivers:
     post:
-      operationId: getUsersRecipientsFromAlert
-      summary: Returns the list of keywords defined by the current user
-      tags: [ 'Query' ]
+      operationId: searchEventMostLikelyReceivers
+      summary: >-
+              Returns the list of users that have an interested in the current record,
+              and should thus get a notification from Butterfly.
+      tags: [ 'SEARCH' ]
       requestBody:
         description: Event record
         required: true
@@ -969,12 +921,41 @@ paths:
             schema:
               $ref: '#/components/schemas/Event'
       responses:
-        '200':
-          description: OK, user keywords updated. Returns the list of keywords
+        '201':
+          description: OK, the list of users which are most likely to be interested in the current
+                       event has been returned successfully. A copy of the current event has been saved
+                       to the database.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventWithContactInfo'
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UserContactInfoList'
+
+        '400':
+          description: >-
+            Bad Request, cannot parse the given event structure.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    description: error message
+
+        '422':
+          description: >-
+            Unprocessable Entity error, the fields inside the event object aren't specified in a valid format.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    description: error message
 
 components:
   schemas:
@@ -1030,6 +1011,7 @@ components:
         - GITLAB_MERGE_REQUEST_CREATED
         - GITLAB_MERGE_REQUEST_EDITED
         - GITLAB_MERGE_REQUEST_MERGED
+        - GITLAB_MERGE_REQUEST_CLOSED
         - SONARQUBE_PROJECT_ANALYSIS_COMPLETED
 
     CreateUser:
@@ -1233,8 +1215,10 @@ components:
         - userPriority
         - keywords
       properties:
-        contactType:
-          $ref: '#/components/schemas/ThirdPartyContactService'
+        contactTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ThirdPartyContactService'
         userPriority:
           $ref: '#/components/schemas/UserPriority'
         keywords:
@@ -1245,7 +1229,9 @@ components:
         userEmail: "dstackgroup@gmail.com"
         projectName: "Butterfly"
         eventType: GITLAB_COMMIT_CREATED
-        contactType: TELEGRAM
+        contactTypes:
+          - TELEGRAM
+          - SLACK
         userPriority: HIGH
         keywords:
           - "bug"
@@ -1264,7 +1250,9 @@ components:
           items:
             type: string
       example:
-        contactType: TELEGRAM
+        contactTypes:
+          - EMAIL
+          - SLACK
         userPriority: HIGH
         keywords:
           - "bug"
@@ -1290,8 +1278,11 @@ components:
           type: string
         eventType:
           $ref: '#/components/schemas/ServiceEventType'
-        contactType:
-          $ref: '#/components/schemas/ThirdPartyContactService'
+        contactTypes:
+          type: object
+          properties:
+            '#/components/schemas/ThirdPartyContactService':
+              type: string
         userPriority:
           $ref: '#/components/schemas/UserPriority'
         keywords:
@@ -1303,74 +1294,113 @@ components:
         userEmail: "1"
         projectName: "2"
         eventType: GITLAB_COMMIT_CREATED
-        contactType: TELEGRAM
+        contactTypes:
+          TELEGRAM: "1232398"
+          EMAIL: "dstackgroup@gmail.com"
         userPriority: HIGH
         keywords:
           - "bug"
           - "fix"
           - "performance"
 
+    UserContactInfo:
+      type: object
+      required:
+        - firstname
+        - lastname
+      properties:
+        firstname:
+          type: string
+        lastname:
+          type: string
+        contacts:
+          type: array
+          items:
+            type: object
+            required:
+              - contactType
+              - contactRef
+            properties:
+              contactType:
+                $ref: '#/components/schemas/ThirdPartyContactService'
+              contactRef:
+                type: string
+      example:
+        firstname: "Jon"
+        lastname: "Snow"
+        contacts:
+          - contactType: TELEGRAM
+            contactRef: "120923823"
+          - contactType: EMAIL
+            contactRef: "jon.snow@got.co.uk"
+
+    UserContactInfoList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserContactInfo'
+      example:
+        - firstname: "Jon"
+          lastname: "Snow"
+          contacts:
+            - contactType: TELEGRAM
+              contactRef: "120923823"
+            - contactType: EMAIL
+              contactRef: "jon.snow@got.co.uk"
+        - firstname: "Sansa"
+          lastname: "Stark"
+          contacts:
+            - contactType: SLACK
+              contactRef: "23232nkn23"
+
     Event:
       type: object
       required:
-        - service_name
-        - server_url
-        - project_url
-        - project_name
+        - timestamp
+        - service
+        - projectName
+        - projectURL
+        - eventId
+        - eventType
         - title
         - description
-        - event_type
+        - tags
       properties:
-        service_name:
+        timestamp:
+          type: string
+          format: date-time
+        service:
           $ref: '#/components/schemas/ThirdPartyProducerService'
-        server_url:
+        projectName:
           type: string
-        project_url:
+        projectURL:
           type: string
-        project_name:
+          nullable: true
+        eventId:
           type: string
+        eventType:
+          $ref: '#/components/schemas/ServiceEventType'
+        userEmail:
+          type: string
+          format: email
         title:
           type: string
         description:
           type: string
-        event_type:
-          type: string
-        user_email:
-          type: string
-
-    EventWithContactInfo:
-      type: object
-      required:
-        - service_name
-        - server_url
-        - project_url
-        - project_name
-        - title
-        - description
-        - event_type
-        - contact_name
-        - contact_ref
-      properties:
-        service_name:
-          $ref: '#/components/schemas/ThirdPartyProducerService'
-        server_url:
-          type: string
-        project_url:
-          type: string
-        project_name:
-          type: string
-        title:
-          type: string
-        description:
-          type: string
-        event_type:
-          type: string
-        user_email:
-          type: string
-        contact_name:
-          $ref: '#/components/schemas/ThirdPartyContactService'
-        contact_ref:
-          type: string
+        tags:
+          type: array
+          items:
+            type: string
+      example:
+        service: GITLAB
+        projectName: Butterfly
+        projectURL: http://gitlab.dstack.unipd.it
+        eventId: "1"
+        eventType: GITLAB_ISSUE_CREATED
+        title: "Fix kanban card"
+        descripion: "Todo kanban fixes for tomorrow"
+        tags:
+          - BUG
+          - FIX
 
   responses:
     UserSuccessReturnRecord:

@@ -1,0 +1,2055 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "0.0.1",
+    "title": "Butterfly User Manager API",
+    "description": "Butterfly User Manager REST API",
+    "contact": {
+      "name": "DStack Group",
+      "email": "dstackgroup@gmail.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Development Server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "APIStatus",
+      "description": "Non business operations related to the API health status and usage metrics"
+    },
+    {
+      "name": "USERS",
+      "description": "Operations that concern the User module. When a user is removed from the database, its contact account and its subscriptions should be removed as well."
+    },
+    {
+      "name": "USER-CONTACTS",
+      "description": "Operations that link a user to a contaact account of a certain contact platform. Before creating a user contact, it's necessary that a valid user exists."
+    },
+    {
+      "name": "PROJECTS",
+      "description": "Operations that concern the Project module"
+    },
+    {
+      "name": "SUBSCRIPTIONS",
+      "description": "Operations that expresses the interest of a user for a particular event emitted by a project"
+    },
+    {
+      "name": "SEARCH",
+      "description": "Operations which take in queries to perform a piece of work. For example matching users to alerts."
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "getHealth",
+        "summary": "Ensures the server is still alive",
+        "tags": [
+          "APIStatus"
+        ],
+        "responses": {
+          "204": {
+            "description": "OK, no content to return"
+          }
+        }
+      }
+    },
+    "/health/metrics": {
+      "get": {
+        "operationId": "getMetrics",
+        "summary": "Returns some memory and platform metrics from the running server, for DevOps purposes",
+        "tags": [
+          "APIStatus"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, returns the server metrics.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Metrics"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "operationId": "getUsers",
+        "summary": "Retrieves the list of registered users",
+        "tags": [
+          "USERS"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, returns a list of user records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createUser",
+        "summary": "Creates new user and returns the user record",
+        "tags": [
+          "USERS"
+        ],
+        "requestBody": {
+          "description": "User record",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUser"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "OK, user inserted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Unique constraint violation, another user exists with the same email",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{email}": {
+      "get": {
+        "operationId": "getUserByEmail",
+        "summary": "Searches a user by its email and returns its record data",
+        "tags": [
+          "USERS"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, user found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error, the user does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patchUserByEmail",
+        "summary": "Updates the data of the user identified by the given email and returns the updated user record",
+        "tags": [
+          "USERS"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "User record",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUser"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK, user updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error, the user does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteUserByEmail",
+        "summary": "Removes the user that is registered with the given email",
+        "tags": [
+          "USERS"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, user deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error, the user does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{email}/contacts": {
+      "get": {
+        "operationId": "getUserContacts",
+        "summary": "Lists all the contact platforms and accounts associated with the user identified by the given email.",
+        "tags": [
+          "USER-CONTACTS"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, returns the list of contacts available for the current user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UserContactMap"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error, the user does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{email}/contacts/{contactService}": {
+      "post": {
+        "operationId": "createUserContact",
+        "summary": "Creates a new association between an existing user and a new contact platform where the user wishes to receive event notifications",
+        "tags": [
+          "USER-CONTACTS"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "contactService",
+            "schema": {
+              "$ref": "#/components/schemas/ThirdPartyContactService"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "Contact account identifier for the given contact service",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contactRef": {
+                    "type": "string",
+                    "description": "the contact account id, such as the Telegram's bot chat id, the Slack's user id, or the Email address (possibly different from the currently registered email)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "OK, new contact info added to the user identified by the given email",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UserContact"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error, the user does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict error, there is already a contact defined for the given user and service",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error, the chosen contact service isn't supported",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "editUserContact",
+        "summary": "Edits an existing association between a user and a contact platform where the user wishes to receive event notifications",
+        "tags": [
+          "USER-CONTACTS"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "contactService",
+            "schema": {
+              "$ref": "#/components/schemas/ThirdPartyContactService"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "Updated contact account identifier for the given contact service",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contactRef": {
+                    "type": "string",
+                    "description": "the new contact account id, such as the Telegram's bot chat id, the Slack's user id, or the Email address (possibly different from the currently registered email)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK, new contact info updated for the user identified by the given email",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UserContact"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error, the user or the given contact association does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error, the chosen contact service isn't supported",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteUserContact",
+        "summary": "Removes the user contact specified by contact service. The user is identified by its email",
+        "tags": [
+          "USER-CONTACTS"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "contactService",
+            "schema": {
+              "$ref": "#/components/schemas/ThirdPartyContactService"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, contact info deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error, the contact info does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects": {
+      "get": {
+        "operationId": "getProjects",
+        "summary": "Retrieves the list of registered projects",
+        "tags": [
+          "PROJECTS"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, returns a list of projects records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Project"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createProject",
+        "summary": "Creates new project and returns the project record",
+        "tags": [
+          "PROJECTS"
+        ],
+        "requestBody": {
+          "description": "Project record",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProject"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "OK, project inserted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Project"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Unique constraint violation, another project exists with the same name",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/{projectName}": {
+      "get": {
+        "operationId": "getProjectByName",
+        "summary": "Searches a project by its name and returns its record data",
+        "tags": [
+          "PROJECTS"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "projectName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, project found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Project"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error, the project does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patchProjectByName",
+        "summary": "Updates the data of the project identified by the given project name and returns the updated project record",
+        "tags": [
+          "PROJECTS"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "projectName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "Project record",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProject"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK, project updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Project"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error, the project does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteProjectByName",
+        "summary": "Removes the project that is registered with the given project name",
+        "tags": [
+          "PROJECTS"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "projectName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, project deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error, the project does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/{projectName}/{producerService}": {
+      "delete": {
+        "operationId": "removeServiceURLByProjectNameAndProducerService",
+        "summary": "Given a project name and a producer service name, removes the project URL associated with the specified producer service.",
+        "tags": [
+          "PROJECTS"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "projectName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "producerService",
+            "schema": {
+              "$ref": "#/components/schemas/ThirdPartyProducerService"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, the URL associated with the given producer service name has been removed. Returns the updated project record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Project"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error, the project does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity error, the given producer service name isn't valid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/users/{userEmail}/projects/{projectName}/event-types/{eventType}": {
+      "get": {
+        "operationId": "getSubscription",
+        "summary": "Given a user email, a project name, and a service event typology, it returns the subscription which associates the specified user, project, and event type together, if any.",
+        "tags": [
+          "SUBSCRIPTIONS"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userEmail",
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "required": true,
+            "example": "dstackgroup@gmail.com"
+          },
+          {
+            "in": "path",
+            "name": "projectName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "Butterfly"
+          },
+          {
+            "in": "path",
+            "name": "eventType",
+            "schema": {
+              "$ref": "#/components/schemas/ServiceEventType"
+            },
+            "required": true,
+            "example": "GITLAB_COMMIT_CREATED"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, subscription found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Subscription"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error Not Found, the curren user never subscribed to the given project specifying the given event type.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity error, the given user email isn't valid, or the project name is either too long or contains special characters, or the specified event type isn't supported.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateSubscription",
+        "summary": "Given a user email, a project name, and a service event typology, edits the existing subscription which associates the specified user, project, and event type together, if any.",
+        "tags": [
+          "SUBSCRIPTIONS"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userEmail",
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "required": true,
+            "example": "dstackgroup@gmail.com"
+          },
+          {
+            "in": "path",
+            "name": "projectName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "Butterfly"
+          },
+          {
+            "in": "path",
+            "name": "eventType",
+            "schema": {
+              "$ref": "#/components/schemas/ServiceEventType"
+            },
+            "required": true,
+            "example": "GITLAB_COMMIT_CREATED"
+          }
+        ],
+        "requestBody": {
+          "description": "Subscription record",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSubscription"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK, subscription edited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Subscription"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error Not Found, the curren user never subscribed to the given project specifying the given event type.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity error, the given user email isn't valid, or the project name is either too long or contains special characters, or the specified event type isn't supported.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteSubscription",
+        "summary": "Removes a subscription that keeps the user identified by the given email notified about the given project and event type.",
+        "tags": [
+          "SUBSCRIPTIONS"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userEmail",
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "required": true,
+            "example": "dstackgroup@gmail.com"
+          },
+          {
+            "in": "path",
+            "name": "projectName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "Butterfly"
+          },
+          {
+            "in": "path",
+            "name": "eventType",
+            "schema": {
+              "$ref": "#/components/schemas/ServiceEventType"
+            },
+            "required": true,
+            "example": "GITLAB_COMMIT_CREATED"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, subscription deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error Not Found, the curren subscription cannot be found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity error, the given user email isn't valid, or the project name is either too long or contains special characters, or the specified event type isn't supported.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions": {
+      "post": {
+        "operationId": "createSubscription",
+        "summary": "Subscribes a user to a particular event of a project, sets the contact platform of choice to receive notifications and a list of keywords to be compared with the contents of the future events.",
+        "tags": [
+          "SUBSCRIPTIONS"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userEmail",
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "required": true,
+            "example": "dstackgroup@gmail.com"
+          },
+          {
+            "in": "path",
+            "name": "projectName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "Butterfly"
+          },
+          {
+            "in": "path",
+            "name": "eventType",
+            "schema": {
+              "$ref": "#/components/schemas/ServiceEventType"
+            },
+            "required": true,
+            "example": "GITLAB_COMMIT_CREATED"
+          }
+        ],
+        "requestBody": {
+          "description": "Subscription record",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubscription"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "OK, subscription created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Subscription"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error Not Found, may be due to the absence of an association between the user and the given contact platform, due to the absence of a project with the given name, or maybe the chosen event isn't supported.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Unique constraint violation, another subscription which involves the same user, project and event type exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/search/receivers": {
+      "post": {
+        "operationId": "searchEventMostLikelyReceivers",
+        "summary": "Returns the list of users that have an interested in the current record, and should thus get a notification from Butterfly.",
+        "tags": [
+          "SEARCH"
+        ],
+        "requestBody": {
+          "description": "Event record",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Event"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "OK, the list of users which are most likely to be interested in the current event has been returned successfully. A copy of the current event has been saved to the database.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UserContactInfoList"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request, cannot parse the given event structure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity error, the fields inside the event object aren't specified in a valid format.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "description": "error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Metrics": {
+        "type": "object",
+        "required": [
+          "uptime",
+          "platform",
+          "freememory"
+        ],
+        "properties": {
+          "uptime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "freememory": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "example": {
+          "uptime": 15023,
+          "platform": "Windows 10",
+          "freememory": 5000250
+        }
+      },
+      "ThirdPartyProducerService": {
+        "type": "string",
+        "enum": [
+          "REDMINE",
+          "GITLAB",
+          "SONARQUBE"
+        ]
+      },
+      "ThirdPartyContactService": {
+        "type": "string",
+        "enum": [
+          "TELEGRAM",
+          "SLACK",
+          "EMAIL"
+        ]
+      },
+      "UserPriority": {
+        "type": "string",
+        "enum": [
+          "LOW",
+          "MEDIUM",
+          "HIGH"
+        ]
+      },
+      "ServiceEventType": {
+        "type": "string",
+        "enum": [
+          "REDMINE_TICKET_CREATED",
+          "REDMINE_TICKET_EDITED",
+          "GITLAB_COMMIT_CREATED",
+          "GITLAB_ISSUE_CREATED",
+          "GITLAB_ISSUE_EDITED",
+          "GITLAB_MERGE_REQUEST_CREATED",
+          "GITLAB_MERGE_REQUEST_EDITED",
+          "GITLAB_MERGE_REQUEST_MERGED",
+          "GITLAB_MERGE_REQUEST_CLOSED",
+          "SONARQUBE_PROJECT_ANALYSIS_COMPLETED"
+        ]
+      },
+      "CreateUser": {
+        "type": "object",
+        "required": [
+          "email",
+          "firstname",
+          "lastname"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "firstname": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "example": {
+          "email": "dstackgroup@gmail.com",
+          "firstname": "DStack",
+          "lastname": "Group"
+        }
+      },
+      "UpdateUser": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "firstname": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "example": {
+          "email": "dstackgroup@gmail.com",
+          "enabled": false
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": [
+          "userId",
+          "email",
+          "firstname",
+          "lastname",
+          "created"
+        ],
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "firstname": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modified": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "example": {
+          "userId": "1",
+          "email": "dstackgroup@gmail.com",
+          "firstname": "DStack",
+          "lastname": "Group",
+          "enabled": true
+        }
+      },
+      "UserContact": {
+        "type": "object",
+        "required": [
+          "userContactid",
+          "userId",
+          "contactType",
+          "contactRef"
+        ],
+        "properties": {
+          "userContactId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "contactType": {
+            "$ref": "#/components/schemas/ThirdPartyContactService"
+          },
+          "contactRef": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "userContactId": "23",
+          "userId": "1",
+          "contactType": "TELEGRAM",
+          "contactRef": "12739814"
+        }
+      },
+      "UserContactMap": {
+        "type": "object",
+        "properties": {
+          "TELEGRAM": {
+            "$ref": "#/components/schemas/UserContact"
+          },
+          "SLACK": {
+            "$ref": "#/components/schemas/UserContact"
+          },
+          "EMAIL": {
+            "$ref": "#/components/schemas/UserContact"
+          }
+        },
+        "example": {
+          "TELEGRAM": {
+            "userContactId": "23",
+            "userId": "1",
+            "contactType": "TELEGRAM",
+            "contactRef": "12739814"
+          },
+          "EMAIL": {
+            "userContactId": "24",
+            "userId": "1",
+            "contactType": "EMAIL",
+            "contactRef": "someemail@gmail.com"
+          }
+        }
+      },
+      "ProjectURL": {
+        "type": "object",
+        "properties": {
+          "REDMINE": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          },
+          "GITLAB": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          },
+          "SONARQUBE": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          }
+        },
+        "example": {
+          "REDMINE": "http://redmine.dstack.unipd.it",
+          "GITLAB": "http://gitlab.dstack.unipd.it"
+        }
+      },
+      "CreateProject": {
+        "type": "object",
+        "required": [
+          "projectName",
+          "projectURL"
+        ],
+        "properties": {
+          "projectName": {
+            "type": "string"
+          },
+          "projectURL": {
+            "$ref": "#/components/schemas/ProjectURL"
+          }
+        },
+        "example": {
+          "projectName": "Butterfly",
+          "projectURL": {
+            "REDMINE": "http://redmine.dstack.unipd.it",
+            "GITLAB": "http://gitlab.dstack.unipd.it"
+          }
+        }
+      },
+      "UpdateProject": {
+        "type": "object",
+        "required": [
+          "projectName",
+          "projectURL"
+        ],
+        "properties": {
+          "projectName": {
+            "type": "string"
+          },
+          "projectURL": {
+            "$ref": "#/components/schemas/ProjectURL"
+          }
+        },
+        "example": {
+          "projectName": "Butterfly",
+          "projectURL": {
+            "SONARQUBE": "http://sonarqube.dstack.unipd.it"
+          }
+        }
+      },
+      "Project": {
+        "type": "object",
+        "required": [
+          "projectId",
+          "projectName",
+          "projectURL",
+          "created"
+        ],
+        "properties": {
+          "projectId": {
+            "type": "string"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "projectURL": {
+            "$ref": "#/components/schemas/ProjectURL"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "example": {
+          "projectId": "2",
+          "projectName": "Butterfly",
+          "projectURL": {
+            "REDMINE": "http://redmine.dstack.unipd.it",
+            "GITLAB": "http://gitlab.dstack.unipd.it",
+            "SONARQUBE": "http://sonarqube.dstack.unipd.it"
+          }
+        }
+      },
+      "CreateSubscription": {
+        "type": "object",
+        "required": [
+          "contactType",
+          "userPriority",
+          "keywords"
+        ],
+        "properties": {
+          "contactTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ThirdPartyContactService"
+            }
+          },
+          "userPriority": {
+            "$ref": "#/components/schemas/UserPriority"
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "example": {
+          "userEmail": "dstackgroup@gmail.com",
+          "projectName": "Butterfly",
+          "eventType": "GITLAB_COMMIT_CREATED",
+          "contactTypes": [
+            "TELEGRAM",
+            "SLACK"
+          ],
+          "userPriority": "HIGH",
+          "keywords": [
+            "bug",
+            "fix",
+            "performance"
+          ]
+        }
+      },
+      "UpdateSubscription": {
+        "type": "object",
+        "properties": {
+          "contactType": {
+            "$ref": "#/components/schemas/ThirdPartyContactService"
+          },
+          "userPriority": {
+            "$ref": "#/components/schemas/UserPriority"
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "example": {
+          "contactTypes": [
+            "EMAIL",
+            "SLACK"
+          ],
+          "userPriority": "HIGH",
+          "keywords": [
+            "bug",
+            "fix",
+            "performance"
+          ]
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "required": [
+          "subscriptionId",
+          "userId",
+          "projectId",
+          "eventType",
+          "contactType",
+          "userPriority",
+          "keywords"
+        ],
+        "properties": {
+          "subscriptionId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "eventType": {
+            "$ref": "#/components/schemas/ServiceEventType"
+          },
+          "contactTypes": {
+            "type": "object",
+            "properties": {
+              "#/components/schemas/ThirdPartyContactService": {
+                "type": "string"
+              }
+            }
+          },
+          "userPriority": {
+            "$ref": "#/components/schemas/UserPriority"
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "example": {
+          "subscriptionId": "123",
+          "userEmail": "1",
+          "projectName": "2",
+          "eventType": "GITLAB_COMMIT_CREATED",
+          "contactTypes": {
+            "TELEGRAM": "1232398",
+            "EMAIL": "dstackgroup@gmail.com"
+          },
+          "userPriority": "HIGH",
+          "keywords": [
+            "bug",
+            "fix",
+            "performance"
+          ]
+        }
+      },
+      "UserContactInfo": {
+        "type": "object",
+        "required": [
+          "firstname",
+          "lastname"
+        ],
+        "properties": {
+          "firstname": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "contacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "contactType",
+                "contactRef"
+              ],
+              "properties": {
+                "contactType": {
+                  "$ref": "#/components/schemas/ThirdPartyContactService"
+                },
+                "contactRef": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "firstname": "Jon",
+          "lastname": "Snow",
+          "contacts": [
+            {
+              "contactType": "TELEGRAM",
+              "contactRef": "120923823"
+            },
+            {
+              "contactType": "EMAIL",
+              "contactRef": "jon.snow@got.co.uk"
+            }
+          ]
+        }
+      },
+      "UserContactInfoList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/UserContactInfo"
+        },
+        "example": [
+          {
+            "firstname": "Jon",
+            "lastname": "Snow",
+            "contacts": [
+              {
+                "contactType": "TELEGRAM",
+                "contactRef": "120923823"
+              },
+              {
+                "contactType": "EMAIL",
+                "contactRef": "jon.snow@got.co.uk"
+              }
+            ]
+          },
+          {
+            "firstname": "Sansa",
+            "lastname": "Stark",
+            "contacts": [
+              {
+                "contactType": "SLACK",
+                "contactRef": "23232nkn23"
+              }
+            ]
+          }
+        ]
+      },
+      "Event": {
+        "type": "object",
+        "required": [
+          "timestamp",
+          "service",
+          "projectName",
+          "projectURL",
+          "eventId",
+          "eventType",
+          "title",
+          "description",
+          "tags"
+        ],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "service": {
+            "$ref": "#/components/schemas/ThirdPartyProducerService"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "projectURL": {
+            "type": "string",
+            "nullable": true
+          },
+          "eventId": {
+            "type": "string"
+          },
+          "eventType": {
+            "$ref": "#/components/schemas/ServiceEventType"
+          },
+          "userEmail": {
+            "type": "string",
+            "format": "email"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "example": {
+          "service": "GITLAB",
+          "projectName": "Butterfly",
+          "projectURL": "http://gitlab.dstack.unipd.it",
+          "eventId": "1",
+          "eventType": "GITLAB_ISSUE_CREATED",
+          "title": "Fix kanban card",
+          "descripion": "Todo kanban fixes for tomorrow",
+          "tags": [
+            "BUG",
+            "FIX"
+          ]
+        }
+      }
+    },
+    "responses": {
+      "UserSuccessReturnRecord": {
+        "description": "OK, user processed correctly",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Entity not found."
+      },
+      "IllegalInput": {
+        "description": "Illegal input for operation."
+      }
+    },
+    "parameters": {
+      "skip": {
+        "name": "skip",
+        "in": "query",
+        "description": "number of items to skip",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "limit": {
+        "name": "limit",
+        "in": "query",
+        "description": "max records to return",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    }
+  }
+}
