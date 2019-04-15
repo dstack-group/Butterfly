@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Set;
 
 public class RedmineWebhookManager {
     private static final Logger logger = LoggerFactory.getLogger(RedmineWebhookManager.class);
@@ -14,8 +15,8 @@ public class RedmineWebhookManager {
     private final RedmineWebhookClient webHookManager;
     private final WebhookListener webHookListener;
 
-    public RedmineWebhookManager(RedmineWebhookListener<Event> listener) {
-        webHookManager = new RedmineWebhookClient();
+    public RedmineWebhookManager(RedmineWebhookListener<Event> listener, Set<String> prioritiesToConsider) {
+        webHookManager = new RedmineWebhookClient(prioritiesToConsider);
         this.webHookListener = new RedmineWebhookListenerObserver(listener);
         webHookManager.addListener(this.webHookListener);
     }

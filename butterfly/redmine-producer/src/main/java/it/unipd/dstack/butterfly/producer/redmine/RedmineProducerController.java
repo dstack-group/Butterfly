@@ -7,12 +7,15 @@ import it.unipd.dstack.butterfly.producer.producer.controller.ProducerController
 import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.RedmineWebhookListener;
 import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.RedmineWebhookListenerAggregator;
 import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.RedmineWebhookManager;
+import it.unipd.dstack.butterfly.producer.utils.ProducerUtils;
 import it.unipd.dstack.butterfly.producer.webhookhandler.WebhookHandler;
 import it.unipd.dstack.butterfly.producer.avro.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashSet;
+import java.util.Set;
 
 public class RedmineProducerController extends ProducerController<Event> {
     private static final Logger logger = LoggerFactory.getLogger(RedmineProducerController.class);
@@ -26,9 +29,12 @@ public class RedmineProducerController extends ProducerController<Event> {
             OnWebhookEventFromTopic<Event> onWebhookEventFromTopic
     ) {
         super(configManager, producer, onWebhookEventFromTopic, WebhookHandler.HTTPMethod.POST);
+        String prioritiesToConsiderEnv = configManager.getStringProperty("PRIORITIES_TO_CONSIDER");
+        Set<String> prioritiesToConsider =
+                new HashSet<>(ProducerUtils.getListFromCommaSeparatedString(prioritiesToConsiderEnv));
 
         this.redmineWebhookListener = new RedmineWebhookListenerAggregator<>(this.onWebhookEvent);
-        this.redmineWebhookManager = new RedmineWebhookManager(this.redmineWebhookListener);
+        this.redmineWebhookManager = new RedmineWebhookManager(this.redmineWebhookListener, prioritiesToConsider);
     }
 
     /**

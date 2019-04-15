@@ -4,8 +4,8 @@ import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.producer.avro.ServiceEventTypes;
 import it.unipd.dstack.butterfly.producer.avro.Services;
 import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.WebhookListener;
-import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.model.IssueCreatedEvent;
-import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.model.IssueEditedEvent;
+import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.model.IssueCreatedPayload;
+import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.model.IssueEditedPayload;
 import org.apache.avro.AvroRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ public class RedmineWebhookListenerObserver implements WebhookListener {
     }
 
     @Override
-    public void onIssueCreatedEvent(IssueCreatedEvent issueEvent) {
+    public void onIssueCreatedEvent(IssueCreatedPayload issueEvent) {
         try {
             Event.Builder eventBuilder = Event.newBuilder();
             // TODO: retrieve timestamp
@@ -32,8 +32,7 @@ public class RedmineWebhookListenerObserver implements WebhookListener {
             eventBuilder.setUsername(issueEvent.getIssue().getAuthor().getLogin());
             eventBuilder.setUserEmail(issueEvent.getIssue().getAuthor().getEmail());
             eventBuilder.setTitle(issueEvent.getIssue().getSubject());
-            // TODO: retrieve description
-            // eventBuilder.setDescription();
+            eventBuilder.setDescription(issueEvent.getIssue().getDescription());
             Event event = eventBuilder.build();
             this.listener.onIssueCreatedEvent(event);
 
@@ -44,7 +43,7 @@ public class RedmineWebhookListenerObserver implements WebhookListener {
     }
 
     @Override
-    public void onIssueEditedEvent(IssueEditedEvent issueEvent) {
+    public void onIssueEditedEvent(IssueEditedPayload issueEvent) {
         try {
             Event.Builder eventBuilder = Event.newBuilder();
             // TODO: retrieve timestamp
@@ -57,8 +56,7 @@ public class RedmineWebhookListenerObserver implements WebhookListener {
             eventBuilder.setUsername(issueEvent.getIssue().getAuthor().getLogin());
             eventBuilder.setUserEmail(issueEvent.getIssue().getAuthor().getEmail());
             eventBuilder.setTitle(issueEvent.getIssue().getSubject());
-            // TODO: retrieve description
-            // eventBuilder.setDescription();
+            eventBuilder.setDescription(issueEvent.getIssue().getDescription());
             Event event = eventBuilder.build();
             this.listener.onIssueCreatedEvent(event);
 

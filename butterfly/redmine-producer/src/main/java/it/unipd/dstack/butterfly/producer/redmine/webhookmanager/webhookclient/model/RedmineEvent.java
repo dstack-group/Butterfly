@@ -1,9 +1,9 @@
 package it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.model;
 
-public class SimpleWebhookEvent {
-    private PayloadAction payload;
+public class RedmineEvent {
+    GeneralPayload payload;
 
-    public PayloadAction getPayload() {
+    public GeneralPayload getPayload() {
         return payload;
     }
 }

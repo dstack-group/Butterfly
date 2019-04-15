@@ -5,16 +5,25 @@ import it.unipd.dstack.butterfly.jsonconverter.JSONConverterImpl;
 import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.RedmineWebhookException;
 import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.model.*;
 import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.utils.HttpRequestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RedmineWebhookClient {
-    private final List<WebhookListener> webhookListeners = new CopyOnWriteArrayList<WebhookListener>();
+    private static final Logger logger = LoggerFactory.getLogger(RedmineWebhookClient.class);
+    private final List<WebhookListener> webhookListeners = new CopyOnWriteArrayList<>();
 
     public static final JSONConverter jsonConverter = new JSONConverterImpl();
+    private final Set<String> prioritiesToConsider;
+
+    public RedmineWebhookClient(Set<String> prioritiesToConsider) {
+        this.prioritiesToConsider = prioritiesToConsider;
+    }
 
     /**
      * Adds a webhook event listener.
@@ -47,52 +56,47 @@ public class RedmineWebhookClient {
     public void handleEvent(HttpServletRequest request) throws RedmineWebhookException {
         try {
             String postData = HttpRequestUtils.getPostDataAsString(request);
-            List<PayloadAction> payloadActionList = jsonConverter.fromJsonArray(postData, PayloadAction.class);
+            RedmineEvent redmineEvent = jsonConverter.fromJson(postData, RedmineEvent.class);
+            GeneralPayload payload = redmineEvent.getPayload();
+            logger.info("postData " + postData);
 
-            var action = payloadActionList.get(0).getPayload().getAction();
+            logger.info("payload.getAction() " + payload.getAction());
 
-            WebhookEvent event = null;
+            if (!this.matchesPrioritiesToConsider(payload)) {
+                if (logger.isInfoEnabled()) {
+                    logger.info("The priority is too low, discarding the current event");
+                }
+                return;
+            }
 
             /**
              * Unfortunately the plugin redmine_webhook doesn't provide the type of event in a
              * HTTP header, so a first JSON deserialization is needed in order to determine the
              * even type of the current HTTP request.
              */
-            if (action.equals("opened")) {
-                event = jsonConverter.fromJson(postData, IssueCreatedEvent.class);
-                event.setEventKind(IssueCreatedEvent.eventKind);
-            } else if (action.equals("updated")) {
-                event = jsonConverter.fromJson(postData, IssueEditedEvent.class);
-                event.setEventKind(IssueEditedEvent.EventKind);
+            if (payload.isNewIssue()) {
+                IssueCreatedEvent event = jsonConverter.fromJson(postData, IssueCreatedEvent.class);
+                this.fireIssueCreatedEvent(event.getPayload());
+            } else if (payload.isUpdatedIssue()) {
+                IssueEditedEvent event = jsonConverter.fromJson(postData, IssueEditedEvent.class);
+                this.fireIssueEditedEvent(event.getPayload());
             } else {
                 throw new RedmineWebhookException();
             }
-
-            this.fireEvent(event);
-
         } catch (IOException e) {
             throw new RedmineWebhookException();
         }
     }
 
-    private void fireEvent(WebhookEvent event) {
-        switch (event.getEventKind()) {
-            case IssueCreatedEvent.eventKind:
-                this.fireIssueCreatedEvent((IssueCreatedEvent) event);
-                break;
-            case IssueEditedEvent.EventKind:
-                this.fireIssueEditedEvent((IssueEditedEvent) event);
-                break;
-            default:
-                throw new RedmineWebhookException();
-        }
+    private boolean matchesPrioritiesToConsider(GeneralPayload payload) {
+        return this.prioritiesToConsider.contains(payload.getIssue().getStatus().getName());
     }
 
-    private void fireIssueCreatedEvent(IssueCreatedEvent event) {
+    private void fireIssueCreatedEvent(IssueCreatedPayload event) {
         webhookListeners.forEach(listener -> listener.onIssueCreatedEvent(event));
     }
 
-    private void fireIssueEditedEvent(IssueEditedEvent event) {
+    private void fireIssueEditedEvent(IssueEditedPayload event) {
         webhookListeners.forEach(listener -> listener.onIssueEditedEvent(event));
     }
 }
