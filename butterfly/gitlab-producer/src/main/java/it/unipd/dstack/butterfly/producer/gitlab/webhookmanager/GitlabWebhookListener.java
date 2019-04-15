@@ -18,4 +18,28 @@ public interface GitlabWebhookListener <T> {
      * @param event
      */
     void onCommitCreatedEvent(T event);
+
+    /**
+     * Emitted when a new merge request has been created.
+     * @param event
+     */
+    void onMergeRequestCreatedEvent(T event);
+
+    /**
+     * Emitted when an existing merge request has been edited.
+     * @param event
+     */
+    void onMergeRequestEditedEvent(T event);
+
+    /**
+     * Emitted when an existing merge request has been closed.
+     * @param event
+     */
+    void onMergeRequestClosedEvent(T event);
+
+    /**
+     * Emitted when an existing merge request has been merged.
+     * @param event
+     */
+    void onMergeRequestMergedEvent(T event);
 }

@@ -5,10 +5,18 @@ import it.unipd.dstack.butterfly.producer.avro.ServiceEventTypes;
 import it.unipd.dstack.butterfly.producer.avro.Services;
 import org.apache.avro.AvroRuntimeException;
 import org.gitlab4j.api.webhook.IssueEvent;
+import org.gitlab4j.api.webhook.MergeRequestEvent;
 import org.gitlab4j.api.webhook.PushEvent;
 import org.gitlab4j.api.webhook.WebHookListener;
+import org.gitlab4j.api.webhook.EventLabel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * GitlabWebhookListenerObserver is a concrete implementation of the third-party interface WebHookListener.
@@ -19,9 +27,33 @@ class GitlabWebhookListenerObserver implements WebHookListener {
     private static final Logger logger = LoggerFactory.getLogger(GitlabWebhookListenerObserver.class);
 
     private final GitlabWebhookListener<Event> listener;
+    private final Map<String, EventTypeAndListenerPair> actionServiceEventTypeMap = new HashMap<>();
 
     public GitlabWebhookListenerObserver(GitlabWebhookListener<Event> listener) {
         this.listener = listener;
+        this.actionServiceEventTypeMap.put("open", new EventTypeAndListenerPair(
+                ServiceEventTypes.GITLAB_MERGE_REQUEST_CREATED, this.listener::onMergeRequestCreatedEvent));
+        this.actionServiceEventTypeMap.put("update", new EventTypeAndListenerPair(
+                ServiceEventTypes.GITLAB_MERGE_REQUEST_EDITED, this.listener::onMergeRequestEditedEvent));
+        this.actionServiceEventTypeMap.put("merge", new EventTypeAndListenerPair(
+                ServiceEventTypes.GITLAB_MERGE_REQUEST_MERGED, this.listener::onMergeRequestMergedEvent));
+        this.actionServiceEventTypeMap.put("close", new EventTypeAndListenerPair(
+                ServiceEventTypes.GITLAB_MERGE_REQUEST_CLOSED, this.listener::onMergeRequestClosedEvent));
+    }
+
+    private static class EventTypeAndListenerPair {
+        final ServiceEventTypes serviceEventType;
+        final Consumer<Event> eventConsumer;
+
+        public EventTypeAndListenerPair(ServiceEventTypes serviceEventType, Consumer<Event> eventConsumer) {
+            this.serviceEventType = serviceEventType;
+            this.eventConsumer = eventConsumer;
+        }
+    }
+
+    private EventTypeAndListenerPair getEventTypeAndListenerFromMergeRequestEvent(MergeRequestEvent mergeRequestEvent) {
+        String action = mergeRequestEvent.getObjectAttributes().getAction();
+        return this.actionServiceEventTypeMap.get(action);
     }
 
     /**
@@ -31,25 +63,34 @@ class GitlabWebhookListenerObserver implements WebHookListener {
      *
      * @param mergeRequestEvent the EventObject instance containing info on the merge request
      */
-    /*
     public void onMergeRequestEvent(MergeRequestEvent mergeRequestEvent) {
         logger.info("Creating AVRO Event onMergeRequestEvent");
+        logger.info("STATE " + mergeRequestEvent.getObjectAttributes().getState());
+        logger.info("ACTION " + mergeRequestEvent.getObjectAttributes().getAction());
+        var eventTypeAndListenerPair = this.getEventTypeAndListenerFromMergeRequestEvent(mergeRequestEvent);
+        var eventId = mergeRequestEvent.getObjectAttributes().getId();
         Event.Builder eventBuilder = Event.newBuilder();
         eventBuilder.setTimestamp(mergeRequestEvent.getObjectAttributes().getCreatedAt().getTime());
         eventBuilder.setService(Services.GITLAB);
         eventBuilder.setProjectName(mergeRequestEvent.getProject().getName());
         eventBuilder.setProjectURL(mergeRequestEvent.getProject().getGitHttpUrl());
-        eventBuilder.setEventId(mergeRequestEvent.getObjectAttributes().getId().toString());
-        eventBuilder.setEventType(ServiceEventTypes.GITLAB_MERGE_REQUEST_CREATED);
+        eventBuilder.setEventId(WebhookManagerUtils.numberToString(eventId));
+        eventBuilder.setEventType(eventTypeAndListenerPair.serviceEventType);
+
+        // state.equals("opened") && action.equals("open") -> ServiceEventTypes.GITLAB_MERGE_REQUEST_CREATED
+        // state.equals("opened") && action.equals("update") -> ServiceEventTypes.GITLAB_MERGE_REQUEST_EDITED
+        // state.equals("merged") && action.equals("merge") -> ServiceEventTypes.GITLAB_MERGE_REQUEST_MERGED
+        // state.equals("closed") && action.equals("close") -> ServiceEventTypes.GITLAB_MERGE_REQUEST_CLOSED
+
+        eventBuilder.setUsername(mergeRequestEvent.getUser().getUsername());
         eventBuilder.setUserEmail(mergeRequestEvent.getUser().getEmail());
         eventBuilder.setTitle(mergeRequestEvent.getObjectAttributes().getTitle());
         eventBuilder.setDescription(mergeRequestEvent.getObjectAttributes().getDescription());
         Event event = eventBuilder.build();
 
-        this.listener.onNewGitlabEvent(event);
+        eventTypeAndListenerPair.eventConsumer.accept(event);
         logger.info("Created AVRO Event after onMergeRequestEvent");
     }
-    */
 
     /**
      * This method is called when a WebHook push event has been received.
@@ -122,7 +163,7 @@ class GitlabWebhookListenerObserver implements WebHookListener {
             eventBuilder.setUserEmail(issueEvent.getUser().getEmail());
             eventBuilder.setTitle(issueEvent.getObjectAttributes().getTitle());
             eventBuilder.setDescription(issueEvent.getObjectAttributes().getDescription());
-            // eventBuilder.setTags(this.getStringsFromIssueLabels(issueEvent.getLabels()));
+            eventBuilder.setTags(this.getStringsFromIssueLabels(issueEvent.getLabels()));
             Event event = eventBuilder.build();
 
             if (isIssueEditedEvent) {
@@ -139,11 +180,9 @@ class GitlabWebhookListenerObserver implements WebHookListener {
         }
     }
 
-    /*
-    protected List<String> getStringsFromIssueLabels(List<EventLabel> eventLabelList) {
+    private List<String> getStringsFromIssueLabels(List<EventLabel> eventLabelList) {
         return eventLabelList.stream()
-            .map(EventLabel::getDescription)
+            .map(EventLabel::getTitle)
             .collect(Collectors.toList());
     }
-    */
 }

@@ -1,4 +1,9 @@
 package it.unipd.dstack.butterfly.producer.gitlab.webhookmanager;
 
-public class WebhookManagerUtils {
+class WebhookManagerUtils {
+    private WebhookManagerUtils() {}
+
+    static <T extends Number> String numberToString(T number) {
+        return String.valueOf(number);
+    }
 }
