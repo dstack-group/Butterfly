@@ -1,13 +1,13 @@
 ^/\*\*
 ^ \* @project: Butterfly
-^ \* @author: DStack
+^ \* @author: DStack Group
 ^ \* @module: ([a-zA_Z][\\.\\w]*)
 ^ \* @fileName: ([A-Z][a-z0-9]+)+[.](java)
 ^ \* @created: \d\d\d\d-\d\d-\d\d
 ^ \*
 ^ \* --------------------------------------------------------------------------------------------
 ^ \* Copyright [(]c[)] 2019 DStack Group.
-^ \* Licensed under the MIT License[.] See License.txt in the project root for license information[.]
+^ \* Licensed under the MIT License[.] See LICENSE in the project root for license information[.]
 ^ \* --------------------------------------------------------------------------------------------
 ^ \*
 ^ \* @description: [\\.\\w]*
