@@ -1,9 +1,6 @@
 package it.unipd.dstack.butterfly.jsonconverter;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -17,14 +14,25 @@ public class JSONConverterImpl implements JSONConverter {
     }
 
     public JSONConverterImpl(boolean lowerCaseWithUnderScore) {
+        this(lowerCaseWithUnderScore, null);
+    }
+
+    public JSONConverterImpl(boolean lowerCaseWithUnderScore, String dateFormat) {
         var fieldNamingPolicy = lowerCaseWithUnderScore ?
                 FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES :
                 FieldNamingPolicy.IDENTITY;
 
-        this.gson = new GsonBuilder()
+        GsonBuilder builder = new GsonBuilder()
                 .setFieldNamingPolicy(fieldNamingPolicy)
-                .serializeNulls()
-                .create();
+                .serializeNulls();
+
+        if (dateFormat == null) {
+            builder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        } else {
+            builder.setDateFormat(dateFormat);
+        }
+
+        this.gson = builder.create();
     }
 
     /**
@@ -32,7 +40,7 @@ public class JSONConverterImpl implements JSONConverter {
      *
      * @param json  JSON value expressed as a String
      * @param klass the name of the class to instantiate given the json's value
-     * @return an instance of klass representing a model of json
+     * @return an instance of klass representing a old_model of json
      * @throws JSONConverterException if json doesn't match with klass' definition
      */
     @Override
@@ -93,4 +101,13 @@ public class JSONConverterImpl implements JSONConverter {
             return null;
         }
     }
+
+    /*
+    private class DateTimeDeserializer implements JsonDeserializer<DateTime> {
+        public DateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
+            return new DateTime(json.getAsJsonPrimitive().getAsString());
+        }
+    }
+    */
 }
