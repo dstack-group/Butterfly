@@ -129,22 +129,22 @@ CREATE TABLE public.user (
 );
 ALTER SEQUENCE public.user_id_seq OWNED BY public.user.user_id;
 
-CREATE SEQUENCE public.x_user_contact_id_seq;
-CREATE TABLE public.x_user_contact (
-	x_user_contact_id BIGINT NOT NULL DEFAULT nextval('public.x_user_contact_id_seq'),
+CREATE SEQUENCE public.user_contact_id_seq;
+CREATE TABLE public.user_contact (
+	user_contact_id BIGINT NOT NULL DEFAULT nextval('public.user_contact_id_seq'),
 	user_id BIGINT NOT NULL,
 	contact_type public.consumer_service NOT NULL,
 	contact_ref VARCHAR(30) NOT NULL,
-	CONSTRAINT x_user_contact_pkey PRIMARY KEY (x_user_contact_id),
-	CONSTRAINT x_user_contact_user_id_contact_type_unique
+	CONSTRAINT user_contact_pkey PRIMARY KEY (user_contact_id),
+	CONSTRAINT user_contact_user_id_contact_type_unique
         UNIQUE (user_id, contact_type),
-	CONSTRAINT x_user_contact_user_fkey
+	CONSTRAINT user_contact_user_fkey
 		FOREIGN KEY (user_id)
 		REFERENCES public.user (user_id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
 );
-ALTER SEQUENCE public.x_user_contact_id_seq OWNED BY public.x_user_contact.x_user_contact_id;
+ALTER SEQUENCE public.user_contact_id_seq OWNED BY public.user_contact.user_contact_id;
 
 CREATE SEQUENCE public.keyword_id_seq;
 CREATE TABLE public.keyword (
@@ -162,7 +162,6 @@ CREATE TABLE public.subscription (
 	user_id BIGINT NOT NULL,
 	project_id BIGINT NOT NULL,
 	x_service_event_type_id BIGINT NOT NULL,
-	x_user_contact_id BIGINT NOT NULL,
 	user_priority public.user_priority NOT NULL,
 	CONSTRAINT subscription_pkey PRIMARY KEY (subscription_id),
 	CONSTRAINT subscription_user_id_project_id_x_service_event_type_id_unique
@@ -181,14 +180,25 @@ CREATE TABLE public.subscription (
 		FOREIGN KEY (x_service_event_type_id)
 		REFERENCES public.x_service_event_type (x_service_event_type_id)
 		ON UPDATE CASCADE
-		ON DELETE CASCADE,
-	CONSTRAINT subscription_x_user_contact_id_fkey
-		FOREIGN KEY (x_user_contact_id)
-		REFERENCES public.x_user_contact (x_user_contact_id)
-		ON UPDATE CASCADE
 		ON DELETE CASCADE
 );
 ALTER SEQUENCE public.subscription_id_seq OWNED BY public.subscription.subscription_id;
+
+CREATE TABLE public.x_subscription_user_contact (
+  subscription_id BIGINT NOT NULL,
+  user_contact_id BIGINT NOT NULL,
+  CONSTRAINT x_subscription_user_contact_pkey PRIMARY KEY (subscription_id, user_contact_id),
+  CONSTRAINT x_subscription_user_contact_subscription_fkey
+    FOREIGN KEY (subscription_id)
+    REFERENCES public.subscription (subscription_id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+  CONSTRAINT x_subscription_user_contact_user_contact_fkey
+    FOREIGN KEY (user_contact_id)
+    REFERENCES public.user_contact (user_contact_id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+);
 
 CREATE TABLE public.x_subscription_keyword (
 	subscription_id BIGINT NOT NULL,
@@ -209,23 +219,9 @@ CREATE TABLE public.x_subscription_keyword (
 CREATE SEQUENCE public.event_sent_log_id_seq;
 CREATE TABLE public.event_sent_log (
 	event_sent_log_id BIGINT NOT NULL DEFAULT nextval('public.event_sent_log_id_seq'),
-	user_id BIGINT NOT NULL,
-	created TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
 	producer_service_key public.producer_service NOT NULL,
-	event_type_id BIGINT NOT NULL,
-	project_id BIGINT NOT NULL,
-	CONSTRAINT event_sent_log_user_fkey
-		FOREIGN KEY (user_id)
-		REFERENCES public.user (user_id)
-		ON DELETE CASCADE,
-	CONSTRAINT event_sent_log_event_type_fkey
-		FOREIGN KEY (event_type_id)
-		REFERENCES public.event_type (event_type_id)
-		ON DELETE CASCADE,
-	CONSTRAINT event_sent_log_project_fkey
-		FOREIGN KEY (project_id)
-		REFERENCES public.project (project_id)
-		ON DELETE CASCADE
+  event_record json NOT NULL,
+  CONSTRAINT event_sent_log_pkey PRIMARY KEY (event_sent_log_id)
 );
 
 ----------------- VIEWS -------------------
@@ -250,58 +246,77 @@ CREATE OR REPLACE VIEW public.v_filtered_users AS (
 
 ------------------ FUNCTIONS ----------------
 
-DROP TYPE IF EXISTS public.subscription_type;
-CREATE TYPE public.subscription_type AS (
-	subscription_id BIGINT,
-	user_id BIGINT,
-	project_id BIGINT,
-	x_service_event_type_id BIGINT,
-	x_user_contact_id BIGINT,
-	user_priority public.user_priority
+DROP TYPE IF EXISTS public.subscription_denormalized_type CASCADE;
+CREATE TYPE public.subscription_denormalized_type AS (
+	"subscriptionId" BIGINT,
+	"userId" BIGINT,
+	"projectId" BIGINT,
+	"eventType" public.service_event_type,
+	"userPriority" public.user_priority,
+	"userContactList" jsonb -- each user contact associated with this subscription 
+	-- keywordList text[], -- each keyword associated with this subscription
 );
 
 CREATE OR REPLACE FUNCTION public.create_subscription(
 	in_user_id bigint,
 	in_project_name text,
-	in_event_type_key public.service_event_type,
-	in_contact_type public.consumer_service,
+	in_event_type_key public.service_event_type, -- GITLAB_COMMIT_CREATED, GITLAB_ISSUE_CREATED, ...
 	in_user_priority public.user_priority,
+	in_contact_type_list public.consumer_service[], -- TELEGRAM, EMAIL, SLACK
 	in_keyword_name_list text[])
-RETURNS public.subscription_type
+RETURNS public.subscription_denormalized_type
 LANGUAGE plpgsql
 COST 100
 VOLATILE 
 AS $$
 #variable_conflict use_variable
-DECLARE v_x_user_contact_id BIGINT;
+DECLARE v_curr_contact_type public.consumer_service;
+DECLARE v_user_contact_id_list BIGINT[];
+DECLARE v_curr_user_contact_id BIGINT;
 DECLARE v_project_id BIGINT;
 DECLARE v_event_type_id BIGINT;
 DECLARE v_x_service_event_type_id BIGINT;
 DECLARE v_subscription_id BIGINT;
-DECLARE v_result subscription_type;
+DECLARE v_result public.subscription_denormalized_type;
 DECLARE v_curr_keyword_name text;
+DECLARE v_curr_keyword_name_upper text;
 DECLARE v_curr_keyword_id BIGINT;
 DECLARE v_keyword_id_list BIGINT[];
 BEGIN
-	SELECT xuc.x_user_contact_id
-	FROM public.x_user_contact xuc
-	WHERE xuc.user_id = in_user_id
-		AND xuc.contact_type = in_contact_type
-	INTO v_x_user_contact_id;
+	-- Check that every contact type in the list is associated with the user
+	-- identified by `in_user_id`. If it doesn't, 'CONTACT_NOT_FOUND' is thrown.
+	v_user_contact_id_list = array[]::BIGINT[];
+	FOREACH v_curr_contact_type IN ARRAY in_contact_type_list
+	LOOP
+		SELECT xuc.user_contact_id
+		FROM public.user_contact xuc
+		WHERE xuc.user_id = in_user_id
+			AND xuc.contact_type = v_curr_contact_type
+		INTO v_curr_user_contact_id;
+
+		IF v_curr_user_contact_id IS NULL THEN
+			RAISE EXCEPTION 'CONTACT_NOT_FOUND';
+		END IF;
+
+		-- pushes `v_curr_user_contact_id` into the array `v_user_contact_id_list`
+		v_user_contact_id_list = v_user_contact_id_list || v_curr_user_contact_id;
+		v_curr_user_contact_id = NULL; -- resets v_curr_user_contact_id
+	END LOOP;
+	-- TODO: use v_user_contact_id_list in a FOR loop to write into public.x_subscription_user_contact
 	
-	IF v_x_user_contact_id IS NULL THEN
-		RAISE EXCEPTION 'CONTACT_NOT_FOUND';
-	END IF;
-	
+	-- Check that the project associated with the project name `in_project_name` exists.
+	-- If it doesn't, 'PROJECT_NOT_FOUND' is thrown.
 	SELECT p.project_id
 	FROM public.project p
 	WHERE p.project_name = in_project_name
 	INTO v_project_id;
 	
-	IF v_x_user_contact_id IS NULL THEN
+	IF v_project_id IS NULL THEN
 		RAISE EXCEPTION 'PROJECT_NOT_FOUND';
 	END IF;
 	
+	-- Check that the event type identified by `in_event_type_key` exists.
+	-- If it doesn't, 'EVENT_TYPE_NOT_FOUND' is thrown.
 	SELECT e.event_type_id
 	FROM public.event_type e
 	WHERE e.event_type_key = in_event_type_key
@@ -316,11 +331,14 @@ BEGIN
 	WHERE xse.event_type_id = v_event_type_id
 	INTO v_x_service_event_type_id;
 	
-	RAISE LOG 'x_user_contact_id: %', v_x_user_contact_id;
+	RAISE LOG 'user_contact_id_list: %', v_user_contact_id_list;
 	RAISE LOG 'project_id: %', v_project_id;
 	RAISE LOG 'event_type_id: %', v_event_type_id;
 	RAISE LOG 'x_service_event_type_id: %', v_x_service_event_type_id;
 	
+	-- `public.x_subscription_keyword` uses ids to link a keywords to subscriptions.
+	-- The following block ensures that for keywords that already exists, the previous ids are used,
+	-- and for keywords that didn't, a new record in `public.keyword` is created.
 	v_keyword_id_list = array[]::text[];
 
 	LOCK TABLE public.keyword IN SHARE ROW EXCLUSIVE MODE;
@@ -328,30 +346,63 @@ BEGIN
 
 	FOREACH v_curr_keyword_name IN ARRAY in_keyword_name_list
 	LOOP
+		v_curr_keyword_name_upper = UPPER(v_curr_keyword_name);
+
 		SELECT k.keyword_id
 		FROM public.keyword k
-		WHERE k.keyword_name = v_curr_keyword_name
+		WHERE k.keyword_name = v_curr_keyword_name_upper
 		INTO v_curr_keyword_id;
 
 		IF v_curr_keyword_id IS NULL THEN
 			INSERT INTO public.keyword (keyword_id, keyword_name)
-			VALUES (DEFAULT, v_curr_keyword_name)
+			VALUES (DEFAULT, v_curr_keyword_name_upper)
 			RETURNING keyword_id INTO v_curr_keyword_id;
 		END IF;
 
+		-- pushes `v_curr_keyword_id` into the array `v_keyword_id_list`
 		v_keyword_id_list = v_keyword_id_list || v_curr_keyword_id;
+		v_curr_keyword_id = NULL; -- resets v_curr_keyword_id
 	END LOOP;
 
-	RAISE LOG 'v_keyword_id_list: %', v_keyword_id_list;
+	RAISE LOG 'keyword_id_list: %', v_keyword_id_list;
 
-	INSERT INTO public.subscription (subscription_id, user_id, project_id, x_service_event_type_id, x_user_contact_id, user_priority)
-	VALUES (DEFAULT, in_user_id, v_project_id, v_x_service_event_type_id, v_x_user_contact_id, in_user_priority)
-	RETURNING * INTO v_result;
+	WITH INS AS (
+		INSERT INTO public.subscription (subscription_id, user_id, project_id, x_service_event_type_id, user_priority)
+		VALUES (DEFAULT, in_user_id, v_project_id, v_x_service_event_type_id, in_user_priority)
+		RETURNING subscription_id,
+			user_id,
+			project_id,
+			in_event_type_key AS event_type,
+			user_priority
+	)
+	SELECT i.subscription_id AS "subscriptionId",
+			i.user_id AS "userId",
+			i.project_id AS "projectId",
+			i.event_type AS "eventType",
+			i.user_priority AS "userPriority",
+			json_agg(
+					json_build_object(
+							'contactType', uc.contact_type,
+							'contactRef', uc.contact_ref
+					)
+			) AS "userContactList" --,
+			-- in_keyword_name_list AS "keywordList"
+	FROM INS i
+	JOIN public.user_contact uc
+			ON uc.user_contact_id = ANY(v_user_contact_id_list)
+	GROUP BY 1, 2, 3, 4, 5
+	INTO v_result;
 
 	FOREACH v_curr_keyword_id IN ARRAY v_keyword_id_list
 	LOOP
 		INSERT INTO public.x_subscription_keyword (subscription_id, keyword_id)
-		VALUES (v_result.subscription_id, v_curr_keyword_id);
+		VALUES (v_result."subscriptionId", v_curr_keyword_id);
+	END LOOP;
+
+	FOREACH v_curr_user_contact_id IN ARRAY v_user_contact_id_list
+	LOOP
+		INSERT INTO public.x_subscription_user_contact (subscription_id, user_contact_id)
+		VALUES (v_result."subscriptionId", v_curr_user_contact_id);
 	END LOOP;
 	
 	RETURN v_result;
@@ -359,12 +410,201 @@ END;
 $$;
 
 CREATE OR REPLACE FUNCTION public.trigger_update_modified_field()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
 BEGIN
   NEW.modified = NOW();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$;
+
+CREATE OR REPLACE FUNCTION public.search_event_receivers(in_event_record json, in_save_event boolean DEFAULT false)
+RETURNS TABLE (
+	"userContactList" json
+)
+LANGUAGE plpgsql
+COST 100
+VOLATILE 
+AS $$
+#variable_conflict use_variable
+DECLARE v_producer_service public.producer_service; -- REDMINE, GITLAB, SLACK
+DECLARE v_project_name text;
+DECLARE v_project_url text;
+DECLARE v_event_id text;
+DECLARE v_event_type_key public.service_event_type; -- GITLAB_COMMIT_CREATED, GITLAB_ISSUE_CREATED, ...
+DECLARE v_user_email text; -- the email of the user that created the event
+DECLARE v_title text; -- the title of the event
+DECLARE v_description text; -- the description of the event
+DECLARE v_tag_list text[]; -- the list of tags of the event
+DECLARE v_result json;
+BEGIN
+  RAISE LOG 'in_event_record: %', in_event_record;
+
+  v_producer_service = in_event_record->>'service';
+  v_project_name = in_event_record->>'projectName';
+  v_project_url = in_event_record->>'projectURL';
+  v_event_id = in_event_record->>'eventId';
+  v_event_type_key = in_event_record->>'eventType';
+  v_user_email = in_event_record->>'userEmail';
+  v_title = in_event_record->>'title';
+  v_description = in_event_record->>'description';
+  v_tag_list = ARRAY(SELECT * FROM json_array_elements_text(in_event_record->'tags'));
+
+  IF in_save_event THEN
+    INSERT INTO public.event_sent_log (producer_service_key, event_record)
+    VALUES (v_producer_service, in_event_record::jsonb);
+  END IF;
+
+	RETURN QUERY
+	-- Record object as it arrives from the Middleware Dispatcher service
+  WITH EVENT_RECORD AS (
+		SELECT NOW() AS timestamp,
+			v_producer_service AS service,
+			v_project_name AS project_name,
+			v_project_url AS project_url,
+			v_event_id AS event_id,
+			v_event_type_key AS event_type,
+			v_user_email AS user_email,
+			v_title AS title,
+			v_description AS description,
+			v_tag_list AS tags
+	),
+	-- Returns the single project that match the event's project
+	EVENT_PROJECT AS (
+		SELECT p.project_id,
+			p.project_name
+		FROM public.project p,
+			EVENT_RECORD r
+		WHERE p.project_name = r.project_name
+			AND p.project_url @> ('{"' || r.service::text || '": "' || r.project_url || '"}')::jsonb
+	),
+	EVENT_TYPE_ID AS (
+		SELECT xset.x_service_event_type_id
+		FROM EVENT_RECORD r
+		JOIN public.service ser
+			ON ser.producer_service_key = r.service
+		JOIN public.event_type et
+			ON et.event_type_key = r.event_type
+		JOIN public.x_service_event_type xset
+			ON xset.service_id = ser.service_id
+			AND xset.event_type_id = et.event_type_id
+	),
+	-- Returns the list of subscription that are related to the project and event type mentioned
+	-- in the event record
+	SUBSCRIPTIONS_TO_SAME_PROJECT_EVENT AS (
+		SELECT s.*
+		FROM public.v_filtered_users vfu
+		JOIN EVENT_PROJECT p ON TRUE
+		JOIN EVENT_TYPE_ID eti ON TRUE
+		JOIN public.subscription s
+			ON s.user_id = vfu.user_id
+			AND s.project_id = p.project_id
+			AND s.x_service_event_type_id = eti.x_service_event_type_id
+	),
+	-- Returns the distinct list of keywords that appear in the subscriptions found
+	-- in SUBSCRIPTIONS_TO_SAME_PROJECT_EVENT
+	KEYWORDS_FOR_SAME_SUBSCRIPTIONS AS (
+		SELECT DISTINCT k.keyword_name,
+			s.user_id
+		FROM SUBSCRIPTIONS_TO_SAME_PROJECT_EVENT s
+		JOIN public.x_subscription_keyword xsk
+			ON xsk.subscription_id = s.subscription_id
+		JOIN public.x_subscription_user_contact xsuc
+			ON xsuc.subscription_id = s.subscription_id
+		JOIN public.keyword k
+			ON k.keyword_id = xsk.keyword_id
+		JOIN public.user_contact xuc
+			ON xuc.user_contact_id = xsuc.user_contact_id
+		-- excludes the event creator
+		WHERE NOT EXISTS(
+			SELECT *
+			FROM public.v_filtered_users u,
+				EVENT_RECORD r
+			WHERE u.user_id = s.user_id
+				AND u.email = r.user_email
+		)
+	),
+	-- Finds all the keywords defined in the subscriptions that are linked to the current
+	-- project and event type. For each keyword, it also returns the list of filtered users 
+	-- that have specified said keyword.
+	KEYWORD_USERS_MAP AS (
+		SELECT ku.keyword_name,
+			array_agg(ku.user_id) AS user_id_list
+		FROM KEYWORDS_FOR_SAME_SUBSCRIPTIONS ku
+		GROUP BY ku.keyword_name
+	),
+	-- Filters KEYWORD_USERS_MAP, returning only those keywords which appear either in the event
+	-- title, description or tags. This word matching is case unsensitive.
+	SEARCH_KEYWORDS_IN_RECORD AS (
+		SELECT kg.keyword_name,
+			kg.user_id_list
+		FROM KEYWORD_USERS_MAP kg
+		JOIN EVENT_RECORD r ON true
+		WHERE r.description ILIKE '%' || kg.keyword_name || '%'
+			OR r.title ILIKE '%' || kg.keyword_name || '%'
+			OR kg.keyword_name ILIKE ANY(r.tags)
+	),
+	-- Returns the users that have specified at least one of the keywords that appear in SEARCH_KEYWORDS_IN_RECORD.
+	-- For each user, a count stating the number of keyword matches is returned.
+	KEYWORD_MATCHES_GROUPED_BY_USER AS (
+		-- this cast is needed otherwise I can't join later
+		SELECT CAST(u AS BIGINT) as user_id,
+			COUNT(*) AS n_keyword_match_occurs
+		FROM SEARCH_KEYWORDS_IN_RECORD,
+			unnest(user_id_list) AS u
+		GROUP BY 1
+	),
+	-- Performs a ranking considering the user priority and the number of keyword matches for each user
+	-- found in KEYWORD_MATCHES_GROUPED_BY_USER. The higher the user priority and the number of matches,
+	-- the lower the rank (i.e. the better the rank).
+	USER_MATCHES_RANKED AS (
+		SELECT km.user_id,
+			RANK () OVER (
+				ORDER BY km.n_keyword_match_occurs DESC,
+						s.user_priority DESC
+			) AS rank
+		FROM KEYWORD_MATCHES_GROUPED_BY_USER km
+		JOIN SUBSCRIPTIONS_TO_SAME_PROJECT_EVENT s
+			ON s.user_id = km.user_id
+		ORDER BY rank
+	),
+	-- Returns the users with the best rank among the ones selected in USER_MATCHES_RANKED.
+	BEST_USER_MATCHES AS (
+		SELECT umr.user_id
+		FROM USER_MATCHES_RANKED umr
+		GROUP BY umr.user_id
+		-- HAVING MIN(umr.rank) = 1
+	),
+	-- For each user, it returns the contact info related to the matched user's subscription.
+	-- The contact info is represented as a map, which has the contact service as key and the
+	-- contact identified as value.
+	USER_CONTACT_INFO AS (
+		SELECT u.firstname,
+			u.lastname,
+			jsonb_object_agg(
+				uc.contact_type, uc.contact_ref
+			) AS "contacts"
+		FROM BEST_USER_MATCHES bum
+		JOIN SUBSCRIPTIONS_TO_SAME_PROJECT_EVENT s
+			ON s.user_id = bum.user_id
+		JOIN public.x_subscription_user_contact xsuc
+			ON xsuc.subscription_id = s.subscription_id
+		JOIN public.user_contact uc
+			ON uc.user_contact_id = xsuc.user_contact_id
+		JOIN v_filtered_users u
+			ON u.user_id = uc.user_id
+		GROUP BY u.firstname,
+			u.lastname
+	)
+	SELECT COALESCE(
+		json_agg(row_to_json(uci.*)),
+		'[]'::json
+	) AS "userContactList"
+	FROM USER_CONTACT_INFO uci;
+
+END;
+$$;
 
 ----------------- PROCEDURES -----------------
 
@@ -449,24 +689,24 @@ BEGIN
 	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (6, 'elton97@gmail.com', 'Elton', 'Stafa');
 	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (7, 'singh@gmail.com', 'Harwinder', 'Singh');
 
-	INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (1, 'TELEGRAM', 'jkomyno');
-	INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (1, 'SLACK', 'jkomyno');
-	INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (1, 'EMAIL', 'dstackgroup@gmail.com');
-	INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (2, 'TELEGRAM', 'frispo');
-	INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (2, 'EMAIL', 'dstackgroup@gmail.com');
-	INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (3, 'TELEGRAM', 'enrico_dogen');
-	INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (3, 'EMAIL', 'dstackgroup@gmail.com');
-	INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (4, 'TELEGRAM', 'mrossi');
-	INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref) VALUES (4, 'EMAIL', 'dstackgroup@gmail.com');
+	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (1, 'TELEGRAM', 'jkomyno');
+	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (1, 'SLACK', 'jkomyno');
+	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (1, 'EMAIL', 'dstackgroup@gmail.com');
+	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (2, 'TELEGRAM', 'frispo');
+	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (2, 'EMAIL', 'dstackgroup@gmail.com');
+	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (3, 'TELEGRAM', 'enrico_dogen');
+	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (3, 'EMAIL', 'dstackgroup@gmail.com');
+	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (4, 'TELEGRAM', 'mrossi');
+	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (4, 'EMAIL', 'dstackgroup@gmail.com');
 
   -- PERFORM is used when we're not interesting in the actual data returned from the called stored function.
-	PERFORM public.create_subscription(1, 'Butterfly', 'GITLAB_COMMIT_CREATED', 'TELEGRAM', 'HIGH', array['bug', 'fix', 'close']::text[]);
-	PERFORM public.create_subscription(1, 'Butterfly', 'GITLAB_ISSUE_CREATED', 'TELEGRAM', 'HIGH', array[]::text[]);
-	PERFORM public.create_subscription(1, 'Butterfly', 'REDMINE_TICKET_CREATED', 'TELEGRAM', 'HIGH', array[]::text[]);
-	PERFORM public.create_subscription(2, 'Amazon', 'GITLAB_ISSUE_CREATED', 'TELEGRAM', 'LOW', array['fix', 'bug', 'resolve']::text[]);
-	PERFORM public.create_subscription(3, 'Amazon', 'GITLAB_ISSUE_CREATED', 'TELEGRAM', 'LOW', array['fix', 'bug', 'resolve']::text[]);
-	PERFORM public.create_subscription(4, 'Amazon', 'GITLAB_ISSUE_CREATED', 'EMAIL', 'HIGH', array['fix', 'bug', 'revert']::text[]);
-
+  PERFORM public.create_subscription(1, 'Butterfly', 'GITLAB_COMMIT_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, FIX, CLOSE}'::text[]);
+	PERFORM public.create_subscription(1, 'Butterfly', 'GITLAB_ISSUE_CREATED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{BUG}'::text[]);
+	PERFORM public.create_subscription(1, 'Butterfly', 'REDMINE_TICKET_CREATED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{PROJECT, BUG, DEADLINE}'::text[]);
+	PERFORM public.create_subscription(2, 'Amazon', 'GITLAB_ISSUE_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{FIX, BUG, RESOLVE}'::text[]);
+	PERFORM public.create_subscription(2, 'Amazon', 'GITLAB_ISSUE_EDITED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{FIX, BUG, RESOLVE}'::text[]);
+	PERFORM public.create_subscription(3, 'Amazon', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM}'::public.consumer_service[], '{FIX, STRANGE}'::text[]);
+	PERFORM public.create_subscription(4, 'Amazon', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{FIX, STRANGE, BUG}'::text[]);
 END;
 $$;
 
@@ -486,139 +726,7 @@ EXECUTE PROCEDURE public.trigger_update_modified_field();
 
 CALL public.trunc_data();
 CALL public.init_event_data();
-
-/*
-
--- NEW QUERY (almost done)
-
-WITH EVENT_RECORD AS (
-	SELECT NOW() AS timestamp,
-		public.producer_service 'GITLAB' AS service,
-		'Amazon' AS project_name,
-		'gitlab.amazon.com/amazon/amazon.git' AS project_url,
-		1 AS event_id,
-		public.service_event_type 'GITLAB_ISSUE_CREATED' AS event_type,
-		'federico.rispo@gmail.com' AS user_email, -- the user that matches this email should be excluded from the result set
-		'New performance bug for you' AS title,
-		'Random and pretty long description that discusses about the importance of writing clean and performance-wise code. Something must be fixed.' AS description,
-		array['bug', 'revert']::text[] AS tags
-),
-EVENT_PROJECT AS (
-	SELECT p.project_id,
-		p.project_name
-	FROM public.project p,
-		EVENT_RECORD r
-	WHERE p.project_name = r.project_name
-		AND p.project_url @> ('{"' || r.service::text || '": "' || r.project_url || '"}')::jsonb
-),
-EVENT_TYPE_ID AS (
-	SELECT xset.x_service_event_type_id
-	FROM EVENT_RECORD r
-	JOIN public.service ser
-		ON ser.producer_service_key = r.service
-	JOIN public.event_type et
-		ON et.event_type_key = r.event_type
-	JOIN public.x_service_event_type xset
-		ON xset.service_id = ser.service_id
-		AND xset.event_type_id = et.event_type_id
-),
-SUBSCRIPTIONS_TO_SAME_PROJECT_EVENT AS (
-	SELECT s.*
-	FROM public.v_filtered_users vfu
-	JOIN EVENT_PROJECT p ON TRUE
-	JOIN EVENT_TYPE_ID eti ON TRUE
-	JOIN public.subscription s
-		ON s.user_id = vfu.user_id
-		AND s.x_service_event_type_id = eti.x_service_event_type_id
-),
-KEYWORDS_USER AS (
-	SELECT DISTINCT k.*,
-		s.user_id,
-		s.user_priority,
-		xuc.contact_type,
-		xuc.contact_ref
-	FROM SUBSCRIPTIONS_TO_SAME_PROJECT_EVENT s
-	JOIN public.x_subscription_keyword xsk
-		ON xsk.subscription_id = s.subscription_id
-	JOIN public.keyword k
-		ON k.keyword_id = xsk.keyword_id
-	JOIN public.x_user_contact xuc
-		ON xuc.x_user_contact_id = s.x_user_contact_id
-	WHERE NOT EXISTS(
-		SELECT *
-		FROM public.v_filtered_users u,
-			EVENT_RECORD r
-		WHERE u.user_id = s.user_id
-			AND u.email = r.user_email
-	)
-),			  
-KEYWORDS_GROUPED AS (
-		SELECT ku.keyword_name,
-				array_agg(
-						json_build_object(
-								'user_id', ku.user_id,
-								'priority', ku.user_priority,
-				'contact_type', ku.contact_type,
-				'contact_ref', ku.contact_ref
-						)
-				) AS user_list
-		FROM KEYWORDS_USER ku
-		GROUP BY ku.keyword_name
-),
-SEARCH AS (
-	SELECT kg.keyword_name,
-		kg.user_list
-	FROM KEYWORDS_GROUPED kg
-	JOIN EVENT_RECORD r ON true
-	WHERE r.description ILIKE '%' || kg.keyword_name || '%'
-				OR r.title ILIKE '%' || kg.keyword_name || '%'
-		OR kg.keyword_name = ANY(r.tags)
-),
-BEST_MATCH_SEARCH AS (
-		-- this cast is needed otherwise I can't join later
-	SELECT CAST(u->>'user_id' AS BIGINT) as user_id,
-		u->>'priority' AS priority,
-		u->>'contact_type' AS contact_type,
-		u->>'contact_ref' AS contact_ref,
-		COUNT(*) AS n_keyword_match_occurs
-	FROM SEARCH,
-			unnest(user_list) AS u
-	GROUP BY 1, 2, 3, 4
-),
-RANK_BEST_MATCH_SEARCH AS (
-	SELECT s.*,
-		RANK () OVER (
-			ORDER BY s.n_keyword_match_occurs DESC,
-					s.priority DESC
-		) AS rank
-	FROM BEST_MATCH_SEARCH s
-	ORDER BY rank
-),
-CONTACT_INFO_JSON_MAP_BY_USER_ID AS (
-	SELECT m.user_id,
-		jsonb_object_agg(
-			m.contact_type, m.contact_ref
-		) AS contact_info
-	FROM RANK_BEST_MATCH_SEARCH m
-	GROUP BY m.user_id
-),
-USER_CONTACTS_INFO AS (
-	SELECT u.user_id,
-		u.email,
-		u.firstname,
-		u.lastname,
-		c.contact_info
-	FROM CONTACT_INFO_JSON_MAP_BY_USER_ID c
-	JOIN v_filtered_users u
-		ON u.user_id = c.user_id
-)
-SELECT COALESCE(
-	array_agg(row_to_json(u.*)),
-	array[]::json[]
-) AS user_contacts
-FROM USER_CONTACTS_INFO u
-*/
-
+CALL public.init_demo_data();
 
 
 /*
@@ -737,7 +845,7 @@ CONTACT_INFO_JSON_MAP_BY_USER_ID AS (
 				xuc.contact_type, xuc.contact_ref
 			) AS contact_info
 	FROM BEST_MATCH_SEARCH_RANK m
-	JOIN public.x_user_contact xuc
+	JOIN public.user_contact xuc
 		ON xuc.user_id = m.user_id
 	GROUP BY m.user_id
 ),
