@@ -1,4 +1,4 @@
-import { EventWithRecipients } from './entity';
+import { EventReceiversResult } from './entity';
 import { SearchRepository } from './repository';
 import { Event } from '../../common/Event';
 
@@ -9,7 +9,7 @@ export class SearchManager {
     this.repository = repository;
   }
 
-  async searchUsersFromEvent(event: Event): Promise<EventWithRecipients> {
-    return this.repository.searchUsersFromEvent(event);
+  async searchReceiversByRecord(event: Event, saveEvent = false): Promise<EventReceiversResult> {
+    return this.repository.searchReceiversByRecord(event, saveEvent);
   }
 }

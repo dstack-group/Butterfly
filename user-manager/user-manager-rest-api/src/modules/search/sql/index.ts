@@ -2,7 +2,7 @@ import { getSQLFile } from '../../../utils/getSQLFile';
 
 const directoryName = __dirname;
 export = {
-  searchUsersFromEvent: sql('./searchUsersFromEvent.sql'),
+  searchReceiversByRecord: sql('./searchReceiversByRecord.sql'),
 };
 
 function sql(relativeFilename: string) {

@@ -56,13 +56,13 @@ export interface Event {
    * If `service` is SONARQUBE:
    * - SONARQUBE_PROJECT_ANALYSIS_COMPLETED
    */
-  eventType: string; // TODO: this should be an enum dependent on `service`
+  eventType: ServiceEventType; // TODO: this should be an enum dependent on `service`
 
   /**
    * Email of the user that originated the event.
    * Sonarqube doesn't provide this information.
    */
-  email?: string;
+  userEmail?: string;
 
   /**
    * Title of the event. For instance, in Gitlab this would be the branch in which there was a new

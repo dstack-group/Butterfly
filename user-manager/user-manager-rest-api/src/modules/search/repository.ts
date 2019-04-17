@@ -1,16 +1,19 @@
-import { EventWithRecipients } from './entity';
-import sqlProvider from './sql';
+import { EventReceiversResult } from './entity';
 import { Database } from '../../database';
 import { Event } from '../../common/Event';
+import { SearchQueryProvider } from './SearchQueryProvider';
+import sqlProvider from './sql';
 
 export class SearchRepository {
   private database: Database;
+  private sqlProvider: SearchQueryProvider;
 
   constructor(database: Database) {
     this.database = database;
+    this.sqlProvider = sqlProvider;
   }
 
-  async searchUsersFromEvent(event: Event): Promise<EventWithRecipients> {
-    return await this.database.one(sqlProvider.searchUsersFromEvent, event);
+  async searchReceiversByRecord(event: Event, saveEvent: boolean): Promise<EventReceiversResult> {
+    return await this.database.one(this.sqlProvider.searchReceiversByRecord, { event, saveEvent });
   }
 }

@@ -1,23 +1,15 @@
-import { User } from '../users/entity';
 import { ThirdPartyContactService } from '../../common/ThirdPartyContactService';
 
 export type ContactInfo = {
-  readonly [key in ThirdPartyContactService]: {
-    contact_ref: string;
-  };
+  readonly [key in ThirdPartyContactService]?: string;
 };
 
-export interface UserContactsInfo {
-  user: User;
-  contacts: ContactInfo[];
+export interface EventReceiver {
+  firstname: string;
+  lastname: string;
+  contactInfo: ContactInfo;
 }
 
-export interface EventWithRecipients {
-  entityId: string;
-  entityType: string;
-  projectName: string;
-  projectURL?: string;
-  title: string;
-  description: string;
-  userContacts: UserContactsInfo[];
+export interface EventReceiversResult {
+  userContactList: EventReceiver[];
 }
