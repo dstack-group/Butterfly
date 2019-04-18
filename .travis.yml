@@ -23,12 +23,21 @@ cache:
 # matrix:
 #   fast_finish: true
 
+addons:
+  apt:
+    packages:
+      - docker-ce # updates Docker
+
 before_install:
+  # shows the current version of docker
+  - docker --version
   # install the version of docker-compose identified by $COMPOSE_VERSION
   - sudo rm /usr/local/bin/docker-compose
-  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-  - chmod +x docker-compose
-  - sudo mv docker-compose /usr/local/bin
+  - sudo curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)"  -o /usr/local/bin/docker-compose
+  - sudo mv /usr/local/bin/docker-compose /usr/bin/docker-compose
+  - sudo chmod +x /usr/bin/docker-compose
+  # shows the current version of docker-compose
+  - docker-compose --version
   # makes the shell files executable
   - find ./ -type f -name "*.sh" -exec chmod +x {} \;
   # install project dependencies
