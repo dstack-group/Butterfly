@@ -45,4 +45,4 @@ before_install:
 
 script:
   # tests the Java services and the User Manager
-  - test.sh
+  - ./test.sh
