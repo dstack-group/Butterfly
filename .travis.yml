@@ -12,7 +12,7 @@ install: true
 
 env:
   global:
-    - COMPOSE_VERSION="1.23.2"
+    - DOCKER_COMPOSE_VERSION="1.23.2"
   
 cache:
   directories:
@@ -31,9 +31,7 @@ addons:
 before_install:
   # shows the current version of docker
   - docker --version
-  - uname -s
-  - uname -m
-  # install the version of docker-compose identified by $COMPOSE_VERSION
+  # install the version of docker-compose identified by $DOCKER_COMPOSE_VERSION
   - sudo rm /usr/local/bin/docker-compose
   - sudo curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)"  -o /usr/local/bin/docker-compose
   - sudo mv /usr/local/bin/docker-compose /usr/bin/docker-compose
