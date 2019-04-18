@@ -496,8 +496,8 @@ BEGIN
 			p.project_name
 		FROM public.project p,
 			EVENT_RECORD r
-		WHERE p.project_name = r.project_name
-			AND p.project_url @> ('{"' || r.service::text || '": "' || r.project_url || '"}')::jsonb
+		WHERE p.project_url @> ('{"' || r.service::text || '": "' || r.project_url || '"}')::jsonb
+			OR p.project_name = r.project_name
 	),
 	EVENT_TYPE_ID AS (
 		SELECT xset.x_service_event_type_id
@@ -811,7 +811,7 @@ CREATE OR REPLACE PROCEDURE public.init_demo_data()
 LANGUAGE plpgsql
 AS $$
 BEGIN
-	INSERT INTO public.project(project_id, project_name, project_url) VALUES (1, 'Butterfly', '{"REDMINE": "redmine.dstackgroup.com/butterfly/butterfly.git", "GITLAB": "https://localhost:10443/dstack/butterfly.git"}');
+	INSERT INTO public.project(project_id, project_name, project_url) VALUES (1, 'Butterfly', '{"REDMINE": "http://localhost:15000/issues/2", "GITLAB": "https://localhost:10443/dstack/butterfly"}');
 	INSERT INTO public.project(project_id, project_name, project_url) VALUES (2, 'Amazon', '{"GITLAB": "gitlab.amazon.com/amazon/amazon.git"}');
 	INSERT INTO public.project(project_id, project_name, project_url) VALUES (3, 'Uber', '{"GITLAB": "gitlab.uber.com/uber/uber.git"}');
 	INSERT INTO public.project(project_id, project_name, project_url) VALUES (4, 'Twitter', '{"SONARQUBE": "sonarqube.twitter.com/twitter/twitter.git", "GITLAB": "gitlab.twitter.com/twitter/twitter.git"}');
@@ -819,8 +819,8 @@ BEGIN
 	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (1, 'alberto.schiabel@gmail.com', 'Alberto', 'Schiabel');
 	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (2, 'federico.rispo@gmail.com', 'Federico', 'Rispo');
 	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (3, 'enrico.trinco@gmail.com', 'Enrico', 'Trinco');
-	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (4, 'eleonorasignor@gmail.com', 'Eleonora', 'Signor');
-	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (5, 'TheAlchemist97@gmail.com', 'Niccolò', 'Vettorello');
+	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (4, 'TheAlchemist97@gmail.com', 'Niccolò', 'Vettorello');
+	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (5, 'eleonorasignor@gmail.com', 'Eleonora', 'Signor');
 	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (6, 'elton97@gmail.com', 'Elton', 'Stafa');
 	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (7, 'singh@gmail.com', 'Harwinder', 'Singh');
 
@@ -831,17 +831,23 @@ BEGIN
 	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (2, 'EMAIL', 'dstackgroup@gmail.com');
 	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (3, 'TELEGRAM', 'enrico_dogen');
 	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (3, 'EMAIL', 'dstackgroup@gmail.com');
-	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (4, 'TELEGRAM', 'mrossi');
+	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (4, 'TELEGRAM', 'TheAlchemist97');
 	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (4, 'EMAIL', 'dstackgroup@gmail.com');
 
   -- PERFORM is used when we're not interesting in the actual data returned from the called stored function.
-  PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_COMMIT_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, FIX, CLOSE}'::text[]);
-	PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{BUG}'::text[]);
-	PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'REDMINE_TICKET_CREATED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{PROJECT, BUG, DEADLINE}'::text[]);
-	PERFORM public.create_subscription('federico.rispo@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{FIX, BUG, RESOLVE}'::text[]);
-	PERFORM public.create_subscription('federico.rispo@gmail.com', 'Amazon', 'GITLAB_ISSUE_EDITED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{FIX, BUG, RESOLVE}'::text[]);
-	PERFORM public.create_subscription('enrico.trinco@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM}'::public.consumer_service[], '{FIX, STRANGE}'::text[]);
-	PERFORM public.create_subscription('eleonorasignor@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{FIX, STRANGE, BUG}'::text[]);
+
+  PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, FIX, CLOSE}'::text[]);
+  PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'REDMINE_TICKET_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, DOGE}'::text[]);
+	PERFORM public.create_subscription('TheAlchemist97@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{EMAIL}'::public.consumer_service[], '{DOGE, BREAK, VSCODE}'::text[]);
+	PERFORM public.create_subscription('TheAlchemist97@gmail.com', 'Butterfly', 'GITLAB_ISSUE_EDITED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{DOGE, BREAK, BUG}'::text[]);
+
+  -- PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_COMMIT_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, FIX, CLOSE}'::text[]);
+	-- PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{BUG}'::text[]);
+	-- PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'REDMINE_TICKET_CREATED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{PROJECT, BUG, DEADLINE}'::text[]);
+	-- PERFORM public.create_subscription('federico.rispo@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{FIX, BUG, RESOLVE}'::text[]);
+	-- PERFORM public.create_subscription('federico.rispo@gmail.com', 'Amazon', 'GITLAB_ISSUE_EDITED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{FIX, BUG, RESOLVE}'::text[]);
+	-- PERFORM public.create_subscription('enrico.trinco@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM}'::public.consumer_service[], '{FIX, STRANGE}'::text[]);
+	-- PERFORM public.create_subscription('TheAlchemist97@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{FIX, STRANGE, BUG}'::text[]);
 END;
 $$;
 
