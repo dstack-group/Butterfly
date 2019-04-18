@@ -2,7 +2,7 @@ import * as HttpStatus from 'http-status-codes';
 import { UserManager } from './manager';
 import { RouteController } from '../../common/controller/RouteController';
 import { RouteContextReplierFactory } from '../../router/RouteContextReplierFactory';
-import { User } from './entity';
+import { User, CreateUser } from './entity';
 import { RouteCommand } from '../../router/RouteCommand';
 import { Middleware } from '../../router/Router';
 
@@ -25,7 +25,7 @@ export class UserController extends RouteController {
   }
 
   private createUserCommand: RouteCommand<User> = async routeContext => {
-    const userModel = routeContext.getRequestBody() as User;
+    const userModel = routeContext.getRequestBody() as CreateUser;
     const newUser = await this.manager.create(userModel);
 
     return {

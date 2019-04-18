@@ -1,6 +1,4 @@
 /**
- * Deletes the user that matches the given id
+ * Deletes the user with the given email.
  */
-DELETE
-FROM ${schema~}.user
-WHERE email = ${email}
+SELECT ${schema~}.delete_user(${email}) AS "count";

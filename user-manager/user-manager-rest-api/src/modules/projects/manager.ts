@@ -1,4 +1,4 @@
-import { Project } from './entity';
+import { Project, ProjectName, RemoveServiceFromProject } from './entity';
 import { ProjectRepository } from './repository';
 import { AbstractCRUDManager } from '../../common/AbstractCRUDManager';
 import { NotFoundError } from '../../errors';
@@ -9,12 +9,12 @@ export class ProjectManager extends AbstractCRUDManager<Project, any, ProjectRep
     super(repository);
   }
 
-  findByName(project: Project): Promise<Project> {
-    return this.repository.findByName(project);
+  findByName(params: ProjectName): Promise<Project> {
+    return this.repository.findByName(params);
   }
 
-  async removeServiceURL(project: Project): Promise<Project> {
-    const result = await this.repository.removeServiceURL(project);
+  async removeServiceURL(params: RemoveServiceFromProject): Promise<Project> {
+    const result = await this.repository.removeServiceURL(params);
     if (result.length === 0) {
       throw new NotFoundError('Project entity not found');
     } else {

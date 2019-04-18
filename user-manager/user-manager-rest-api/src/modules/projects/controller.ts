@@ -2,7 +2,7 @@ import * as HttpStatus from 'http-status-codes';
 import { ProjectManager } from './manager';
 import { RouteController } from '../../common/controller/RouteController';
 import { RouteContextReplierFactory } from '../../router/RouteContextReplierFactory';
-import { Project } from './entity';
+import { Project, CreateProject, ProjectName, RemoveServiceFromProject } from './entity';
 import { RouteCommand } from '../../router/RouteCommand';
 import { Middleware } from '../../router/Router';
 import { ThirdPartyProducerService } from '../../common/ThirdPartyProducerService';
@@ -26,7 +26,7 @@ export class ProjectController extends RouteController {
   }
 
   private createProjectCommand: RouteCommand<Project> = async routeContext => {
-    const projectModel = routeContext.getRequestBody() as Project;
+    const projectModel = routeContext.getRequestBody() as CreateProject;
     const newProject = await this.manager.create(projectModel);
 
     return {
@@ -37,8 +37,8 @@ export class ProjectController extends RouteController {
 
   private getProjectByNameCommand: RouteCommand<Project> = async routeContext => {
     const { projectName } = routeContext.getNamedParams() as { projectName: string };
-    const projectParams = { projectName };
-    const projectFound = await this.manager.findByName(projectParams as Project);
+    const projectParams: ProjectName = { projectName };
+    const projectFound = await this.manager.findByName(projectParams);
 
     return {
       data: projectFound,
@@ -47,7 +47,7 @@ export class ProjectController extends RouteController {
 
   private deleteProjectByNameCommand: RouteCommand<Project> = async routeContext => {
     const { projectName } = routeContext.getNamedParams() as { projectName: string };
-    const projectParams = { projectName };
+    const projectParams: ProjectName = { projectName };
     await this.manager.delete(projectParams as Project);
 
     return {
@@ -61,8 +61,8 @@ export class ProjectController extends RouteController {
       projectName: string,
       producerService: ThirdPartyProducerService,
     };
-    const projectParams = { projectName, producerService };
-    const project = await this.manager.removeServiceURL(projectParams as Project);
+    const projectParams: RemoveServiceFromProject = { projectName, producerService };
+    const project = await this.manager.removeServiceURL(projectParams);
 
     return {
       data: project,

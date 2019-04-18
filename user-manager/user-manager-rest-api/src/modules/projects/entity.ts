@@ -5,8 +5,19 @@ export type ProjectURL = {
   [key in keyof typeof ThirdPartyProducerService]?: string;
 };
 
-export interface Project {
-  projectId?: string;
+export interface ProjectName {
   projectName: string;
-  projectURL?: ProjectURL;
+}
+
+export interface CreateProject extends ProjectName {
+  projectURL: ProjectURL;
+}
+
+export interface Project extends CreateProject {
+  projectId: string;
+}
+
+export interface RemoveServiceFromProject {
+  producerService: ThirdPartyProducerService;
+  projectName: string;
 }

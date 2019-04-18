@@ -1,4 +1,4 @@
-import { User } from './entity';
+import { User, CreateUser } from './entity';
 import { UserRepository } from './repository';
 import { AbstractCRUDManager } from '../../common/AbstractCRUDManager';
 
@@ -8,7 +8,7 @@ export class UserManager extends AbstractCRUDManager<User, any, UserRepository> 
     super(repository);
   }
 
-  findByEmail(user: User): Promise<User> {
+  findByEmail(user: CreateUser): Promise<User> {
     return this.repository.findByEmail(user);
   }
 

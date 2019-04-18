@@ -6,7 +6,7 @@ import { truncData } from '../fixtures/truncData';
 import { PgDatabaseConnection } from '../../src/database';
 import { createProjects, createProject } from '../fixtures/createProjects';
 import { isValidDate } from '../isValidDate';
-import { Project } from '../../src/modules/projects/entity';
+import { Project, CreateProject } from '../../src/modules/projects/entity';
 import { ThirdPartyProducerService } from '../../src/common/ThirdPartyProducerService';
 
 let app: AppServer;
@@ -70,7 +70,7 @@ describe(`POST /projects`, () => {
   it(`Should fail if another project with the same name already exists`, done => {
     const { transaction, result } = createProject(databaseConnection);
     const { projectName } = result;
-    const project: Project = {
+    const project: CreateProject = {
       projectName,
       projectURL: {
         GITLAB: 'http://gitlab',
@@ -95,7 +95,7 @@ describe(`POST /projects`, () => {
   });
 
   it(`Should return the newly inserted project if the INSERT operation is successful`, done => {
-    const project: Project = {
+    const project: CreateProject = {
       projectName: 'PROJECT_NAME',
       projectURL: {
         GITLAB: 'http://gitlab',
@@ -166,7 +166,7 @@ describe(`DELETE /projects/:projectName`, () => {
 });
 
 describe(`DELETE /projects/:projectName/:producerService`, () => {
-  it(`Should delete a project if it exists`, done => {
+  it(`Should delete a project URL if it exists`, done => {
     const { transaction, result } = createProject(databaseConnection);
     const { projectId, projectName, projectURL } = result;
 
