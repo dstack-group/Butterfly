@@ -16,10 +16,11 @@ export class UserContactController extends RouteController {
 
   private createUserContactCommand: RouteCommand<UserContact> = async routeContext => {
     const userContactURLParams = routeContext.getNamedParams() as unknown as CreateUserContactURLParams;
-    const { contactRef } = routeContext.getRequestBody() as CreateUserContact;
+    const { contactRef, userEmail } = routeContext.getRequestBody() as CreateUserContact;
     const userContactModel: CreateUserContact = {
       ...userContactURLParams,
       contactRef,
+      userEmail,
     };
     const newUserContact = await this.manager.create(userContactModel);
 

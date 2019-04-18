@@ -1,11 +1,12 @@
 import { ThirdPartyContactService } from '../../common/ThirdPartyContactService';
 
 export interface CreateUserContactURLParams {
-  userEmail: string;
   contactService: ThirdPartyContactService;
+  userEmail?: string; // only in DELETE
 }
 
 export interface CreateUserContact extends CreateUserContactURLParams {
+  userEmail: string;
   contactRef: string;
 }
 

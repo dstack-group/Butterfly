@@ -114,6 +114,7 @@ services:
       - schema-registry
     networks:
       - kafka-network
+      - telegram-consumer-network
 
   email-consumer:
     build:
@@ -154,5 +155,7 @@ networks:
     name: redmine-producer-network
   middleware-dispatcher-network:
     name: middleware-dispatcher-network
+  telegram-consumer-network:
+    name: telegram-consumer-network
   kafka-network:
     name: kafka-network

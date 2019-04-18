@@ -64,6 +64,7 @@ services:
     networks:
       - user-manager-network
       - middleware-dispatcher-network
+      - telegram-consumer-network
 
 volumes:
   pg_data:
@@ -76,3 +77,6 @@ networks:
   middleware-dispatcher-network:
     external:
       name: middleware-dispatcher-network
+  telegram-consumer-network:
+    external:
+      name: telegram-consumer-network

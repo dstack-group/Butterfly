@@ -824,14 +824,14 @@ BEGIN
 	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (6, 'elton97@gmail.com', 'Elton', 'Stafa');
 	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (7, 'singh@gmail.com', 'Harwinder', 'Singh');
 
-	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (1, 'TELEGRAM', 'jkomyno');
+	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (1, 'TELEGRAM', '38442289');
 	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (1, 'SLACK', 'jkomyno');
 	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (1, 'EMAIL', 'dstackgroup@gmail.com');
 	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (2, 'TELEGRAM', 'frispo');
 	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (2, 'EMAIL', 'dstackgroup@gmail.com');
 	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (3, 'TELEGRAM', 'enrico_dogen');
 	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (3, 'EMAIL', 'dstackgroup@gmail.com');
-	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (4, 'TELEGRAM', 'TheAlchemist97');
+	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (4, 'TELEGRAM', '191751378');
 	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (4, 'EMAIL', 'dstackgroup@gmail.com');
 
   -- PERFORM is used when we're not interesting in the actual data returned from the called stored function.

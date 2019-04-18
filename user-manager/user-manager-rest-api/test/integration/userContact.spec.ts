@@ -29,7 +29,7 @@ afterEach(done => {
   app.closeServer().then(done);
 });
 
-describe(`POST /users/:userEmail/contacts/:contactService`, () => {
+describe(`POST /user-contacts/:contactService`, () => {
   it(`Should fail if the given contactService is already linked to the given user`, done => {
     const {
       transaction: createUserTransaction,
@@ -49,7 +49,7 @@ describe(`POST /users/:userEmail/contacts/:contactService`, () => {
       result: userContactResult,
     } = createUserContact(databaseConnection, createUserContactParams);
 
-    const endpoint = `/users/${createUserContactParams.userEmail}/contacts/${createUserContactParams.contactService}`;
+    const endpoint = `/user-contacts/${createUserContactParams.contactService}`;
 
     createUserTransaction
       .then(async () => await createUserContactTransaction)
@@ -71,7 +71,7 @@ describe(`POST /users/:userEmail/contacts/:contactService`, () => {
   });
 });
 
-describe(`DELETE /users/:userEmail/contacts/:contactService`, () => {
+describe(`DELETE /user-contacts/:userEmail/:contactService`, () => {
   it(`Should delete a user contact if it exists`, done => {
     const {
       transaction: createUserTransaction,
@@ -90,7 +90,7 @@ describe(`DELETE /users/:userEmail/contacts/:contactService`, () => {
       transaction: createUserContactTransaction,
     } = createUserContact(databaseConnection, createUserContactParams);
 
-    const endpoint = `/users/${createUserContactParams.userEmail}/contacts/${createUserContactParams.contactService}`;
+    const endpoint = `/user-contacts/${createUserContactParams.userEmail}/${createUserContactParams.contactService}`;
 
     createUserTransaction
       .then(async () => await createUserContactTransaction)
@@ -116,7 +116,7 @@ describe(`DELETE /users/:userEmail/contacts/:contactService`, () => {
       result: userResult,
     } = createUser(databaseConnection);
 
-    const endpoint = `/users/${userResult.email}/contacts/${ThirdPartyContactService.TELEGRAM}`;
+    const endpoint = `/user-contacts/${userResult.email}/${ThirdPartyContactService.TELEGRAM}`;
 
     createUserTransaction
       .then(() => {
