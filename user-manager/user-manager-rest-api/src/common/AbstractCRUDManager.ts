@@ -6,12 +6,12 @@ import { NotFoundError } from '../errors';
 
 export abstract class AbstractCRUDManager
 <T, Provider extends CRUDQueryProvider, Repository extends AbstractCRUDRepository<T, Provider>>
-extends AbstractCRUManager<T, Provider, Repository> implements Delete<T> {
+extends AbstractCRUManager<T, Provider, Repository> implements Delete {
   constructor(repository: Repository) {
     super(repository);
   }
 
-  async delete(item: T): Promise<boolean> {
+  async delete<V>(item: V): Promise<boolean> {
     const hasDeletedSomething = await this.repository.delete(item);
     if (!hasDeletedSomething) {
       throw new NotFoundError('Entity not found');

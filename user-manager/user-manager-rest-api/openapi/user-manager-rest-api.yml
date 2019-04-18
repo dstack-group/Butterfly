@@ -843,26 +843,6 @@ paths:
         Subscribes a user to a particular event of a project, sets the contact platform of choice to receive notifications
         and a list of keywords to be compared with the contents of the future events.
       tags: [ 'SUBSCRIPTIONS' ]
-      parameters:
-        - in: path
-          name: userEmail
-          schema:
-            type: string
-            format: email
-          required: true
-          example: "dstackgroup@gmail.com"
-        - in: path
-          name: projectName
-          schema:
-            type: string
-          required: true
-          example: "Butterfly"
-        - in: path
-          name: eventType
-          schema:
-            $ref: '#/components/schemas/ServiceEventType'
-          required: true
-          example: GITLAB_COMMIT_CREATED
       requestBody:
         description: Subscription record
         required: true
@@ -1211,11 +1191,21 @@ components:
     CreateSubscription:
       type: object
       required:
-        - contactType
+        - userEmail
+        - projectName
+        - eventType
+        - contactServices
         - userPriority
         - keywords
       properties:
-        contactTypes:
+        userEmail:
+          type: string
+          format: email
+        projectName:
+          type: string
+        eventType:
+          $ref: '#/components/schemas/ServiceEventType'
+        contactServices:
           type: array
           items:
             $ref: '#/components/schemas/ThirdPartyContactService'
@@ -1229,7 +1219,7 @@ components:
         userEmail: "dstackgroup@gmail.com"
         projectName: "Butterfly"
         eventType: GITLAB_COMMIT_CREATED
-        contactTypes:
+        contactServices:
           - TELEGRAM
           - SLACK
         userPriority: HIGH
@@ -1308,12 +1298,13 @@ components:
       required:
         - firstname
         - lastname
+        - contacts
       properties:
         firstname:
           type: string
         lastname:
           type: string
-        contacts:
+        contactInfo:
           type: array
           items:
             type: object
@@ -1321,18 +1312,14 @@ components:
               - contactType
               - contactRef
             properties:
-              contactType:
-                $ref: '#/components/schemas/ThirdPartyContactService'
-              contactRef:
+              '#/components/schemas/ThirdPartyContactService':
                 type: string
       example:
         firstname: "Jon"
         lastname: "Snow"
-        contacts:
-          - contactType: TELEGRAM
-            contactRef: "120923823"
-          - contactType: EMAIL
-            contactRef: "jon.snow@got.co.uk"
+        contactInfo:
+          TELEGRAM: "120923823"
+          EMAIL: "jon.snow@got.co.uk"
 
     UserContactInfoList:
       type: array
@@ -1341,14 +1328,14 @@ components:
       example:
         - firstname: "Jon"
           lastname: "Snow"
-          contacts:
+          contactInfo:
             - contactType: TELEGRAM
               contactRef: "120923823"
             - contactType: EMAIL
               contactRef: "jon.snow@got.co.uk"
         - firstname: "Sansa"
           lastname: "Stark"
-          contacts:
+          contactInfo:
             - contactType: SLACK
               contactRef: "23232nkn23"
 

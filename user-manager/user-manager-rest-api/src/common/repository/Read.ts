@@ -12,5 +12,5 @@ export interface Read<T> {
    * Returns a single resource from the given item.
    * @param item the resource to be read.
    */
-  findOne(item: T): Promise<T>;
+  findOne<V>(item: V): Promise<T>;
 }

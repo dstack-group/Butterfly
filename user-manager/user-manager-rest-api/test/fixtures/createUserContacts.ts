@@ -1,10 +1,38 @@
 import { PgDatabaseConnection, GetQueries } from '../../src/database';
-import { ThirdPartyContactService } from '../../src/common/ThirdPartyContactService';
+import { CreateUserContact, UserContact } from '../../src/modules/userContacts/entity';
 
+const query = `SELECT *
+               FROM public.create_user_contact(
+                 $[userEmail],
+                 $[contactService],
+                 $[contactRef]
+               )`;
+
+export const createUserContactsQuery = query;
+
+export interface CreateUserContactResult {
+  result: UserContact;
+  transaction: Promise<void>;
+}
+
+export function createUserContact(database: PgDatabaseConnection, params: CreateUserContact): CreateUserContactResult {
+  const userContactResult: UserContact = {
+    ...params,
+  };
+
+  const getUserContactQuery: GetQueries<UserContact> = t => {
+    const userContactQuery = t.any(query, params);
+    return [userContactQuery];
+  };
+
+  return {
+    result: userContactResult,
+    transaction: database.transaction(getUserContactQuery),
+  };
+}
+
+/*
 export function createUserContacts(database: PgDatabaseConnection): Promise<void> {
-  const query = `INSERT INTO public.x_user_contact(user_id, contact_type, contact_ref)
-                 VALUES($[userId], $[contactType], $[contactRef])`;
-
   const getUserContactQueries: GetQueries<unknown> = t => {
     const createUserContactQueries: Array<Promise<Array<unknown>>> = [];
     createUserContactQueries.push(t.any(query, {
@@ -58,3 +86,4 @@ export function createUserContacts(database: PgDatabaseConnection): Promise<void
 
   return database.transaction(getUserContactQueries);
 }
+*/

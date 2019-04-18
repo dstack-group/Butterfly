@@ -54,7 +54,14 @@ export class Database implements DatabaseConnection {
    * @param values the named value parameters to be passed to the query
    */
   async result(query: string, values?: DatabaseConnectionValues): Promise<number> {
-    return this.connection.result(query, values);
+    return new Promise<number>(async (resolve, reject) => {
+      try {
+        const resultObject = await this.connection.one<{ count: number }>(query, values);
+        resolve(resultObject.count);
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 
   /**

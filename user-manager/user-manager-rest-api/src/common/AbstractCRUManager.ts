@@ -13,7 +13,7 @@ extends AbstractManager<Repository> implements Write<T>, Read<T> {
     super(repository);
   }
 
-  create(item: T): Promise<T> {
+  create<V>(item: V): Promise<T> {
     return new Promise<T>(async (resolve, reject) => {
       try {
         const result = await this.repository.create(item);
@@ -35,11 +35,11 @@ extends AbstractManager<Repository> implements Write<T>, Read<T> {
     return this.repository.find(params);
   }
 
-  findOne(item: T): Promise<T> {
+  findOne<V>(item: V): Promise<T> {
     return this.repository.findOne(item);
   }
 
-  update(item: T): Promise<T> {
+  update<V>(item: V): Promise<T> {
     return this.repository.update(item);
   }
 }

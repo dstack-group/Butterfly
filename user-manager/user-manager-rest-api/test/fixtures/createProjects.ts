@@ -4,6 +4,8 @@ import { Project } from '../../src/modules/projects/entity';
 const query = `INSERT INTO public.project(project_id, project_name, project_url)
                VALUES($[projectId], $[projectName], $[projectURL]::json)`;
 
+export const createProjectQuery = query;
+
 const commonValues = {
   modified: null,
 };
@@ -25,8 +27,8 @@ export function createProject(database: PgDatabaseConnection): CreateProjectResu
   };
 
   const getProjectQuery: GetQueries<unknown> = t => {
-    const createProjectQuery = t.any(query, projectResult);
-    return [createProjectQuery];
+    const projectQuery = t.any(query, projectResult);
+    return [projectQuery];
   };
 
   return {

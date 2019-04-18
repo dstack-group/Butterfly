@@ -249,16 +249,16 @@ CREATE OR REPLACE VIEW public.v_filtered_users AS (
 DROP TYPE IF EXISTS public.subscription_denormalized_type CASCADE;
 CREATE TYPE public.subscription_denormalized_type AS (
 	"subscriptionId" BIGINT,
-	"userId" BIGINT,
-	"projectId" BIGINT,
+	"userEmail" text,
+	"projectName" text,
 	"eventType" public.service_event_type,
 	"userPriority" public.user_priority,
-	"userContactList" jsonb -- each user contact associated with this subscription 
-	-- keywordList text[], -- each keyword associated with this subscription
+	"userContactMap" jsonb, -- each user contact associated with this subscription 
+	"keywordList" text[] -- each keyword associated with this subscription
 );
 
 CREATE OR REPLACE FUNCTION public.create_subscription(
-	in_user_id bigint,
+	in_user_email text,
 	in_project_name text,
 	in_event_type_key public.service_event_type, -- GITLAB_COMMIT_CREATED, GITLAB_ISSUE_CREATED, ...
 	in_user_priority public.user_priority,
@@ -270,6 +270,7 @@ COST 100
 VOLATILE 
 AS $$
 #variable_conflict use_variable
+DECLARE v_user_id BIGINT;
 DECLARE v_curr_contact_type public.consumer_service;
 DECLARE v_user_contact_id_list BIGINT[];
 DECLARE v_curr_user_contact_id BIGINT;
@@ -283,14 +284,25 @@ DECLARE v_curr_keyword_name_upper text;
 DECLARE v_curr_keyword_id BIGINT;
 DECLARE v_keyword_id_list BIGINT[];
 BEGIN
+	-- Check that the user associated with the user email `in_user_email` exists.
+	-- If it doesn't, 'USER_NOT_FOUND' is thrown.
+	SELECT u.user_id
+	FROM public.user u
+	WHERE u.email = in_user_email
+	INTO v_user_id;
+	
+	IF v_user_id IS NULL THEN
+		RAISE EXCEPTION 'USER_NOT_FOUND';
+	END IF;
+
 	-- Check that every contact type in the list is associated with the user
-	-- identified by `in_user_id`. If it doesn't, 'CONTACT_NOT_FOUND' is thrown.
+	-- identified by `v_user_id`. If it doesn't, 'CONTACT_NOT_FOUND' is thrown.
 	v_user_contact_id_list = array[]::BIGINT[];
 	FOREACH v_curr_contact_type IN ARRAY in_contact_type_list
 	LOOP
 		SELECT xuc.user_contact_id
 		FROM public.user_contact xuc
-		WHERE xuc.user_id = in_user_id
+		WHERE xuc.user_id = v_user_id
 			AND xuc.contact_type = v_curr_contact_type
 		INTO v_curr_user_contact_id;
 
@@ -368,29 +380,37 @@ BEGIN
 
 	WITH INS AS (
 		INSERT INTO public.subscription (subscription_id, user_id, project_id, x_service_event_type_id, user_priority)
-		VALUES (DEFAULT, in_user_id, v_project_id, v_x_service_event_type_id, in_user_priority)
+		VALUES (DEFAULT, v_user_id, v_project_id, v_x_service_event_type_id, in_user_priority)
 		RETURNING subscription_id,
 			user_id,
 			project_id,
 			in_event_type_key AS event_type,
 			user_priority
+	),
+	SEL AS (
+		SELECT i.subscription_id AS "subscriptionId",
+				u.email AS "userEmail",
+				p.project_name AS "projectName",
+				i.event_type AS "eventType",
+				i.user_priority AS "userPriority",
+				json_agg(
+						json_build_object(
+								'contactType', uc.contact_type,
+								'contactRef', uc.contact_ref
+						)
+				) AS "userContactMap"
+		FROM INS i
+		JOIN public.user_contact uc
+				ON uc.user_contact_id = ANY(v_user_contact_id_list)
+		JOIN public.user u
+				ON u.user_id = i.user_id
+		JOIN public.project p
+				ON p.project_id = i.project_id
+		GROUP BY 1, 2, 3, 4, 5
 	)
-	SELECT i.subscription_id AS "subscriptionId",
-			i.user_id AS "userId",
-			i.project_id AS "projectId",
-			i.event_type AS "eventType",
-			i.user_priority AS "userPriority",
-			json_agg(
-					json_build_object(
-							'contactType', uc.contact_type,
-							'contactRef', uc.contact_ref
-					)
-			) AS "userContactList" --,
-			-- in_keyword_name_list AS "keywordList"
-	FROM INS i
-	JOIN public.user_contact uc
-			ON uc.user_contact_id = ANY(v_user_contact_id_list)
-	GROUP BY 1, 2, 3, 4, 5
+	SELECT s.*,
+			in_keyword_name_list AS "keywordList"
+	FROM SEL s
 	INTO v_result;
 
 	FOREACH v_curr_keyword_id IN ARRAY v_keyword_id_list
@@ -606,6 +626,121 @@ BEGIN
 END;
 $$;
 
+
+DROP TYPE IF EXISTS public.user_contact_denormalized_type CASCADE;
+CREATE TYPE public.user_contact_denormalized_type AS (
+	"userContactId" BIGINT,
+	"userEmail" text,
+	"contactService" public.consumer_service,
+	"contactRef" text
+);
+
+CREATE OR REPLACE FUNCTION public.create_user_contact(
+	in_user_email text,
+	in_contact_type public.consumer_service,
+	in_contact_ref text
+)
+RETURNS public.user_contact_denormalized_type
+LANGUAGE plpgsql
+COST 2
+VOLATILE
+AS $$
+#variable_conflict use_variable
+DECLARE v_user_id BIGINT;
+DECLARE v_result public.user_contact_denormalized_type;
+BEGIN
+	-- Check that the user associated with the user email `in_user_email` exists.
+	-- If it doesn't, 'USER_NOT_FOUND' is thrown.
+	SELECT u.user_id
+	FROM public.user u
+	WHERE u.email = in_user_email
+	INTO v_user_id;
+	
+	IF v_user_id IS NULL THEN
+		RAISE EXCEPTION 'USER_NOT_FOUND';
+	END IF;
+
+	INSERT INTO public.user_contact (user_id, contact_type, contact_ref)
+	VALUES (v_user_id, in_contact_type, in_contact_ref)
+	RETURNING user_contact_id AS "userContactId",
+		in_user_email AS "userEmail",
+		contact_type AS "contactService",
+		contact_ref AS "contactRef"
+	INTO v_result;
+
+	RETURN v_result;
+
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION public.delete_user(in_user_email text)
+RETURNS INT
+LANGUAGE sql
+AS $$
+	WITH DEL AS (
+		DELETE
+		FROM public.user
+		WHERE email = in_user_email
+		RETURNING *
+	)
+	SELECT COUNT(*)::INT
+	FROM DEL;
+$$;
+
+
+CREATE OR REPLACE FUNCTION public.delete_project(in_project_name text)
+RETURNS INT
+LANGUAGE sql
+AS $$
+	WITH DEL AS (
+		DELETE
+		FROM public.project
+		WHERE project_name = in_project_name
+		RETURNING *
+	)
+	SELECT COUNT(*)::INT
+	FROM DEL;
+$$;
+
+
+CREATE OR REPLACE FUNCTION public.delete_user_contact(in_user_email text, in_contact_type public.consumer_service)
+RETURNS INT
+LANGUAGE plpgsql
+COST 2
+VOLATILE
+AS $$
+#variable_conflict use_variable
+DECLARE v_user_id BIGINT;
+DECLARE v_result INT;
+BEGIN
+	-- Check that the user associated with the user email `in_user_email` exists.
+	-- If it doesn't, 'USER_NOT_FOUND' is thrown.
+	SELECT u.user_id
+	FROM public.user u
+	WHERE u.email = in_user_email
+	INTO v_user_id;
+	
+	IF v_user_id IS NULL THEN
+		RAISE EXCEPTION 'USER_NOT_FOUND';
+	END IF;
+
+	WITH DEL AS (
+		DELETE
+		FROM public.user_contact
+		WHERE user_id = v_user_id
+			AND contact_type = in_contact_type
+		RETURNING *
+	)
+	SELECT COUNT(*)::INT
+	FROM DEL
+	INTO v_result;
+
+	RETURN v_result;
+
+END;
+$$;
+
 ----------------- PROCEDURES -----------------
 
 /*
@@ -700,13 +835,13 @@ BEGIN
 	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (4, 'EMAIL', 'dstackgroup@gmail.com');
 
   -- PERFORM is used when we're not interesting in the actual data returned from the called stored function.
-  PERFORM public.create_subscription(1, 'Butterfly', 'GITLAB_COMMIT_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, FIX, CLOSE}'::text[]);
-	PERFORM public.create_subscription(1, 'Butterfly', 'GITLAB_ISSUE_CREATED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{BUG}'::text[]);
-	PERFORM public.create_subscription(1, 'Butterfly', 'REDMINE_TICKET_CREATED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{PROJECT, BUG, DEADLINE}'::text[]);
-	PERFORM public.create_subscription(2, 'Amazon', 'GITLAB_ISSUE_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{FIX, BUG, RESOLVE}'::text[]);
-	PERFORM public.create_subscription(2, 'Amazon', 'GITLAB_ISSUE_EDITED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{FIX, BUG, RESOLVE}'::text[]);
-	PERFORM public.create_subscription(3, 'Amazon', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM}'::public.consumer_service[], '{FIX, STRANGE}'::text[]);
-	PERFORM public.create_subscription(4, 'Amazon', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{FIX, STRANGE, BUG}'::text[]);
+  PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_COMMIT_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, FIX, CLOSE}'::text[]);
+	PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{BUG}'::text[]);
+	PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'REDMINE_TICKET_CREATED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{PROJECT, BUG, DEADLINE}'::text[]);
+	PERFORM public.create_subscription('federico.rispo@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{FIX, BUG, RESOLVE}'::text[]);
+	PERFORM public.create_subscription('federico.rispo@gmail.com', 'Amazon', 'GITLAB_ISSUE_EDITED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{FIX, BUG, RESOLVE}'::text[]);
+	PERFORM public.create_subscription('enrico.trinco@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM}'::public.consumer_service[], '{FIX, STRANGE}'::text[]);
+	PERFORM public.create_subscription('eleonorasignor@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{FIX, STRANGE, BUG}'::text[]);
 END;
 $$;
 

@@ -11,6 +11,9 @@ services:
     environment:
       SWAGGER_JSON: /openapi.json
       # API_URL: ""
+    networks:
+      - user-manager-network
+      - swagger
 
   pgadmin:
     image: "dpage/pgadmin4:latest"
@@ -60,7 +63,7 @@ services:
       NODE_ENV: "production"
     networks:
       - user-manager-network
-      # - middleware-dispatcher-network
+      - middleware-dispatcher-network
 
 volumes:
   pg_data:
@@ -70,6 +73,6 @@ networks:
     name: user-manager-network
   swagger:
     name: swagger
-  # middleware-dispatcher-network:
-  #   external:
-  #     name: middleware-dispatcher-network
+  middleware-dispatcher-network:
+    external:
+      name: middleware-dispatcher-network

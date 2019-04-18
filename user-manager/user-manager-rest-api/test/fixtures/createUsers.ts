@@ -4,6 +4,8 @@ import { User } from '../../src/modules/users/entity';
 const query = `INSERT INTO public.user(user_id, email, firstname, lastname)
                VALUES($[userId], $[email], $[firstname], $[lastname])`;
 
+export const createUserQuery = query;
+
 const commonValues = {
   enabled: true,
   modified: null,
@@ -20,12 +22,11 @@ export function createUser(database: PgDatabaseConnection): CreateUserResult {
     firstname: 'Alberto',
     lastname: 'Schiabel',
     userId: '1',
-    ...commonValues,
   };
 
   const getUserQuery: GetQueries<User> = t => {
-    const createUserQuery = t.any(query, userResult);
-    return [createUserQuery];
+    const userQuery = t.any(query, userResult);
+    return [userQuery];
   };
 
   return {

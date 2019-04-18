@@ -6,11 +6,11 @@ export interface Write<T> {
    * Creates a new resource and returns it.
    * @param item the resource to be created.
    */
-  create(item: T): Promise<T>;
+  create<V>(item: V): Promise<T>;
 
   /**
    * Updates an existing resource and returns it.
    * @param item the resource to be updated.
    */
-  update(item: T): Promise<T>;
+  update<V>(item: V): Promise<T>;
 }
