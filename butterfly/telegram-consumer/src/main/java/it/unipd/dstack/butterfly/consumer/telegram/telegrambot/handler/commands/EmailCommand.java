@@ -26,6 +26,7 @@ public class EmailCommand implements Command {
     @Override
     public void execute(TelegramMessageSender sender, TelegramResponse response) throws Exception {
         String emailAddress = response.getCommandArguments().get(0);
+        logger.info("emailAddress " + emailAddress);
 
         if (!EmailValidator.isValidEmailAddress(emailAddress)) {
             String messageContent = emailAddress + " non è un'email valida";
@@ -36,9 +37,10 @@ public class EmailCommand implements Command {
                 throw e;
             }
         } else {
-            EmailWithContactRef emailWithContactRef = EmailWithContactRef.newBuilder().build();
-            emailWithContactRef.setContactRef(response.getChatId());
-            emailWithContactRef.setEmail(emailAddress);
+            var emailWithContactRefBuilder = EmailWithContactRef.newBuilder();
+            emailWithContactRefBuilder.setContactRef(response.getChatId());
+            emailWithContactRefBuilder.setUserEmail(emailAddress);
+            EmailWithContactRef emailWithContactRef = emailWithContactRefBuilder.build();
 
             // it should process the event if and only if the email address is valid
             eventProcessor.processEvent(emailWithContactRef, EmailCommand.class)
@@ -78,6 +80,6 @@ public class EmailCommand implements Command {
      */
     @Override
     public String getCommandName() {
-        return "EMAIL";
+        return "email";
     }
 }

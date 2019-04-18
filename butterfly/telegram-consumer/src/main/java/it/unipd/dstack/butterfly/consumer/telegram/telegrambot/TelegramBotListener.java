@@ -53,22 +53,34 @@ class TelegramBotListener extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage()) {
             Message message = update.getMessage();
-            if (message.isCommand() && message.hasText()) {
-                String text = message.getText();
-                if (text.startsWith(BotCommand.COMMAND_INIT_CHARACTER)) {
-                    String commandMessage = text.substring(1);
-                    String[] commandSplit = commandMessage.split(BotCommand.COMMAND_PARAMETER_SEPARATOR_REGEXP);
-                    String[] parameters = Arrays.copyOfRange(commandSplit, 1, commandSplit.length);
-                    List<String> paramsList = Arrays.asList(parameters);
+            logger.info("Message received " + message);
+            logger.info("message.isCommand() " + message.isCommand());
+            long chatId = message.getChatId();
+            logger.info("message chatId " + chatId);
 
-                    String commandName = commandSplit[0];
+            String text = message.getText();
+            if (text.startsWith(BotCommand.COMMAND_INIT_CHARACTER)) {
+                String commandMessage = text.substring(1);
 
-                    Command command = this.commandRegister.getCommand(commandName);
-                    if (command != null) {
-                        TelegramResponse response = new TelegramResponse(message.getChatId().toString(), paramsList);
-                        commandHandler.executeCommand(command, sender, response);
-                        logger.info("command executed!");
-                    }
+                logger.info("commandMessage " + commandMessage);
+
+                String[] commandSplit = commandMessage.split(BotCommand.COMMAND_PARAMETER_SEPARATOR_REGEXP);
+                String[] parameters = Arrays.copyOfRange(commandSplit, 1, commandSplit.length);
+                List<String> paramsList = Arrays.asList(parameters);
+
+                logger.info("paramsList " + paramsList);
+
+                String commandName = commandSplit[0];
+                logger.info("CommandName " + commandName);
+
+                Command command = this.commandRegister.getCommand(commandName);
+
+                logger.info("Command " + command);
+
+                if (command != null) {
+                    TelegramResponse response = new TelegramResponse(message.getChatId().toString(), paramsList);
+                    commandHandler.executeCommand(command, sender, response);
+                    logger.info("command executed! " + response);
                 }
             }
         }

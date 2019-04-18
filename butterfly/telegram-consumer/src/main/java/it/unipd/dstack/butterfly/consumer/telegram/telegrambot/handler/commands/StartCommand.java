@@ -1,7 +1,9 @@
 package it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands;
 
+import it.unipd.dstack.butterfly.consumer.telegram.message.TelegramMessage;
 import it.unipd.dstack.butterfly.consumer.telegram.message.TelegramMessageSender;
 import it.unipd.dstack.butterfly.consumer.telegram.response.TelegramResponse;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class StartCommand implements Command {
 
@@ -14,9 +16,13 @@ public class StartCommand implements Command {
      */
     @Override
     public void execute(TelegramMessageSender sender, TelegramResponse response) throws Exception {
-        //stampa messaggio introduttivo:
-        //breve introduzione
-        //lista di comandi disponibili
+        String messageContent = String.format("Welcome to Butterfly. Your chat ID is: %s", response.getChatId());
+        TelegramMessage newMessage = new TelegramMessage(response.getChatId(), messageContent);
+        try {
+            sender.send(newMessage);
+        } catch (TelegramApiException e) {
+            throw e;
+        }
     }
 
     /**
@@ -26,6 +32,6 @@ public class StartCommand implements Command {
      */
     @Override
     public String getCommandName() {
-        return "START";
+        return "start";
     }
 }

@@ -39,10 +39,16 @@ public class TelegramBotAdapterImpl implements TelegramBot {
     @Override
     public void sendMessage(TelegramMessage message) {
         SendMessage telegramSendMessage = new SendMessage(message.getRecipient(), message.getContent());
+        telegramSendMessage.enableMarkdown(true);
         try {
+            if (logger.isInfoEnabled()) {
+                logger.info(String.format("SENDING TO %s"), message.getRecipient());
+                logger.info(String.format("CONTENT %s"), message.getContent());
+            }
             this.bot.execute(telegramSendMessage);
         } catch (TelegramApiException e) {
-            throw new TelegramBotException();
+            logger.error(String.format("TELEGRAM_API_EXCEPTION %s", e);
+            // throw new TelegramBotException();
         }
     }
 
