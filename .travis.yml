@@ -16,6 +16,8 @@ env:
   
 cache:
   directories:
+  - /usr/local/bin
+  - /usr/bin
   - $HOME/.travis_cache
   - $HOME/.m2 # Maven will download dependencies to this folder
   - ./user-manager/user-manager-rest-api/node_modules # Node.js dependencies
