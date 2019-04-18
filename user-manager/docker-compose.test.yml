@@ -5,7 +5,8 @@ services:
     image: "postgres:11-alpine"
     restart: "no"
     ports:
-      - "5432:5432"
+      # See https://github.com/travis-ci/travis-ci/issues/8087
+      - "5432"
     volumes:
       # for the test database, no demo data should be inserted
       - ./user-manager-database/sql/ddl.sql:/docker-entrypoint-initdb.d/ddl.sql
@@ -23,7 +24,7 @@ services:
     working_dir: /usr/app
     restart: "no"
     ports:
-      - "5000:5000"
+      - "5000"
     depends_on:
       - postgres-test
     env_file: ./user-manager-rest-api/.user-manager-rest-api.env
