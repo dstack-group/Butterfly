@@ -73,7 +73,7 @@ class GitlabWebhookListenerObserver implements WebHookListener {
         eventBuilder.setTimestamp(mergeRequestEvent.getObjectAttributes().getCreatedAt().getTime());
         eventBuilder.setService(Services.GITLAB);
         eventBuilder.setProjectName(mergeRequestEvent.getProject().getName());
-        eventBuilder.setProjectURL(mergeRequestEvent.getProject().getGitHttpUrl());
+        eventBuilder.setProjectURL(mergeRequestEvent.getProject().getWebUrl());
         eventBuilder.setEventId(WebhookManagerUtils.numberToString(eventId));
         eventBuilder.setEventType(eventTypeAndListenerPair.serviceEventType);
 
@@ -112,7 +112,7 @@ class GitlabWebhookListenerObserver implements WebHookListener {
             eventBuilder.setTimestamp(commit.getTimestamp().getTime());
             eventBuilder.setService(Services.GITLAB);
             eventBuilder.setProjectName(pushEvent.getProject().getName());
-            eventBuilder.setProjectURL(pushEvent.getProject().getGitHttpUrl());
+            eventBuilder.setProjectURL(pushEvent.getProject().getWebUrl());
             eventBuilder.setEventId(commit.getId());
             eventBuilder.setEventType(ServiceEventTypes.GITLAB_COMMIT_CREATED);
             eventBuilder.setUsername(pushEvent.getUserName());
@@ -156,7 +156,7 @@ class GitlabWebhookListenerObserver implements WebHookListener {
             eventBuilder.setTimestamp(issueEvent.getObjectAttributes().getCreatedAt().getTime());
             eventBuilder.setService(Services.GITLAB);
             eventBuilder.setProjectName(issueEvent.getProject().getName());
-            eventBuilder.setProjectURL(issueEvent.getProject().getGitHttpUrl());
+            eventBuilder.setProjectURL(issueEvent.getProject().getWebUrl());
             eventBuilder.setEventId(issueEvent.getObjectAttributes().getId().toString());
             eventBuilder.setEventType(serviceEventTypes);
             eventBuilder.setUsername(issueEvent.getUser().getUsername());
