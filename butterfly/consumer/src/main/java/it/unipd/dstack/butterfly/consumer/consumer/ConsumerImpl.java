@@ -51,7 +51,8 @@ public class ConsumerImpl <V> extends AbstractSubject<V> implements Consumer<V> 
                 recordList.forEach(super::notifyObservers);
 
             } catch (Exception e) {
-                logger.error(String.format("Error consuming in dispatcher: %s %s", e.getMessage(), e.getStackTrace()));
+                logger.error(String.format("Error consuming in ConsumerImpl: %s %s", e.getMessage(), e.getStackTrace()));
+                throw e;
             }
         }
     }

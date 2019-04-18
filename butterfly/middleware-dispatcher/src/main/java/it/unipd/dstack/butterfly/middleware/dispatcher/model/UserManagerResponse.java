@@ -1,9 +1,11 @@
 package it.unipd.dstack.butterfly.middleware.dispatcher.model;
 
-public class UserManagerResponse {
-    private UserManagerResponseData data;
+import java.util.List;
 
-    public UserManagerResponseData getData() {
+public class UserManagerResponse {
+    private List<UserManagerResponseData> data;
+
+    public List<UserManagerResponseData> getData() {
         return this.data;
     }
 }

@@ -2,7 +2,6 @@ package it.unipd.dstack.butterfly.middleware.dispatcher.utils;
 
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.avro.UserSingleContact;
-import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserContact;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponseData;
 import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.controller.record.Record;
@@ -18,12 +17,13 @@ import java.util.stream.Collectors;
 public final class Utils {
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
-    public static List<EventWithUserContact> parseUserManagerResponseData(UserManagerResponseData data, Event event) {
-        // Event event = this.getEventFromUserManagerResponseData(data);
-        List<UserContact> userContactList = data.getUserContacts();
-        return userContactList.stream()
+    public static List<EventWithUserContact> parseUserManagerResponseData(List<UserManagerResponseData> data, Event event) {
+        return data.stream()
                 .flatMap(user -> {
-                    var userSingleContactListStream = user.getContactInfo().entrySet()
+                    logger.info("IS USER NULL? " + user);
+                    logger.info("IS USER.GETCONTACTINFO NULL? " + user.getContacts());
+
+                    var userSingleContactListStream = user.getContacts().entrySet()
                             .stream()
                             .map(contactInfoEntry -> {
                                 logger.info("Trying to build UserSingleContact");

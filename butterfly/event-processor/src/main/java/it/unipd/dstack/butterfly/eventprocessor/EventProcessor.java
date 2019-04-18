@@ -75,7 +75,7 @@ public class EventProcessor {
                     logger.info("STATUS CODE ON RESPONSE: " + response.statusCode());
                     String responseJSON = response.body(); // return response's payload
                     try {
-                        logger.info("Trying to parse UserManagerResponse");
+                        logger.info("Trying to parse UserManagerResponse: " + responseJSON);
                         T userManagerResponseFromJson =
                                 this.jsonConverter.fromJson(responseJSON, klass);
                         return userManagerResponseFromJson;

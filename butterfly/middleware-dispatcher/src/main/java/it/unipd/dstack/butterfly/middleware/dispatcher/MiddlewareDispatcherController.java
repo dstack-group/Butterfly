@@ -108,13 +108,13 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
      */
     private void onValidResponse(UserManagerResponse userManagerResponse, Event event) {
         try {
-            UserManagerResponseData data = userManagerResponse.getData();
+            List<UserManagerResponseData> data = userManagerResponse.getData();
 
             /**
              * Extracts every possible association between a user and 1 to N contact platforms, and aggregates this
              * information with the original event.
              */
-            logger.info("Trying to parse eventWithUserContactList");
+            logger.info("Trying to parse eventWithUserContactList " + data);
             List<EventWithUserContact> eventWithUserContactList =
                     Utils.parseUserManagerResponseData(data, event);
 
