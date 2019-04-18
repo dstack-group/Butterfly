@@ -47,8 +47,7 @@ public class TelegramBotAdapterImpl implements TelegramBot {
             }
             this.bot.execute(telegramSendMessage);
         } catch (TelegramApiException e) {
-            logger.error(String.format("TELEGRAM_API_EXCEPTION %s", e);
-            // throw new TelegramBotException();
+            logger.error(String.format("TELEGRAM_API_EXCEPTION %s", e));
         }
     }
 

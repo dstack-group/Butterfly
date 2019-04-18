@@ -26,9 +26,9 @@ public class TelegramFormatStrategy implements FormatStrategy<EventWithUserConta
         var intro = String.format("Hi *%s* *%s*, here's a new event for you.",
                 eventWithUserContact.getUserContact().getFirstname(),
                 eventWithUserContact.getUserContact().getLastname());
-        var header = String.format("Progetto: [%s](%s)",
-                event.getProjectName(),
-                event.getProjectURL());
+        var header = String.format("Progetto: <a href=\"%s\">%s</a>",
+                event.getProjectURL(),
+                event.getProjectName());
         var title = String.format("*%s*", event.getTitle());
         var description = String.format("%s", event.getDescription());
 
