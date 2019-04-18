@@ -45,7 +45,6 @@ docker run --rm \
   -v /${PWD}:/butterfly \
   -v /${HOME}/.m2:/root/.m2 \
   -v /${PWD}/avro-schemas/target:/butterfly/avro-schemas/target \
-  -v /${PWD}/common/target:/butterfly/common/target \
   -v /${PWD}/config/target:/butterfly/config/target \
   -v /${PWD}/consumer/target:/butterfly/consumer/target \
   -v /${PWD}/controller/target:/butterfly/controller/target \

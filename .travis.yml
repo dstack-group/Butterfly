@@ -1,0 +1,39 @@
+sudo: required
+os: linux
+dist: trusty
+services:
+  - docker
+
+language: java
+jdk:
+ - oraclejdk11 # This is needed in order to have a $HOME/.m2 directory already set up
+
+install: true
+
+env:
+  global:
+    - COMPOSE_VERSION="1.23.2"
+  
+cache:
+  directories:
+  - $HOME/.travis_cache
+  - $HOME/.m2 # Maven will download dependencies to this folder
+  - ./user-manager/user-manager-rest-api/node_modules # Node.js dependencies
+
+# matrix:
+#   fast_finish: true
+
+before_install:
+  # install the version of docker-compose identified by $COMPOSE_VERSION
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  # makes the shell files executable
+  - find ./ -type f -name "*.sh" -exec chmod +x {} \;
+  # install project dependencies
+  - ./install.sh
+
+script:
+  # tests the Java services and the User Manager
+  - test.sh
