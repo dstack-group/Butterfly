@@ -15,8 +15,8 @@ import it.unipd.dstack.butterfly.consumer.telegram.telegrambot.handler.commands.
 public class Main {
     public static void main(String[] args) {
         AbstractConfigManager configManager = new EnvironmentConfigManager();
-        String token = configManager.getStringProperty("TELEGRAM_TOKEN", "577704603:AAFWyfXNdZOXx8nx0y9jo-lIPljvSDvUyYY");
-        String botName = configManager.getStringProperty("TELEGRAM_BOT_NAME", "ProtoTelegramBot");
+        String token = configManager.getStringProperty("TELEGRAM_TOKEN");
+        String botName = configManager.getStringProperty("TELEGRAM_BOT_NAME");
 
         String userManagerUrl = configManager.getStringProperty("USER_MANAGER_URL");
         int userManagerRequestTimeout = configManager.getIntProperty("USER_MANAGER_REQUEST_TIMEOUT_MS");
