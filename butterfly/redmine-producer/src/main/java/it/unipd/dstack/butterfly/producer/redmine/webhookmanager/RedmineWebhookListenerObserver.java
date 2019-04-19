@@ -22,8 +22,7 @@ public class RedmineWebhookListenerObserver implements WebhookListener {
     public void onIssueCreatedEvent(IssueCreatedPayload issueEvent) {
         try {
             Event.Builder eventBuilder = Event.newBuilder();
-            // TODO: retrieve timestamp
-            // eventBuilder.setTimestamp();
+            eventBuilder.setTimestamp(issueEvent.getIssue().getUpdatedOn().getTime());
             eventBuilder.setService(Services.REDMINE);
             eventBuilder.setProjectName(issueEvent.getIssue().getProject().getName());
             eventBuilder.setProjectURL(issueEvent.getIssue().getProject().getHomepage());
@@ -46,8 +45,7 @@ public class RedmineWebhookListenerObserver implements WebhookListener {
     public void onIssueEditedEvent(IssueEditedPayload issueEvent) {
         try {
             Event.Builder eventBuilder = Event.newBuilder();
-            // TODO: retrieve timestamp
-            // eventBuilder.setTimestamp();
+            eventBuilder.setTimestamp(issueEvent.getIssue().getUpdatedOn().getTime());
             eventBuilder.setService(Services.REDMINE);
             eventBuilder.setProjectName(issueEvent.getIssue().getProject().getName());
             eventBuilder.setProjectURL(issueEvent.getIssue().getProject().getHomepage());

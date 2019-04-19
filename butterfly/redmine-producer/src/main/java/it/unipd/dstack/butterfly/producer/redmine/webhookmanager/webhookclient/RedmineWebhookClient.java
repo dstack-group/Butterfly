@@ -89,7 +89,7 @@ public class RedmineWebhookClient {
     }
 
     private boolean matchesPrioritiesToConsider(GeneralPayload payload) {
-        return this.prioritiesToConsider.contains(payload.getIssue().getStatus().getName());
+        return this.prioritiesToConsider.contains(payload.getIssue().getPriority().getName());
     }
 
     private void fireIssueCreatedEvent(IssueCreatedPayload event) {

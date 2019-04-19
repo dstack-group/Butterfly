@@ -20,9 +20,6 @@ public final class Utils {
     public static List<EventWithUserContact> parseUserManagerResponseData(List<UserManagerResponseData> data, Event event) {
         return data.stream()
                 .flatMap(user -> {
-                    logger.info("IS USER NULL? " + user);
-                    logger.info("IS USER.GETCONTACTINFO NULL? " + user.getContacts());
-
                     var userSingleContactListStream = user.getContacts().entrySet()
                             .stream()
                             .map(contactInfoEntry -> {

@@ -42,8 +42,8 @@ public class TelegramBotAdapterImpl implements TelegramBot {
         telegramSendMessage.enableMarkdown(true);
         try {
             if (logger.isInfoEnabled()) {
-                logger.info(String.format("SENDING TO %s"), message.getRecipient());
-                logger.info(String.format("CONTENT %s"), message.getContent());
+                logger.info(String.format("SENDING TO %s", message.getRecipient()));
+                logger.info(String.format("CONTENT %s", message.getContent()));
             }
             this.bot.execute(telegramSendMessage);
         } catch (TelegramApiException e) {

@@ -38,7 +38,7 @@ services:
       - redmine-network
       - redmine-producer-network
 
-  # POST http://localhost:5000/webhook/redmine
+  # POST http://localhost:5000/webhooks/redmine
   # redmine-webhook-response-inspector:
   #   build:
   #     context: ./redmine-webhook-response-inspector
