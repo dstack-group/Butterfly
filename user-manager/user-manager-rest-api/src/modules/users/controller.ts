@@ -2,7 +2,7 @@ import * as HttpStatus from 'http-status-codes';
 import { UserManager } from './manager';
 import { RouteController } from '../../common/controller/RouteController';
 import { RouteContextReplierFactory } from '../../router/RouteContextReplierFactory';
-import { User, CreateUser } from './entity';
+import { User, CreateUser, UpdateUser, UpdateUserBody, UserEmail } from './entity';
 import { RouteCommand } from '../../router/RouteCommand';
 import { Middleware } from '../../router/Router';
 
@@ -36,11 +36,25 @@ export class UserController extends RouteController {
 
   private getUserByEmailCommand: RouteCommand<User> = async routeContext => {
     const { email } = routeContext.getNamedParams() as { email: string };
-    const userParams = { email };
-    const userFound = await this.manager.findByEmail(userParams as User);
+    const userParams: UserEmail = { email };
+    const userFound = await this.manager.findOne(userParams);
 
     return {
       data: userFound,
+      status: HttpStatus.OK,
+    };
+  }
+
+  private updateUserByEmailCommand: RouteCommand<User> = async routeContext => {
+    const { email } = routeContext.getNamedParams() as { email: string };
+    const userModel = routeContext.getRequestBody() as UpdateUserBody;
+    const userParams: UpdateUser = { email, ...userModel };
+
+    const userUpdated = await this.manager.update(userParams);
+
+    return {
+      data: userUpdated,
+      status: HttpStatus.OK,
     };
   }
 
@@ -65,6 +79,10 @@ export class UserController extends RouteController {
 
   getUserByEmail(): Middleware {
     return this.execute(this.getUserByEmailCommand);
+  }
+
+  updateUserByEmail(): Middleware {
+    return this.execute(this.updateUserByEmailCommand);
   }
 
   deleteUserByEmail(): Middleware {

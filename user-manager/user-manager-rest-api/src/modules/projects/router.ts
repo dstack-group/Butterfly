@@ -18,6 +18,9 @@ export const getProjectRouter = (routesParams: RoutesInjectionParams) => {
       middlewares.bodyParser(),
       projectController.createProject())
     .get('/:projectName', projectController.getProjectByName())
+    .put('/:projectName',
+      middlewares.bodyParser(),
+      projectController.updateProjectByName())
     .delete('/:projectName', projectController.deleteProjectByName())
     .delete('/:projectName/:producerService', projectController.removeServiceURL());
 

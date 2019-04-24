@@ -34,18 +34,9 @@ export const getUserRouter = (routesParams: RoutesInjectionParams) => {
       */
       userController.createUser())
     .get('/:email', userController.getUserByEmail())
-    /*
-    .put('/:email',
+    .patch('/:email',
       middlewares.bodyParser(),
-      async ctx => {
-        const userModel: User = ctx.request.body;
-        const updatedUser = await userManager.update(userModel);
-        ctx.body = {
-          data: updatedUser,
-        };
-        ctx.status = HttpStatus.OK;
-      })
-    */
+      userController.updateUserByEmail())
     .delete('/:email', userController.deleteUserByEmail());
 
   return userRouter;

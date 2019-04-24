@@ -9,10 +9,6 @@ export class ProjectRepository extends AbstractCRUDRepository<Project, ProjectQu
     super(database, sqlProvider);
   }
 
-  findByName(params: ProjectName): Promise<Project> {
-    return this.database.one(sqlProvider.findOne, params);
-  }
-
   removeServiceURL(params: RemoveServiceFromProject): Promise<Project[]> {
     return this.database.any(sqlProvider.removeServiceURL, params);
   }

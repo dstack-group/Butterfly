@@ -21,3 +21,11 @@ export interface RemoveServiceFromProject {
   producerService: ThirdPartyProducerService;
   projectName: string;
 }
+
+export interface UpdateProjectBody {
+  projectURL: ProjectURL;
+}
+
+export interface UpdateProject extends ProjectName, UpdateProjectBody {
+  // tslint:disable-next-line: no-trailing-whitespace
+}

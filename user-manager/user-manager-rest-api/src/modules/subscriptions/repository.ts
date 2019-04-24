@@ -12,7 +12,7 @@ export class SubscriptionRepository {
     this.sqlProvider = sqlProvider;
   }
 
-  async createSubscription(params: CreateSubscription): Promise<Subscription> {
-    return await this.database.one(this.sqlProvider.create, params);
+  createSubscription(params: CreateSubscription): Promise<Subscription> {
+    return this.database.one(this.sqlProvider.create, params) as Promise<Subscription>;
   }
 }

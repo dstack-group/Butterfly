@@ -10,7 +10,8 @@ export interface Read<T> {
 
   /**
    * Returns a single resource from the given item.
+   * If no resource is present, it returns null.
    * @param item the resource to be read.
    */
-  findOne<V>(item: V): Promise<T>;
+  findOne<V>(item: V): Promise<T|null>;
 }

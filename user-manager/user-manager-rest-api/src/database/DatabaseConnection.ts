@@ -15,12 +15,13 @@ export interface DatabaseConnection {
   none(query: string, values?: DatabaseConnectionValues): Promise<void>;
 
   /**
-   * Executes a query that expects exactly one row of data. When 0 or more than 1 rows are returned,
+   * Executes a query that expects exactly one row of data. When no row is returned,
+   * the method returns null. When more than 1 rows are returned,
    * the method rejects.
    * @param query the SQL string that contains the query to be run
    * @param values the named value parameters to be passed to the query
    */
-  one<T>(query: string, values?: DatabaseConnectionValues): Promise<T>;
+  one<T>(query: string, values?: DatabaseConnectionValues): Promise<T|null>;
 
   /**
    * Executes a query that expects any number of rows.

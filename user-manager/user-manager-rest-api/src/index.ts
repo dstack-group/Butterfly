@@ -24,6 +24,18 @@ server.on('close', () => {
   logger.info('Server closed');
 });
 
-server.on('error', () => {
-  logger.error('Server error');
+server.on('error', error => {
+  logger.error('Server error', error);
 });
+
+app.isConnectedToDatabase()
+  .then(connected => {
+    if (connected) {
+      logger.info('Connected to database');
+    } else {
+      logger.error('Cannot contact database');
+    }
+  })
+  .catch(error => {
+    throw error;
+  });

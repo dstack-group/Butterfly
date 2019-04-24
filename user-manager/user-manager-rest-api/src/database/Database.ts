@@ -35,7 +35,7 @@ export class Database implements DatabaseConnection {
    * @param query the SQL string that contains the query to be run
    * @param values the named value parameters to be passed to the query
    */
-  async one<T = any>(query: string, values?: DatabaseConnectionValues): Promise<T> {
+  async one<T>(query: string, values?: DatabaseConnectionValues): Promise<T|null> {
     return this.connection.one(query, values);
   }
 
@@ -44,7 +44,7 @@ export class Database implements DatabaseConnection {
    * @param query the SQL string that contains the query to be run
    * @param values the named value parameters to be passed to the query
    */
-  async any<T = any>(query: string, values?: DatabaseConnectionValues): Promise<T[]> {
+  async any<T>(query: string, values?: DatabaseConnectionValues): Promise<T[]> {
     return this.connection.any(query, values);
   }
 
@@ -57,7 +57,8 @@ export class Database implements DatabaseConnection {
     return new Promise<number>(async (resolve, reject) => {
       try {
         const resultObject = await this.connection.one<{ count: number }>(query, values);
-        resolve(resultObject.count);
+        const count = resultObject ? resultObject.count : 0;
+        resolve(count);
       } catch (error) {
         reject(error);
       }

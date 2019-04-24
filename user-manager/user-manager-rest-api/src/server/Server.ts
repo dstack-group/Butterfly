@@ -26,6 +26,10 @@ export class Server {
     this.metricsProvider = config.metricsProvider;
   }
 
+  isConnectedToDatabase(): Promise<boolean> {
+    return this.database.isConnected();
+  }
+
   createServer() {
     this.logger.info('Starting server');
     this.setupMiddlewares();

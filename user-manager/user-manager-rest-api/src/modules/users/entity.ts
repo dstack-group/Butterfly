@@ -1,11 +1,27 @@
-export interface CreateUser {
+export interface UserEmail {
   email: string;
+}
+
+export interface CreateUser extends UserEmail {
   firstname: string;
   lastname: string;
+  enabled?: boolean;
 }
 
 export interface User extends CreateUser {
-  created?: Date;
-  updated?: Date;
-  userId?: string;
+  created?: string;
+  modified?: string | null;
+  userId: string;
+}
+
+/**
+ * UpdateUserBody is used to update a user record. It's the type of the PATCH body payload.
+ * The `email` property is excluded because it's read from the querystring params.
+ */
+export interface UpdateUserBody extends Partial<Pick<CreateUser, Exclude<keyof CreateUser, 'email'>>> {
+
+}
+
+export interface UpdateUser extends Partial<CreateUser> {
+
 }

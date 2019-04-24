@@ -4,7 +4,7 @@ import { Logger } from '../logger';
 import { DatabaseConfig } from '../database';
 import { RoutesInjectionParams } from '../routes/RoutesInjectionParams';
 import { RouteContextReplierFactory } from '../router/RouteContextReplierFactory';
-import { MetricsProvider } from '@src/common/metrics/MetricsProvider';
+import { MetricsProvider } from '../common/metrics/MetricsProvider';
 
 export interface ServerConfig {
   databaseConfig: DatabaseConfig;

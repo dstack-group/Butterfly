@@ -775,8 +775,8 @@
           }
         }
       },
-      "patch": {
-        "operationId": "patchProjectByName",
+      "put": {
+        "operationId": "updateProjectByName",
         "summary": "Updates the data of the project identified by the given project name and returns the updated project record",
         "tags": [
           "PROJECTS"
@@ -1243,36 +1243,6 @@
         "tags": [
           "SUBSCRIPTIONS"
         ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "userEmail",
-            "schema": {
-              "type": "string",
-              "format": "email"
-            },
-            "required": true,
-            "example": "dstackgroup@gmail.com"
-          },
-          {
-            "in": "path",
-            "name": "projectName",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "Butterfly"
-          },
-          {
-            "in": "path",
-            "name": "eventType",
-            "schema": {
-              "$ref": "#/components/schemas/ServiceEventType"
-            },
-            "required": true,
-            "example": "GITLAB_COMMIT_CREATED"
-          }
-        ],
         "requestBody": {
           "description": "Subscription record",
           "required": true,
@@ -1733,12 +1703,25 @@
       "CreateSubscription": {
         "type": "object",
         "required": [
-          "contactType",
+          "userEmail",
+          "projectName",
+          "eventType",
+          "contactServices",
           "userPriority",
           "keywords"
         ],
         "properties": {
-          "contactTypes": {
+          "userEmail": {
+            "type": "string",
+            "format": "email"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "eventType": {
+            "$ref": "#/components/schemas/ServiceEventType"
+          },
+          "contactServices": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ThirdPartyContactService"
@@ -1758,7 +1741,7 @@
           "userEmail": "dstackgroup@gmail.com",
           "projectName": "Butterfly",
           "eventType": "GITLAB_COMMIT_CREATED",
-          "contactTypes": [
+          "contactServices": [
             "TELEGRAM",
             "SLACK"
           ],
@@ -1862,7 +1845,8 @@
         "type": "object",
         "required": [
           "firstname",
-          "lastname"
+          "lastname",
+          "contacts"
         ],
         "properties": {
           "firstname": {
@@ -1871,7 +1855,7 @@
           "lastname": {
             "type": "string"
           },
-          "contacts": {
+          "contactInfo": {
             "type": "array",
             "items": {
               "type": "object",
@@ -1880,10 +1864,7 @@
                 "contactRef"
               ],
               "properties": {
-                "contactType": {
-                  "$ref": "#/components/schemas/ThirdPartyContactService"
-                },
-                "contactRef": {
+                "#/components/schemas/ThirdPartyContactService": {
                   "type": "string"
                 }
               }
@@ -1893,16 +1874,10 @@
         "example": {
           "firstname": "Jon",
           "lastname": "Snow",
-          "contacts": [
-            {
-              "contactType": "TELEGRAM",
-              "contactRef": "120923823"
-            },
-            {
-              "contactType": "EMAIL",
-              "contactRef": "jon.snow@got.co.uk"
-            }
-          ]
+          "contactInfo": {
+            "TELEGRAM": "120923823",
+            "EMAIL": "jon.snow@got.co.uk"
+          }
         }
       },
       "UserContactInfoList": {
@@ -1914,7 +1889,7 @@
           {
             "firstname": "Jon",
             "lastname": "Snow",
-            "contacts": [
+            "contactInfo": [
               {
                 "contactType": "TELEGRAM",
                 "contactRef": "120923823"
@@ -1928,7 +1903,7 @@
           {
             "firstname": "Sansa",
             "lastname": "Stark",
-            "contacts": [
+            "contactInfo": [
               {
                 "contactType": "SLACK",
                 "contactRef": "23232nkn23"

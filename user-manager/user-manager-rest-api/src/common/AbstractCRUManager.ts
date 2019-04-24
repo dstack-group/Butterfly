@@ -5,6 +5,7 @@ import { Write } from './repository/Write';
 import { Read } from './repository/Read';
 import { AbstractManager } from './AbstractManager';
 import { DBUniqueConstraintError } from '../errors/DBUniqueConstraintError';
+import { NotFoundError } from '../errors';
 
 export abstract class AbstractCRUManager
 <T, Provider extends CRUQueryProvider, Repository extends AbstractCRURepository<T, Provider>>
@@ -36,10 +37,30 @@ extends AbstractManager<Repository> implements Write<T>, Read<T> {
   }
 
   findOne<V>(item: V): Promise<T> {
-    return this.repository.findOne(item);
+    return new Promise<T>(async (resolve, reject) => {
+      try {
+        const result = await this.repository.findOne(item);
+        if (result === null) {
+          throw new NotFoundError('Entity not found');
+        }
+        resolve(result);
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 
   update<V>(item: V): Promise<T> {
-    return this.repository.update(item);
+    return new Promise<T>(async (resolve, reject) => {
+      try {
+        const result = await this.repository.update(item);
+        if (result === null) {
+          throw new NotFoundError('Entity not found');
+        }
+        resolve(result);
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 }

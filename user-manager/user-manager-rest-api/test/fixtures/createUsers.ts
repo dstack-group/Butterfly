@@ -19,6 +19,7 @@ export interface CreateUserResult {
 export function createUser(database: PgDatabaseConnection): CreateUserResult {
   const userResult: User = {
     email: 'alberto.schiabel@gmail.com',
+    enabled: true,
     firstname: 'Alberto',
     lastname: 'Schiabel',
     userId: '1',

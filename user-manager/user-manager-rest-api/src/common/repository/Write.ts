@@ -10,7 +10,8 @@ export interface Write<T> {
 
   /**
    * Updates an existing resource and returns it.
+   * If no resource is present, it returns null.
    * @param item the resource to be updated.
    */
-  update<V>(item: V): Promise<T>;
+  update<V>(item: V): Promise<T|null>;
 }

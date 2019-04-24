@@ -2,7 +2,14 @@ import * as HttpStatus from 'http-status-codes';
 import { ProjectManager } from './manager';
 import { RouteController } from '../../common/controller/RouteController';
 import { RouteContextReplierFactory } from '../../router/RouteContextReplierFactory';
-import { Project, CreateProject, ProjectName, RemoveServiceFromProject } from './entity';
+import {
+  Project,
+  CreateProject,
+  ProjectName,
+  RemoveServiceFromProject,
+  UpdateProjectBody,
+  UpdateProject,
+} from './entity';
 import { RouteCommand } from '../../router/RouteCommand';
 import { Middleware } from '../../router/Router';
 import { ThirdPartyProducerService } from '../../common/ThirdPartyProducerService';
@@ -22,6 +29,7 @@ export class ProjectController extends RouteController {
     const projectList = await this.manager.find();
     return {
       data: projectList,
+      status: HttpStatus.OK,
     };
   }
 
@@ -38,10 +46,23 @@ export class ProjectController extends RouteController {
   private getProjectByNameCommand: RouteCommand<Project> = async routeContext => {
     const { projectName } = routeContext.getNamedParams() as { projectName: string };
     const projectParams: ProjectName = { projectName };
-    const projectFound = await this.manager.findByName(projectParams);
+    const projectFound = await this.manager.findOne(projectParams);
 
     return {
       data: projectFound,
+      status: HttpStatus.OK,
+    };
+  }
+
+  private updateProjectByNameCommand: RouteCommand<Project> = async routeContext => {
+    const { projectName } = routeContext.getNamedParams() as { projectName: string };
+    const projectModel = routeContext.getRequestBody() as UpdateProjectBody;
+    const projectParams: UpdateProject = { ...projectModel, projectName };
+    const projectUpdated = await this.manager.update(projectParams);
+
+    return {
+      data: projectUpdated,
+      status: HttpStatus.OK,
     };
   }
 
@@ -80,6 +101,10 @@ export class ProjectController extends RouteController {
 
   getProjectByName(): Middleware {
     return this.execute(this.getProjectByNameCommand);
+  }
+
+  updateProjectByName(): Middleware {
+    return this.execute(this.updateProjectByNameCommand);
   }
 
   deleteProjectByName(): Middleware {

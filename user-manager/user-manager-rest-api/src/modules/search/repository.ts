@@ -13,7 +13,7 @@ export class SearchRepository {
     this.sqlProvider = sqlProvider;
   }
 
-  async searchReceiversByRecord(event: Event, saveEvent: boolean): Promise<EventReceiversResult> {
+  async searchReceiversByRecord(event: Event, saveEvent: boolean): Promise<EventReceiversResult|null> {
     return await this.database.one(this.sqlProvider.searchReceiversByRecord, { event, saveEvent });
   }
 }

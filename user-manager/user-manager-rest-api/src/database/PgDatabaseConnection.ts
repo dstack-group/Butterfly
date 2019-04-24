@@ -1,4 +1,4 @@
-import pgPromiseFactory, { IMain, IDatabase, ITask } from 'pg-promise';
+import pgPromiseFactory, { IMain, IDatabase } from 'pg-promise';
 import { DatabaseConnection, DatabaseConnectionValues } from './DatabaseConnection';
 import { DatabaseConfig } from './DatabaseConfig';
 
@@ -16,10 +16,12 @@ export class PgDatabaseConnection implements DatabaseConnection {
   private config: DatabaseConfig;
   private pgPromise: IMain;
   private database: IDatabase<{}>;
+  private pgErrors: IMain['errors'];
 
   constructor(config: DatabaseConfig) {
     this.config = config;
     this.pgPromise = pgPromiseFactory();
+    this.pgErrors = this.pgPromise.errors;
     this.database = this.pgPromise(this.config);
   }
 
@@ -34,13 +36,29 @@ export class PgDatabaseConnection implements DatabaseConnection {
   }
 
   /**
-   * Executes a query that expects exactly one row of data. When 0 or more than 1 rows are returned,
+   * Executes a query that expects exactly one row of data. When no row is returned,
+   * the method returns null. When more than 1 rows are returned,
    * the method rejects.
    * @param query the SQL string that contains the query to be run
    * @param values the named value parameters to be passed to the query
    */
-  async one<T>(query: string, values?: DatabaseConnectionValues): Promise<T> {
-    return this.database.one(query, values);
+  async one<T>(query: string, values?: DatabaseConnectionValues): Promise<T|null> {
+    let result: T | null;
+    try {
+      result = await this.database.one(query, values);
+      return result;
+    } catch (error) {
+      if (error instanceof this.pgErrors.QueryResultError) {
+        /**
+         * If no data is returned from the query, return a null value.
+         * This should be handled by the caller in order to set Error 404.
+         */
+        if (error.code === this.pgErrors.queryResultErrorCode.noData) {
+          return null;
+        }
+      }
+      throw error;
+    }
   }
 
   /**

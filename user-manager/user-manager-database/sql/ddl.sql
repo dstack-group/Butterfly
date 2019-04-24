@@ -811,30 +811,29 @@ CREATE OR REPLACE PROCEDURE public.init_demo_data()
 LANGUAGE plpgsql
 AS $$
 BEGIN
-	INSERT INTO public.project(project_id, project_name, project_url) VALUES (1, 'Butterfly', '{"REDMINE": "http://localhost:15000/issues/2", "GITLAB": "https://localhost:10443/dstack/butterfly"}');
-	INSERT INTO public.project(project_id, project_name, project_url) VALUES (2, 'Amazon', '{"GITLAB": "gitlab.amazon.com/amazon/amazon.git"}');
-	INSERT INTO public.project(project_id, project_name, project_url) VALUES (3, 'Uber', '{"GITLAB": "gitlab.uber.com/uber/uber.git"}');
-	INSERT INTO public.project(project_id, project_name, project_url) VALUES (4, 'Twitter', '{"SONARQUBE": "sonarqube.twitter.com/twitter/twitter.git", "GITLAB": "gitlab.twitter.com/twitter/twitter.git"}');
+	INSERT INTO public.project(project_name, project_url) VALUES ('Butterfly', '{"REDMINE": "http://localhost:15000/issues/2", "GITLAB": "https://localhost:10443/dstack/butterfly"}');
+	INSERT INTO public.project(project_name, project_url) VALUES ('Amazon', '{"GITLAB": "gitlab.amazon.com/amazon/amazon.git"}');
+	INSERT INTO public.project(project_name, project_url) VALUES ('Uber', '{"GITLAB": "gitlab.uber.com/uber/uber.git"}');
+	INSERT INTO public.project(project_name, project_url) VALUES ('Twitter', '{"SONARQUBE": "sonarqube.twitter.com/twitter/twitter.git", "GITLAB": "gitlab.twitter.com/twitter/twitter.git"}');
 
-	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (1, 'alberto.schiabel@gmail.com', 'Alberto', 'Schiabel');
-	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (2, 'federico.rispo@gmail.com', 'Federico', 'Rispo');
-	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (3, 'enrico.trinco@gmail.com', 'Enrico', 'Trinco');
-	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (4, 'TheAlchemist97@gmail.com', 'Niccolò', 'Vettorello');
-	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (5, 'eleonorasignor@gmail.com', 'Eleonora', 'Signor');
-	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (6, 'elton97@gmail.com', 'Elton', 'Stafa');
-	INSERT INTO public.user(user_id, email, firstname, lastname) VALUES (7, 'singh@gmail.com', 'Harwinder', 'Singh');
+	INSERT INTO public.user(email, firstname, lastname) VALUES ('alberto.schiabel@gmail.com', 'Alberto', 'Schiabel');
+	INSERT INTO public.user(email, firstname, lastname) VALUES ('federico.rispo@gmail.com', 'Federico', 'Rispo');
+	INSERT INTO public.user(email, firstname, lastname) VALUES ('enrico.trinco@gmail.com', 'Enrico', 'Trinco');
+	INSERT INTO public.user(email, firstname, lastname) VALUES ('TheAlchemist97@gmail.com', 'Niccolò', 'Vettorello');
+	INSERT INTO public.user(email, firstname, lastname) VALUES ('eleonorasignor@gmail.com', 'Eleonora', 'Signor');
+	INSERT INTO public.user(email, firstname, lastname) VALUES ('elton97@gmail.com', 'Elton', 'Stafa');
+	INSERT INTO public.user(email, firstname, lastname) VALUES ('singh@gmail.com', 'Harwinder', 'Singh');
 
-	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (1, 'TELEGRAM', '38442289');
-	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (1, 'SLACK', 'jkomyno');
-	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (1, 'EMAIL', 'dstackgroup@gmail.com');
-	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (2, 'TELEGRAM', 'frispo');
-	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (2, 'EMAIL', 'dstackgroup@gmail.com');
-	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (3, 'TELEGRAM', 'enrico_dogen');
-	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (3, 'EMAIL', 'dstackgroup@gmail.com');
-	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (4, 'TELEGRAM', '191751378');
-	INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (4, 'EMAIL', 'dstackgroup@gmail.com');
-
-  -- PERFORM is used when we're not interesting in the actual data returned from the called stored function.
+	-- PERFORM is used when we're not interesting in the actual data returned from the called stored function.
+	PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'TELEGRAM', '38442289');
+	PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'SLACK', 'jkomyno');
+	PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
+	PERFORM public.create_user_contact('federico.rispo@gmail.com', 'TELEGRAM', 'frispo');
+	PERFORM public.create_user_contact('federico.rispo@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
+	PERFORM public.create_user_contact('enrico.trinco@gmail.com', 'TELEGRAM', 'enrico_dogen');
+	PERFORM public.create_user_contact('enrico.trinco@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
+	PERFORM public.create_user_contact('TheAlchemist97@gmail.com', 'TELEGRAM', '191751378');
+	PERFORM public.create_user_contact('TheAlchemist97@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
 
   PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, FIX, CLOSE}'::text[]);
   PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'REDMINE_TICKET_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, DOGE}'::text[]);

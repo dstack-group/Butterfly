@@ -3,7 +3,7 @@ import { Middleware } from '../router/Router';
 import { Logger } from '../logger';
 import { AppError, getHTTPStatusFromErrorCode } from '../errors';
 import { ErrorToJSON } from '../common/errors';
-import { RouteContextReplierFactory } from '@src/router/RouteContextReplierFactory';
+import { RouteContextReplierFactory } from '../router/RouteContextReplierFactory';
 
 export interface UnknownErrorToJSON extends ErrorToJSON {
   name: string;

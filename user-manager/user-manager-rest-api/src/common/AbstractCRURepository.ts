@@ -18,15 +18,15 @@ export abstract class AbstractCRURepository
     return this.database.any(this.queryProvider.find, params);
   }
 
-  findOne<V>(item: V): Promise<T> {
+  findOne<V>(item: V): Promise<T|null> {
     return this.database.one(this.queryProvider.findOne, item);
   }
 
   create<V>(item: V): Promise<T> {
-    return this.database.one(this.queryProvider.create, item);
+    return this.database.one(this.queryProvider.create, item) as Promise<T>;
   }
 
-  update<V>(item: V): Promise<T> {
+  update<V>(item: V): Promise<T|null> {
     return this.database.one(this.queryProvider.update, item);
   }
 }

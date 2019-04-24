@@ -522,8 +522,8 @@ paths:
                     type: boolean
                     description: error message
 
-    patch:
-      operationId: patchProjectByName
+    put:
+      operationId: updateProjectByName
       summary: Updates the data of the project identified by the given project name and returns the updated project record
       tags: [ 'PROJECTS' ]
       parameters:

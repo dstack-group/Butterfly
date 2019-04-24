@@ -9,10 +9,6 @@ export class ProjectManager extends AbstractCRUDManager<Project, any, ProjectRep
     super(repository);
   }
 
-  findByName(params: ProjectName): Promise<Project> {
-    return this.repository.findByName(params);
-  }
-
   async removeServiceURL(params: RemoveServiceFromProject): Promise<Project> {
     const result = await this.repository.removeServiceURL(params);
     if (result.length === 0) {
