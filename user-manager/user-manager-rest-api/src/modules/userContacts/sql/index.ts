@@ -8,7 +8,7 @@ const queryProvider: UserContactQueryProvider = {
   create: sql('./create.sql'),
   delete: sql('./delete.sql'),
   find: sql('find.sql'),
-  findOne: sql('./findByOne.sql'),
+  findOne: sql('./findOne.sql'),
   update: sql('./update.sql'),
 };
 

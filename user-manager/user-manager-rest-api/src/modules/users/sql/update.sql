@@ -1,8 +1,8 @@
 /**
- * Returns the user that matches the given email
+ * Updates the user that matches the given email and returns the updated record.
  */
- WITH PATCH_PARAMS AS (
-	  SELECT ${firstname}::text AS firstname,
+WITH PATCH_PARAMS AS (
+	SELECT ${firstname}::text AS firstname,
         ${lastname}::text AS lastname,
         ${enabled}::boolean AS enabled,
         ${email} AS email

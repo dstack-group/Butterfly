@@ -13,9 +13,13 @@ export const getUserContactRouter = (routesParams: RoutesInjectionParams) => {
   const userContactController = new UserContactController(routesParams.routeContextReplierFactory, userContactManager);
 
   userContactRouter
+    .get('/:userEmail', userContactController.getUserContactByUserEmail())
     .post('/:contactService',
       middlewares.bodyParser(),
       userContactController.createUserContact())
+    .put('/:userEmail/:contactService',
+      middlewares.bodyParser(),
+      userContactController.updateUserContact())
     .delete('/:userEmail/:contactService', userContactController.deleteUserContact());
 
   return userContactRouter;
