@@ -777,8 +777,6 @@ BEGIN
 
 	INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(1, 'REDMINE_TICKET_CREATED');
 	INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(2, 'REDMINE_TICKET_EDITED');
-	INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(3, 'REDMINE_TICKET_PRIORITY_EDITED');
-	INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(4, 'REDMINE_USER_ADDED');
 
 	INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(10, 'GITLAB_COMMIT_CREATED');
 	INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(11, 'GITLAB_ISSUE_CREATED');
@@ -789,8 +787,6 @@ BEGIN
 	-- REDMINE event types
 	INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (1, 1, 1);
 	INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (2, 1, 2);
-	INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (3, 1, 3);
-	INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (4, 1, 4);
 
 	-- GITLAB event types
 	INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (5, 2, 10);
