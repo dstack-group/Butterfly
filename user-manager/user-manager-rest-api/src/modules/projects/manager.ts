@@ -3,7 +3,7 @@ import { ProjectRepository } from './repository';
 import { AbstractCRUDManager } from '../../common/AbstractCRUDManager';
 import { NotFoundError } from '../../errors';
 
-export class ProjectManager extends AbstractCRUDManager<Project, any, ProjectRepository> {
+export class ProjectManager extends AbstractCRUDManager<any, ProjectRepository> {
 
   constructor(repository: ProjectRepository) {
     super(repository);

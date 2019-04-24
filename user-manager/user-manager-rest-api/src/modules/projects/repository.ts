@@ -1,10 +1,10 @@
-import { Project, RemoveServiceFromProject, ProjectName } from './entity';
+import { Project, RemoveServiceFromProject } from './entity';
 import sqlProvider from './sql';
 import { Database } from '../../database';
 import { AbstractCRUDRepository } from '../../common/repository/AbstractCRUDRepository';
 import { ProjectQueryProvider } from './ProjectQueryProvider';
 
-export class ProjectRepository extends AbstractCRUDRepository<Project, ProjectQueryProvider> {
+export class ProjectRepository extends AbstractCRUDRepository<ProjectQueryProvider> {
   constructor(database: Database) {
     super(database, sqlProvider);
   }

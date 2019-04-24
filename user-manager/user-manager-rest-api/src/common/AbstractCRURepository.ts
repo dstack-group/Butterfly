@@ -4,7 +4,7 @@ import { Write } from './repository/Write';
 import { CRUQueryProvider } from './repository/CRUQueryProvider';
 
 export abstract class AbstractCRURepository
-<T, Provider extends CRUQueryProvider> implements Read<T>, Write<T> {
+<Provider extends CRUQueryProvider> implements Read, Write {
 
   protected database: Database;
   protected queryProvider: Provider;
@@ -14,19 +14,19 @@ export abstract class AbstractCRURepository
     this.queryProvider = queryProvider;
   }
 
-  find<V>(params: V): Promise<T[]> {
+  find<P, R>(params: P): Promise<R[]> {
     return this.database.any(this.queryProvider.find, params);
   }
 
-  findOne<V>(item: V): Promise<T|null> {
-    return this.database.one(this.queryProvider.findOne, item);
+  findOne<P, R>(params: P): Promise<R|null> {
+    return this.database.one(this.queryProvider.findOne, params);
   }
 
-  create<V>(item: V): Promise<T> {
-    return this.database.one(this.queryProvider.create, item) as Promise<T>;
+  create<P, R>(params: P): Promise<R> {
+    return this.database.one(this.queryProvider.create, params) as Promise<R>;
   }
 
-  update<V>(item: V): Promise<T|null> {
-    return this.database.one(this.queryProvider.update, item);
+  update<P, R>(params: P): Promise<R|null> {
+    return this.database.one(this.queryProvider.update, params);
   }
 }

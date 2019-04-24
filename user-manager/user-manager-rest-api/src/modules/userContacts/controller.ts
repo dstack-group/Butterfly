@@ -11,6 +11,7 @@ import {
   ContactServiceUserEmailURLParams,
   UpdateUserContact,
   ContactRef,
+  UserContactInfo,
 } from './entity';
 import { RouteCommand } from '../../router/RouteCommand';
 import { Middleware } from '../../router/Router';
@@ -23,14 +24,9 @@ export class UserContactController extends RouteController {
     this.manager = manager;
   }
 
-  /**
-   * TODO: the T type on the manager classes should be provided inline for each method,
-   * not at the root level.
-   */
-  // @ts-ignore
-  private getUserContactByUserEmailCommand: RouteCommand<UserContactInfoData> = async routeContext => {
+  private getUserContactByUserEmailCommand: RouteCommand<UserContactInfo> = async routeContext => {
     const userContactURLParams = routeContext.getNamedParams() as unknown as UserEmail;
-    const userContact = await this.manager.findOne(userContactURLParams) as unknown as UserContactInfoData;
+    const userContact = await this.manager.findOne<UserEmail, UserContactInfoData>(userContactURLParams);
 
     return {
       data: userContact.data,
@@ -46,7 +42,7 @@ export class UserContactController extends RouteController {
       contactRef,
       userEmail,
     };
-    const newUserContact = await this.manager.create(userContactModel);
+    const newUserContact = await this.manager.create<CreateUserContact, UserContact>(userContactModel);
 
     return {
       data: newUserContact,
@@ -61,7 +57,7 @@ export class UserContactController extends RouteController {
       ...userContactURLParams,
       contactRef,
     };
-    const newUserContact = await this.manager.update(userContactModel);
+    const newUserContact = await this.manager.update<UpdateUserContact, UserContact>(userContactModel);
 
     return {
       data: newUserContact,
@@ -71,7 +67,7 @@ export class UserContactController extends RouteController {
 
   private deleteUserContactCommand: RouteCommand<UserContact> = async routeContext => {
     const userContactURLParams = routeContext.getNamedParams() as unknown as CreateUserContactURLParams;
-    await this.manager.delete(userContactURLParams);
+    await this.manager.delete<CreateUserContactURLParams>(userContactURLParams);
 
     return {
       data: null,

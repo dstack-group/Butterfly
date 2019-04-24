@@ -18,7 +18,7 @@ export class UserController extends RouteController {
     /**
      * TODO: pagination
      */
-    const userList = await this.manager.find();
+    const userList = await this.manager.find<undefined, User>();
     return {
       data: userList,
     };
@@ -26,7 +26,7 @@ export class UserController extends RouteController {
 
   private createUserCommand: RouteCommand<User> = async routeContext => {
     const userModel = routeContext.getRequestBody() as CreateUser;
-    const newUser = await this.manager.create(userModel);
+    const newUser = await this.manager.create<CreateUser, User>(userModel);
 
     return {
       data: newUser,
@@ -37,7 +37,7 @@ export class UserController extends RouteController {
   private getUserByEmailCommand: RouteCommand<User> = async routeContext => {
     const { email } = routeContext.getNamedParams() as { email: string };
     const userParams: UserEmail = { email };
-    const userFound = await this.manager.findOne(userParams);
+    const userFound = await this.manager.findOne<UserEmail, User>(userParams);
 
     return {
       data: userFound,
@@ -50,7 +50,7 @@ export class UserController extends RouteController {
     const userModel = routeContext.getRequestBody() as UpdateUserBody;
     const userParams: UpdateUser = { email, ...userModel };
 
-    const userUpdated = await this.manager.update(userParams);
+    const userUpdated = await this.manager.update<UpdateUser, User>(userParams);
 
     return {
       data: userUpdated,
@@ -61,7 +61,7 @@ export class UserController extends RouteController {
   private deleteUserByEmailCommand: RouteCommand<User> = async routeContext => {
     const { email } = routeContext.getNamedParams() as { email: string };
     const userParams = { email };
-    await this.manager.delete(userParams as User);
+    await this.manager.delete<User>(userParams as User);
 
     return {
       data: null,

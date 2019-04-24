@@ -1,17 +1,17 @@
 /**
  * General contract for the database operations that create or modify resources.
  */
-export interface Write<T> {
+export interface Write {
   /**
    * Creates a new resource and returns it.
-   * @param item the resource to be created.
+   * @param params the named parameters needed to craete a new resource.
    */
-  create<V>(item: V): Promise<T>;
+  create<P, R>(params: P): Promise<R>;
 
   /**
    * Updates an existing resource and returns it.
    * If no resource is present, it returns null.
-   * @param item the resource to be updated.
+   * @param params the named paramters to be used to update a resource.
    */
-  update<V>(item: V): Promise<T|null>;
+  update<P, R>(params: P): Promise<R|null>;
 }

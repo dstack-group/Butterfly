@@ -3,11 +3,11 @@ import { Delete } from './Delete';
 import { CRUDQueryProvider } from './CRUDQueryProvider';
 
 export abstract class AbstractCRUDRepository
-<T, Provider extends CRUDQueryProvider>
-extends AbstractCRURepository<T, Provider> implements Delete {
+<Provider extends CRUDQueryProvider>
+extends AbstractCRURepository<Provider> implements Delete {
 
-  async delete<V>(item: V): Promise<boolean> {
-    const rowAffected = await this.database.result(this.queryProvider.delete, item);
+  async delete<P>(params: P): Promise<boolean> {
+    const rowAffected = await this.database.result(this.queryProvider.delete, params);
 
     const isAtLeastARowAffected = rowAffected > 0;
     return isAtLeastARowAffected;

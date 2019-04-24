@@ -7,5 +7,5 @@ export interface Delete {
    * If no resource is found, it returns `false`.
    * @param item the resource to delete.
    */
-  delete<V>(item: V): Promise<boolean>;
+  delete<P>(item: P): Promise<boolean>;
 }

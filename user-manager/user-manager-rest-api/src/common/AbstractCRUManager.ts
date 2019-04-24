@@ -8,16 +8,16 @@ import { DBUniqueConstraintError } from '../errors/DBUniqueConstraintError';
 import { NotFoundError } from '../errors';
 
 export abstract class AbstractCRUManager
-<T, Provider extends CRUQueryProvider, Repository extends AbstractCRURepository<T, Provider>>
-extends AbstractManager<Repository> implements Write<T>, Read<T> {
+<Provider extends CRUQueryProvider, Repository extends AbstractCRURepository<Provider>>
+extends AbstractManager<Repository> implements Write, Read {
   constructor(repository: Repository) {
     super(repository);
   }
 
-  create<V>(item: V): Promise<T> {
-    return new Promise<T>(async (resolve, reject) => {
+  create<P, R>(params: P): Promise<R> {
+    return new Promise<R>(async (resolve, reject) => {
       try {
-        const result = await this.repository.create(item);
+        const result = await this.repository.create<P, R>(params);
         resolve(result);
       } catch (error) {
         const dbError: DBError = wrapError(error);
@@ -32,14 +32,14 @@ extends AbstractManager<Repository> implements Write<T>, Read<T> {
     });
   }
 
-  find<V>(params?: V): Promise<T[]> {
+  find<P, R>(params?: P): Promise<R[]> {
     return this.repository.find(params);
   }
 
-  findOne<V>(item: V): Promise<T> {
-    return new Promise<T>(async (resolve, reject) => {
+  findOne<P, R>(params: P): Promise<R> {
+    return new Promise<R>(async (resolve, reject) => {
       try {
-        const result = await this.repository.findOne(item);
+        const result = await this.repository.findOne<P, R>(params);
         if (result === null) {
           throw new NotFoundError('Entity not found');
         }
@@ -50,10 +50,10 @@ extends AbstractManager<Repository> implements Write<T>, Read<T> {
     });
   }
 
-  update<V>(item: V): Promise<T> {
-    return new Promise<T>(async (resolve, reject) => {
+  update<P, R>(params: P): Promise<R> {
+    return new Promise<R>(async (resolve, reject) => {
       try {
-        const result = await this.repository.update(item);
+        const result = await this.repository.update<P, R>(params);
         if (result === null) {
           throw new NotFoundError('Entity not found');
         }

@@ -26,7 +26,7 @@ export class ProjectController extends RouteController {
     /**
      * TODO: pagination
      */
-    const projectList = await this.manager.find();
+    const projectList = await this.manager.find<undefined, Project>();
     return {
       data: projectList,
       status: HttpStatus.OK,
@@ -35,7 +35,7 @@ export class ProjectController extends RouteController {
 
   private createProjectCommand: RouteCommand<Project> = async routeContext => {
     const projectModel = routeContext.getRequestBody() as CreateProject;
-    const newProject = await this.manager.create(projectModel);
+    const newProject = await this.manager.create<CreateProject, Project>(projectModel);
 
     return {
       data: newProject,
@@ -46,7 +46,7 @@ export class ProjectController extends RouteController {
   private getProjectByNameCommand: RouteCommand<Project> = async routeContext => {
     const { projectName } = routeContext.getNamedParams() as { projectName: string };
     const projectParams: ProjectName = { projectName };
-    const projectFound = await this.manager.findOne(projectParams);
+    const projectFound = await this.manager.findOne<ProjectName, Project>(projectParams);
 
     return {
       data: projectFound,
@@ -58,7 +58,7 @@ export class ProjectController extends RouteController {
     const { projectName } = routeContext.getNamedParams() as { projectName: string };
     const projectModel = routeContext.getRequestBody() as UpdateProjectBody;
     const projectParams: UpdateProject = { ...projectModel, projectName };
-    const projectUpdated = await this.manager.update(projectParams);
+    const projectUpdated = await this.manager.update<UpdateProjectBody, Project>(projectParams);
 
     return {
       data: projectUpdated,
@@ -69,7 +69,7 @@ export class ProjectController extends RouteController {
   private deleteProjectByNameCommand: RouteCommand<Project> = async routeContext => {
     const { projectName } = routeContext.getNamedParams() as { projectName: string };
     const projectParams: ProjectName = { projectName };
-    await this.manager.delete(projectParams as Project);
+    await this.manager.delete<ProjectName>(projectParams);
 
     return {
       data: null,
