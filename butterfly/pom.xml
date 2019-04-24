@@ -59,6 +59,7 @@
         <module>event-processor</module>
         <module>controller</module>
         <module>json-converter</module>
+        <module>slack-consumer</module>
     </modules>
 
     <developers>

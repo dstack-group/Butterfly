@@ -17,6 +17,7 @@
         <module name="middleware-dispatcher" />
         <module name="producer" />
         <module name="redmine-producer" />
+        <module name="slack-consumer" />
         <module name="sonarqube-producer" />
         <module name="telegram-consumer" />
       </profile>

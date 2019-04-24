@@ -3,6 +3,7 @@ package it.unipd.dstack.butterfly.consumer.email;
 import it.unipd.dstack.butterfly.config.AbstractConfigManager;
 import it.unipd.dstack.butterfly.config.EnvironmentConfigManager;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerImplFactory;
+import it.unipd.dstack.butterfly.consumer.email.formatstrategy.EmailFormatStrategy;
 
 public class Main {
     public static void main(String[] args) {

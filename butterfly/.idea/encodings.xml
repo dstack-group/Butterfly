@@ -13,6 +13,7 @@
     <file url="file://$PROJECT_DIR$/middleware-dispatcher" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/producer" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/redmine-producer" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/slack-consumer" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/sonarqube-producer" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/telegram-consumer" charset="UTF-8" />
   </component>
