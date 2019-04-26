@@ -15,16 +15,23 @@ export interface CreateProjectResult {
   transaction: Promise<void>;
 }
 
-export function createProject(database: PgDatabaseConnection): CreateProjectResult {
+export function createProject(database: PgDatabaseConnection, project: Partial<Project> = {}): CreateProjectResult {
   const projectResult: Project = {
     projectId: '1',
     projectName: 'Butterfly',
     projectURL: {
-      GITLAB: 'https://localhost:10443/dstack/butterfly.git',
-      REDMINE: 'redmine.dstackgroup.com/butterfly/butterfly.git',
+      ...project.projectURL,
     },
+    ...project,
     ...commonValues,
   };
+
+  if (!project.projectURL) {
+    projectResult.projectURL = {
+      GITLAB: 'https://localhost:10443/dstack/butterfly.git',
+      REDMINE: 'redmine.dstackgroup.com/butterfly/butterfly.git',
+    };
+  }
 
   const getProjectQuery: GetQueries<unknown> = t => {
     const projectQuery = t.any(query, projectResult);

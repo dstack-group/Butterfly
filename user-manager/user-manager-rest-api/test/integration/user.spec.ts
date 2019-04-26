@@ -380,6 +380,52 @@ describe(`PATCH /users/:email`, () => {
         expect(e).toBe(undefined);
       });
   });
+
+  it(`Should update a user even if some optional properties aren't specified`, done => {
+    const { transaction, result } = createUser(databaseConnection);
+    const { email } = result;
+    const userPayload = {
+      email,
+      firstname: 'NEW_FIRSTNAME',
+    };
+
+    transaction
+      .then(() => {
+        supertest(server)
+          .patch(`/users/${email}`)
+          .send(userPayload)
+          .expect('Content-Type', /application\/json/)
+          .expect(response => {
+            expect(response.body).toHaveProperty('data');
+            expect(response.body.data).toMatchObject({
+              ...result,
+              firstname: userPayload.firstname,
+            });
+
+            /**
+             * data.created must be a valid date.
+             */
+            expect(response.body.data).toHaveProperty('created');
+            expect(isValidDate(response.body.data.created)).toBe(true);
+
+            /**
+             * data.modified must be set a valid date.
+             */
+            expect(response.body.data).toHaveProperty('modified');
+            expect(isValidDate(response.body.data.modified)).toBe(true);
+
+            /**
+             * data.projectId should be of type string.
+             */
+            expect(response.body.data).toHaveProperty('userId');
+            expect(typeof response.body.data.userId).toBe('string');
+          })
+          .expect(200, done);
+      })
+      .catch(e => {
+        expect(e).toBe(undefined);
+      });
+  });
 });
 
 describe(`DELETE /users`, () => {

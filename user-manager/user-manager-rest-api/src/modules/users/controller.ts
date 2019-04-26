@@ -48,7 +48,18 @@ export class UserController extends RouteController {
   private updateUserByEmailCommand: RouteCommand<User> = async routeContext => {
     const { email } = routeContext.getNamedParams() as { email: string };
     const userModel = routeContext.getRequestBody() as UpdateUserBody;
-    const userParams: UpdateUser = { email, ...userModel };
+
+    /**
+     * Here we need to manually set undefined values by default because if those fields
+     * aren't set, pg-promise is going to complain with a `Property ${property} doesn't exist` error.
+     */
+    const userParams: UpdateUser = {
+      email,
+      enabled: undefined,
+      firstname: undefined,
+      lastname: undefined,
+      ...userModel,
+    };
 
     const userUpdated = await this.manager.update<UpdateUser, User>(userParams);
 
