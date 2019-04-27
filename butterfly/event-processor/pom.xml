@@ -12,7 +12,15 @@
     <groupId>it.unipd.dstack.butterfly.event-processor</groupId>
     <artifactId>event-processor</artifactId>
     <name>event-processor</name>
+
     <dependencies>
+        <dependency>
+            <groupId>it.unipd.dstack.butterfly.producer.avro-schemas</groupId>
+            <artifactId>avro-schemas</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>it.unipd.dstack.butterfly.json-converter</groupId>
             <artifactId>json-converter</artifactId>
