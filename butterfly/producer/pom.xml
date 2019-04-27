@@ -20,6 +20,13 @@
             <version>2.7.2</version>
         </dependency>
 
+        <!-- HTTP microframework testing -->
+        <dependency>
+            <groupId>com.despegar</groupId>
+            <artifactId>spark-test</artifactId>
+            <version>1.1.8</version>
+        </dependency>
+
         <dependency>
             <groupId>it.unipd.dstack.butterfly.config</groupId>
             <artifactId>config</artifactId>
