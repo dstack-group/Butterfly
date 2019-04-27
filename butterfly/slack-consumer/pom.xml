@@ -9,6 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>it.unipd.dstack.butterfly.consumer.slack-consumer</groupId>
     <artifactId>slack-consumer</artifactId>
     <dependencies>
         <dependency>

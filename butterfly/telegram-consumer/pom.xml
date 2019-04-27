@@ -9,6 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>it.unipd.dstack.butterfly.consumer.telegram-consumer</groupId>
     <artifactId>telegram-consumer</artifactId>
     <dependencies>
         <dependency>

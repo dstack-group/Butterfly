@@ -10,6 +10,7 @@
         <module name="config" />
         <module name="consumer" />
         <module name="controller" />
+        <module name="coverage-reporting" />
         <module name="email-consumer" />
         <module name="event-processor" />
         <module name="gitlab-producer" />

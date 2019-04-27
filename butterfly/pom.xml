@@ -15,6 +15,7 @@
         <maven.compiler.target>1.11</maven.compiler.target>
         <maven.assembly.version>3.1.1</maven.assembly.version>
         <junit.version>5.3.1</junit.version>
+        <mockito.version>2.26.0</mockito.version>
         <hamcrest.version>1.3</hamcrest.version>
         <jacoco.version>0.8.3</jacoco.version>
         <kafka-client.version>2.1.0</kafka-client.version>
@@ -26,6 +27,48 @@
         <jackson.version>2.9.7</jackson.version>
         <sonarqube.version>3.6.0.1398</sonarqube.version>
         <slf4j.version>1.7.25</slf4j.version>
+
+        <build.directory.config>../config/target</build.directory.config>
+        <build.directory.consumer>../consumer/target</build.directory.consumer>
+        <build.directory.controller>../controller/target</build.directory.controller>
+        <build.directory.email-consumer>../email-consumer/target</build.directory.email-consumer>
+        <build.directory.event-processor>../event-processor/target</build.directory.event-processor>
+        <build.directory.gitlab-producer>../gitlab-producer/target</build.directory.gitlab-producer>
+        <build.directory.json-converter>../json-converter/target</build.directory.json-converter>
+        <build.directory.middleware-dispatcher>../middleware-dispatcher/target</build.directory.middleware-dispatcher>
+        <build.directory.producer>../producer/target</build.directory.producer>
+        <build.directory.redmine-producer>../redmine-producer/target</build.directory.redmine-producer>
+        <build.directory.slack-consumer>../slack-consumer/target</build.directory.slack-consumer>
+        <build.directory.sonarqube-producer>../sonarqube-producer/target</build.directory.sonarqube-producer>
+        <build.directory.telegram-consumer>../telegram-consumer/target</build.directory.telegram-consumer>
+
+        <classes.directory.config>../config/target/classes</classes.directory.config>
+        <classes.directory.consumer>../consumer/target/classes</classes.directory.consumer>
+        <classes.directory.controller>../controller/target/classes</classes.directory.controller>
+        <classes.directory.email-consumer>../email-consumer/target/classes</classes.directory.email-consumer>
+        <classes.directory.event-processor>../event-processor/target/classes</classes.directory.event-processor>
+        <classes.directory.gitlab-producer>../gitlab-producer/target/classes</classes.directory.gitlab-producer>
+        <classes.directory.json-converter>../json-converter/target/classes</classes.directory.json-converter>
+        <classes.directory.middleware-dispatcher>../middleware-dispatcher/target/classes</classes.directory.middleware-dispatcher>
+        <classes.directory.producer>../producer/target/classes</classes.directory.producer>
+        <classes.directory.redmine-producer>../redmine-producer/target/classes</classes.directory.redmine-producer>
+        <classes.directory.slack-consumer>../slack-consumer/target/classes</classes.directory.slack-consumer>
+        <classes.directory.sonarqube-producer>../sonarqube-producer/target/classes</classes.directory.sonarqube-producer>
+        <classes.directory.telegram-consumer>../telegram-consumer/target/classes</classes.directory.telegram-consumer>
+
+        <sources.directory.config>../config/src/main/java</sources.directory.config>
+        <sources.directory.consumer>../consumer/src/main/java</sources.directory.consumer>
+        <sources.directory.controller>../controller/src/main/java</sources.directory.controller>
+        <sources.directory.email-consumer>../email-consumer/src/main/java</sources.directory.email-consumer>
+        <sources.directory.event-processor>../event-processor/src/main/java</sources.directory.event-processor>
+        <sources.directory.gitlab-producer>../gitlab-producer/src/main/java</sources.directory.gitlab-producer>
+        <sources.directory.json-converter>../json-converter/src/main/java</sources.directory.json-converter>
+        <sources.directory.middleware-dispatcher>../middleware-dispatcher/src/main/java</sources.directory.middleware-dispatcher>
+        <sources.directory.producer>../producer/src/main/java</sources.directory.producer>
+        <sources.directory.redmine-producer>../redmine-producer/src/main/java</sources.directory.redmine-producer>
+        <sources.directory.slack-consumer>../slack-consumer/src/main/java</sources.directory.slack-consumer>
+        <sources.directory.sonarqube-producer>../sonarqube-producer/src/main/java</sources.directory.sonarqube-producer>
+        <sources.directory.telegram-consumer>../telegram-consumer/src/main/java</sources.directory.telegram-consumer>
     </properties>
 
 
@@ -60,6 +103,7 @@
         <module>controller</module>
         <module>json-converter</module>
         <module>slack-consumer</module>
+        <module>coverage-reporting</module>
     </modules>
 
     <developers>
@@ -120,6 +164,25 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- mock framework -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.objenesis</groupId>
+            <artifactId>objenesis</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.9.12</version>
+        </dependency>
+
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
@@ -260,7 +323,7 @@
                     <version>${confluent.version}</version>
                 </plugin>
 
-                <!-- test coverage -->
+                <!-- test coverage
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
@@ -281,55 +344,34 @@
                         </execution>
                     </executions>
                 </plugin>
+                -->
 
             </plugins>
         </pluginManagement>
 
-        <!-- JaCoCo plugin must be ineserted outsite of pluginManagement otherwise it doesn't work -->
+        <!-- test coverage -->
         <plugins>
-                <!-- test coverage -->
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${jacoco.version}</version>
-                    <executions>
-                      
-                        <!-- Generate reports for every single package -->
-                        <execution>
-                            <id>jacoco-initialize</id>
-                            <goals>
-                                <goal>prepare-agent</goal>
-                            </goals>
-                        </execution>
-                        <execution>  
-                            <id>jacoco-report</id>
-                            <phase>test</phase>
-                            <goals>
-                                <goal>report</goal>
-                            </goals>
-                        </execution>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <id>jacoco-initialize</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
 
-                        <!-- Generate aggregate report -->
-                        <execution>
-                            <id>report-aggregate</id>
-                            <phase>test</phase>
-                            <goals>
-                                <goal>report-aggregate</goal>
-                            </goals>
-                            <configuration>
-                                <title>JaCoCo</title>
-                                <footer>Code Coverage Report for JaCoCo ${project.version}</footer>
-                                <includes>
-                                    <!-- Analyze class files only to exclude shaded agent JAR from report -->
-                                    <include>**/*.class</include>
-                                </includes>
-                                <excludes>
-                                    <exclude>**/HelpMojo.class</exclude>
-                                </excludes>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-    </build>
+</build>
 </project>

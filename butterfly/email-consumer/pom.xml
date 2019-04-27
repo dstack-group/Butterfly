@@ -9,6 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>it.unipd.dstack.butterfly.consumer.email-consumer</groupId>
     <artifactId>email-consumer</artifactId>
     <dependencies>
         <dependency>

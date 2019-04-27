@@ -11,5 +11,245 @@
 
     <artifactId>coverage-reporting</artifactId>
 
+    <name>Butterfly Aggregated Test Coverage Reporting</name>
+
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
+    <dependencies>
+        <!-- modules whose test coverage must be measured -->
+        <dependency>
+            <groupId>it.unipd.dstack.butterfly.producer.avro-schemas</groupId>
+            <artifactId>avro-schemas</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.unipd.dstack.butterfly.config</groupId>
+            <artifactId>config</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.unipd.dstack.butterfly.consumer</groupId>
+            <artifactId>consumer</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.unipd.dstack.butterfly.controller</groupId>
+            <artifactId>controller</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.unipd.dstack.butterfly.consumer.email-consumer</groupId>
+            <artifactId>email-consumer</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.unipd.dstack.butterfly.event-processor</groupId>
+            <artifactId>event-processor</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.unipd.dstack.butterfly.producer.gitlab-producer</groupId>
+            <artifactId>gitlab-producer</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.unipd.dstack.butterfly.json-converter</groupId>
+            <artifactId>json-converter</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.unipd.dstack.butterfly.middleware-dispatcher</groupId>
+            <artifactId>middleware-dispatcher</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.unipd.dstack.butterfly.producer</groupId>
+            <artifactId>producer</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.unipd.dstack.butterfly.producer.redmine-producer</groupId>
+            <artifactId>redmine-producer</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.unipd.dstack.butterfly.consumer.slack-consumer</groupId>
+            <artifactId>slack-consumer</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.unipd.dstack.butterfly.producer.sonarqube-producer</groupId>
+            <artifactId>sonarqube-producer</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.unipd.dstack.butterfly.consumer.telegram-consumer</groupId>
+            <artifactId>telegram-consumer</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JaCoCo test coverage aggregator -->
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <id>report-aggregate</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
+                        <configuration>
+                            <title>JaCoCo</title>
+                            <footer>Code Coverage Report for JaCoCo ${jacoco.version}</footer>
+                            <includes>
+                                <!-- Analyze class files only to exclude shaded agent JAR from report -->
+                                <include>**/*.class</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <echo message="Generating JaCoCo Reports" />
+                                <taskdef name="report" classname="org.jacoco.ant.ReportTask">
+                                    <classpath path="${basedir}/target/jacoco-jars/org.jacoco.ant.jar" />
+                                </taskdef>
+                                <mkdir dir="${basedir}/target/coverage-report" />
+                                <report>
+                                    <executiondata>
+                                        <fileset dir="${build.directory.config}">
+                                            <include name="jacoco.exec" />
+                                        </fileset>
+                                        <fileset dir="${build.directory.consumer}">
+                                            <include name="jacoco.exec" />
+                                        </fileset>
+                                        <fileset dir="${build.directory.controller}">
+                                            <include name="jacoco.exec" />
+                                        </fileset>
+                                        <fileset dir="${build.directory.email-consumer}">
+                                            <include name="jacoco.exec" />
+                                        </fileset>
+                                        <fileset dir="${build.directory.event-processor}">
+                                            <include name="jacoco.exec" />
+                                        </fileset>
+                                        <fileset dir="${build.directory.gitlab-producer}">
+                                            <include name="jacoco.exec" />
+                                        </fileset>
+                                        <fileset dir="${build.directory.json-converter}">
+                                            <include name="jacoco.exec" />
+                                        </fileset>
+                                        <fileset dir="${build.directory.middleware-dispatcher}">
+                                            <include name="jacoco.exec" />
+                                        </fileset>
+                                        <fileset dir="${build.directory.producer}">
+                                            <include name="jacoco.exec" />
+                                        </fileset>
+                                        <fileset dir="${build.directory.redmine-producer}">
+                                            <include name="jacoco.exec" />
+                                        </fileset>
+                                        <fileset dir="${build.directory.slack-consumer}">
+                                            <include name="jacoco.exec" />
+                                        </fileset>
+                                        <fileset dir="${build.directory.sonarqube-producer}">
+                                            <include name="jacoco.exec" />
+                                        </fileset>
+                                        <fileset dir="${build.directory.telegram-consumer}">
+                                            <include name="jacoco.exec" />
+                                        </fileset>
+                                    </executiondata>
+                                    <structure name="jacoco-multi Coverage Project">
+                                        <group name="jacoco-multi">
+                                            <classfiles>
+                                                <fileset dir="${classes.directory.config}" />
+                                                <fileset dir="${classes.directory.consumer}" />
+                                                <fileset dir="${classes.directory.controller}" />
+                                                <fileset dir="${classes.directory.email-consumer}" />
+                                                <fileset dir="${classes.directory.event-processor}" />
+                                                <fileset dir="${classes.directory.gitlab-producer}" />
+                                                <fileset dir="${classes.directory.json-converter}" />
+                                                <fileset dir="${classes.directory.middleware-dispatcher}" />
+                                                <fileset dir="${classes.directory.producer}" />
+                                                <fileset dir="${classes.directory.redmine-producer}" />
+                                                <fileset dir="${classes.directory.slack-consumer}" />
+                                                <fileset dir="${classes.directory.sonarqube-producer}" />
+                                                <fileset dir="${classes.directory.telegram-consumer}" />
+                                            </classfiles>
+                                            <sourcefiles encoding="UTF-8">
+                                                <fileset dir="${sources.directory.config}" />
+                                                <fileset dir="${sources.directory.consumer}" />
+                                                <fileset dir="${sources.directory.controller}" />
+                                                <fileset dir="${sources.directory.email-consumer}" />
+                                                <fileset dir="${sources.directory.event-processor}" />
+                                                <fileset dir="${sources.directory.gitlab-producer}" />
+                                                <fileset dir="${sources.directory.json-converter}" />
+                                                <fileset dir="${sources.directory.middleware-dispatcher}" />
+                                                <fileset dir="${sources.directory.producer}" />
+                                                <fileset dir="${sources.directory.redmine-producer}" />
+                                                <fileset dir="${sources.directory.slack-consumer}" />
+                                                <fileset dir="${sources.directory.sonarqube-producer}" />
+                                                <fileset dir="${sources.directory.telegram-consumer}" />
+                                            </sourcefiles>
+                                        </group>
+                                    </structure>
+                                    <html destdir="${basedir}/target/coverage-report/html" />
+                                    <xml destfile="${basedir}/target/coverage-report/coverage-report.xml" />
+                                    <csv destfile="${basedir}/target/coverage-report/coverage-report.csv" />
+                                </report>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>org.jacoco.ant</artifactId>
+                        <version>${jacoco.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
 
 </project>
