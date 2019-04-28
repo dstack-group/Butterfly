@@ -1,9 +1,11 @@
 package it.unipd.dstack.butterfly.producer.producer;
 
 import it.unipd.dstack.butterfly.controller.record.Record;
+import it.unipd.dstack.butterfly.producer.utils.ProducerUtils;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public interface ProducerSender <T> {
     /**
@@ -18,5 +20,11 @@ public interface ProducerSender <T> {
      * @param recordList
      * @return
      */
-    CompletableFuture<Void> send(List<Record<T>> recordList);
+    default CompletableFuture<Void> send(List<Record<T>> recordList) {
+        var completableFutureList = recordList
+                .stream()
+                .map(this::send)
+                .collect(Collectors.toList());
+        return ProducerUtils.composeFutureList(completableFutureList);
+    }
 }
