@@ -11,6 +11,8 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * ConfigurationException is the base class of the Exceptions that can be thrown by AbstractConfigManager
+ * implementations.
  */
 
 package it.unipd.dstack.butterfly.config.exception;

@@ -11,6 +11,8 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * ConfigurationCastException is the exception thrown by AbstractConfigManager implementations when an illegal
+ * type cast is attempted.
  */
 
 package it.unipd.dstack.butterfly.config.exception;
