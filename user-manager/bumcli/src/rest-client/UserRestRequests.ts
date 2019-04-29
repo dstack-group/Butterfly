@@ -1,7 +1,6 @@
 import { User, CreateUser, UpdateUser, FindUser, RemoveUser } from './entities/UserEntities';
 import { RestRequests, HttpMethod } from './RestRequests';
 
-
 export class UserRestRequests extends RestRequests {
 
   create(user: CreateUser): Promise<User> {
@@ -20,7 +19,7 @@ export class UserRestRequests extends RestRequests {
     return this.submitRequest<User[]>('users', HttpMethod.GET);
   }
 
-  remove(user: RemoveUser): void {
-    this.submitRequest<void>(`users/${user.email}`, HttpMethod.DELETE);
+  remove(user: RemoveUser): Promise<void> {
+    return this.submitRequest<void>(`users/${user.email}`, HttpMethod.DELETE);
   }
 }
