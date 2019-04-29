@@ -1,3 +1,18 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    user-manager-rest-api
+ * @fileName:  createSubscriptions.ts
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 import { PgDatabaseConnection, GetQueries } from '../../src/database';
 import { CreateSubscription, Subscription } from '../../src/modules/subscriptions/entity';
 import { ServiceEventType } from '../../src/common/Event';
