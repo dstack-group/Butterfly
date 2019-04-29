@@ -42,7 +42,10 @@ public abstract class ConsumerController<T> implements Controller {
         );
     }
 
-    public ConsumerController(AbstractConfigManager configManager, ConsumerFactory<T> consumerFactory, List<String> topicList) {
+    public ConsumerController(AbstractConfigManager configManager,
+                              ConsumerFactory<T> consumerFactory,
+                              List<String> topicList
+    ) {
         this.configManager = configManager;
         this.serviceName = configManager.getStringProperty("SERVICE_NAME");
         this.topicList = topicList;

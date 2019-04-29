@@ -2,7 +2,7 @@
 ^ \* @project:   Butterfly
 ^ \* @author:    DStack Group
 ^ \* @module:    ([a-zA_Z][\\.\\w]*)
-^ \* @fileName:  ([A-Z][a-z0-9]+)+[.](java)
+^ \* @fileName:  ([A-Z]+[a-z0-9]+)+[.](java)
 ^ \* @created:   \d\d\d\d-\d\d-\d\d
 ^ \*
 ^ \* --------------------------------------------------------------------------------------------

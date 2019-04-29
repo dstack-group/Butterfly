@@ -18,7 +18,10 @@ package it.unipd.dstack.butterfly.producer.gitlab;
 import it.unipd.dstack.butterfly.config.AbstractConfigManager;
 import it.unipd.dstack.butterfly.config.EnvironmentConfigManager;
 import it.unipd.dstack.butterfly.producer.avro.Event;
-import it.unipd.dstack.butterfly.producer.producer.*;
+import it.unipd.dstack.butterfly.producer.producer.Producer;
+import it.unipd.dstack.butterfly.producer.producer.ProducerImpl;
+import it.unipd.dstack.butterfly.producer.producer.OnWebhookEventFromTopic;
+import it.unipd.dstack.butterfly.producer.producer.OnWebhookEventFromTopicImpl;
 
 public class Main {
     public static void main(String[] args) {

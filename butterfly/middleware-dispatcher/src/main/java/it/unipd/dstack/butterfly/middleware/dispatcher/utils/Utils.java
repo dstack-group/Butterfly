@@ -32,7 +32,10 @@ import java.util.stream.Collectors;
 public final class Utils {
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
-    public static List<EventWithUserContact> parseUserManagerResponseData(List<UserManagerResponseData> data, Event event) {
+    public static List<EventWithUserContact> parseUserManagerResponseData(
+            List<UserManagerResponseData> data,
+            Event event
+    ) {
         return data.stream()
                 .flatMap(user -> {
                     var userSingleContactListStream = user.getContacts().entrySet()

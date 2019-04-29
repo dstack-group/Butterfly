@@ -49,7 +49,7 @@ class TelegramBotListener extends TelegramLongPollingBot {
         this.commandHandler = new CommandHandler();
     }
 
-     // TelegramResponse response
+    // TelegramResponse response
 
     private TelegramMessageSender sender = (TelegramMessage message) -> {
         SendMessage answer = new SendMessage();
