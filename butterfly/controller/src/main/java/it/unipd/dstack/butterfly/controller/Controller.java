@@ -11,6 +11,8 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * Controller defines the common interface that consumer-oriented controllers and producer-oriented controllers
+ * should implement.
  */
 
 package it.unipd.dstack.butterfly.controller;

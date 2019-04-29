@@ -11,11 +11,10 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * Unit tests for Record.
  */
 
 package it.unipd.dstack.butterfly.controller.record;
-
-import it.unipd.dstack.butterfly.controller.record.Record;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,20 +22,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RecordTest {
 
-    private Record<Integer> integerRecord;
-    private Record<String> stringRecord;
-
-    public RecordTest() {
-        integerRecord = new Record<Integer>("IntegerTest", 10);
-        stringRecord = new Record<String>("StringTest", "Ten");
-    }
-
+    private Record<Integer> integerRecord = new Record<>("IntegerTest", 10);
+    private Record<String> stringRecord = new Record<>("StringTest", "Ten");
 
     /**
-     *  <p>Check if the getTopic method returns the Topic string of the Record<p>
+     * <p>Check if the getTopic method returns the Topic string of the Record<p>
      *
-     *  @author DStack Group
-     *  @return void
+     * @author DStack Group
+     * @return void
      */
 
     @Test
@@ -47,10 +40,10 @@ public class RecordTest {
 
 
     /**
-     *  <p>Check if the getData method returns the Data of the Record<p>
+     * <p>Check if the getData method returns the Data of the Record<p>
      *
-     *  @author DStack Group
-     *  @return void
+     * @author DStack Group
+     * @return void
      */
 
     @Test

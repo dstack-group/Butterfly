@@ -11,14 +11,12 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * Record is a container that taht stores the topic in which the message data should be sent,
+ * as well as storing the data itself.
  */
 
 package it.unipd.dstack.butterfly.controller.record;
 
-/**
- * Object that stores the topic in which the data should be sent, and the data itself
- * @param <T>
- */
 public class Record <T> {
     private String topic;
     private T data;
