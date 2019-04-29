@@ -18,10 +18,8 @@ export interface FindUser {
 
 export type RemoveUser = FindUser;
 
-
 export interface User extends CreateUser {
   userId: string;
   created: Date;
   modified: Date;
 }
-
