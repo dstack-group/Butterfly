@@ -1,9 +1,9 @@
 ^/\*\*
-^ \* @project: Butterfly
-^ \* @author: DStack Group
-^ \* @module: ([a-zA_Z][\\.\\w]*)
-^ \* @fileName: ([A-Z][a-z0-9]+)+[.](java)
-^ \* @created: \d\d\d\d-\d\d-\d\d
+^ \* @project:   Butterfly
+^ \* @author:    DStack Group
+^ \* @module:    ([a-zA_Z][\\.\\w]*)
+^ \* @fileName:  ([A-Z][a-z0-9]+)+[.](java)
+^ \* @created:   \d\d\d\d-\d\d-\d\d
 ^ \*
 ^ \* --------------------------------------------------------------------------------------------
 ^ \* Copyright [(]c[)] 2019 DStack Group.
