@@ -11,11 +11,10 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * Unit Tests for EmailValidator.
  */
 
 package it.unipd.dstack.butterfly.consumer.utils;
-
-import it.unipd.dstack.butterfly.consumer.utils.EmailValidator;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;

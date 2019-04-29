@@ -11,6 +11,8 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * Observer is the core interface of the Observer Pattern. It's responsible of triggering update events,
+ * which are then propagated to the subscribers via a Subject implementation.
  */
 
 package it.unipd.dstack.butterfly.consumer.consumer;

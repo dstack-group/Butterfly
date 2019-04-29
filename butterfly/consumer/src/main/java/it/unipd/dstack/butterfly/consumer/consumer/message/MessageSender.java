@@ -11,6 +11,7 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * MessageSender defines the contract that must be respected when sending a message to a third party service.
  */
 
 package it.unipd.dstack.butterfly.consumer.consumer.message;

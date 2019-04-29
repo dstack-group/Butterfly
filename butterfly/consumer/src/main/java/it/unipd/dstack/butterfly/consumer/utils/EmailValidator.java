@@ -11,6 +11,7 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * EmailValidator contains utilities to perform validity checks on email addresses.
  */
 
 package it.unipd.dstack.butterfly.consumer.utils;

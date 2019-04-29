@@ -11,12 +11,15 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * ConsumerReceiver is a FunctionalInterface that defines how a Consumer should subscribe to messages that come
+ * from a list of topics.
  */
 
 package it.unipd.dstack.butterfly.consumer.consumer;
 
 import java.util.List;
 
+@FunctionalInterface
 public interface ConsumerReceiver {
     /**
      * Subscribes to the given list of topics to get dynamically assigned partitions.

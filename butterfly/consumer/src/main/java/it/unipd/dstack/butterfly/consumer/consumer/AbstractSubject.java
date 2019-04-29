@@ -11,6 +11,8 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * AbstractSubject is a partial implementation of the Observer Pattern's Subject. It keeps a list of observers
+ * which should be notified every time a new event is dispatched.
  */
 
 package it.unipd.dstack.butterfly.consumer.consumer;

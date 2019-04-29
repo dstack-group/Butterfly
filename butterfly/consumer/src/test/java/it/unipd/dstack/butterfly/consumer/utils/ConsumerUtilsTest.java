@@ -11,12 +11,11 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * Unit Tests for ConsumerUtils.
  */
 
 package it.unipd.dstack.butterfly.consumer.utils;
 
-import it.unipd.dstack.butterfly.consumer.utils.EnumTesting;
-import it.unipd.dstack.butterfly.consumer.utils.ConsumerUtils;
 import it.unipd.dstack.butterfly.controller.record.Record;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -127,6 +126,12 @@ public class ConsumerUtilsTest {
      *  @author DStack Group
      *  @return void
      */
+
+    private enum EnumTesting {
+        SONARQUBE,
+        TeLeGraM,
+        slack
+    }
 
     @Test
     public void shouldReturnALowerCaseStringFromEnum() {

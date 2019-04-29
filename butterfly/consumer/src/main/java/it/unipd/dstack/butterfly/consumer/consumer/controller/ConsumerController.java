@@ -11,6 +11,11 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * ConsumerController the class that every third party ConsumerController class should extend.
+ * It gives the possibility to either subscribe to a single topic (read from the configuration property "KAFKA_TOPIC")
+ * or to list of topics. Every time a new batch of messages is read from the Broker, the abstract onMessageConsume
+ * method is called for each message in the batch. ConsumerController must be explicitly started and stopped as
+ * necessary.
  */
 
 package it.unipd.dstack.butterfly.consumer.consumer.controller;
@@ -26,6 +31,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+/**
+ * In case you implementation class requires to instantiate a number of resources, please consider overriding
+ * the {@link #releaseResources() releaseResources} method, in order to avoid memory leaks when calling
+ * the {@link #close() close} method.
+ * @param <T>
+ */
 public abstract class ConsumerController<T> implements Controller {
     private static final Logger logger = LoggerFactory.getLogger(ConsumerController.class);
 

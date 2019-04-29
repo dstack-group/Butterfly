@@ -11,6 +11,9 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * ConsumerFactory is a FunctionalInterface which, given a mean to read configuration properties and a list
+ * of topics to subscribe to, is responsible of creating and setting up an appropriate Consumer implementation
+ * via the Abstract Factory pattern.
  */
 
 package it.unipd.dstack.butterfly.consumer.consumer;

@@ -11,6 +11,8 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * KafkaConsumerProperties reads configuration properties at runtime to return the appropriate
+ * settings for a new KafkaConsumer instance.
  */
 
 package it.unipd.dstack.butterfly.consumer.consumer;

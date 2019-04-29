@@ -11,6 +11,7 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * ConsumerUtils contains a set of utilities for the Consumer classes.
  */
 
 package it.unipd.dstack.butterfly.consumer.utils;

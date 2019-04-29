@@ -11,6 +11,8 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * Subject contains the definition of an Observer Pattern Subject, which is the entity that
+ * adds and removes observers.
  */
 
 package it.unipd.dstack.butterfly.consumer.consumer;

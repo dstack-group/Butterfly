@@ -11,6 +11,10 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * ConsumerImpl wraps the usage of a KafkaConsumer client to receive messages from Apache Kafka.
+ * This class is the default implementation of the Consumer interface. It also extends AbstractSubject, which
+ * allows it to notify about new consumed messages via the Observer Pattern, instead of exposing the verbose
+ * old school loop/poll API that the KafkaConsumer class requires.
  */
 
 package it.unipd.dstack.butterfly.consumer.consumer;

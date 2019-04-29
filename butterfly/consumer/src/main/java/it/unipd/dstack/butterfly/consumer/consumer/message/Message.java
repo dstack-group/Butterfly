@@ -11,13 +11,15 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * Message is a simple container class for a message to be sent to someone.
+ * Once created, it is read-only.
  */
 
 package it.unipd.dstack.butterfly.consumer.consumer.message;
 
 public abstract class Message {
-    String recipient;
-    String content;
+    private String recipient;
+    private String content;
 
     public Message(String recipient, String content) {
         this.recipient = recipient;

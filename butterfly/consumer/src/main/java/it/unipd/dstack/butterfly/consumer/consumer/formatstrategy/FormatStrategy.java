@@ -11,6 +11,8 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * FormatStrategy defines the contract that must be respected when creating an appropriately formatted message
+ * from an event object input.
  */
 
 package it.unipd.dstack.butterfly.consumer.consumer.formatstrategy;
@@ -18,7 +20,7 @@ package it.unipd.dstack.butterfly.consumer.consumer.formatstrategy;
 @FunctionalInterface
 public interface FormatStrategy <T> {
     /**
-     * Returns the appropriate formatted message from an input event object.
+     * Returns the appropriate formatted message from an event object input.
      * @param eventWithUserContact
      * @return
      */

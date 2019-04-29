@@ -11,10 +11,14 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * Consumer declares the contract that each third party services consumer should respect.
  */
 
 package it.unipd.dstack.butterfly.consumer.consumer;
 
 public interface Consumer<T> extends ConsumerReceiver, Closeable, Subject<T> {
+    /**
+     * Starts consuming messages
+     */
     void start();
 }

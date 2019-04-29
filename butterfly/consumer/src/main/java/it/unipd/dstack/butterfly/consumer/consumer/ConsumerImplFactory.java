@@ -11,6 +11,7 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * ConsumerFactory creates ConsumerImpl instances and subscribes to messages that come from the given topics.
  */
 
 package it.unipd.dstack.butterfly.consumer.consumer;
