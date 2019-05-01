@@ -17,10 +17,10 @@ import { setupTests } from '../init';
 import supertest from 'supertest';
 import { Server as AppServer } from '../../src/server';
 import { Server } from 'http';
-import { truncData } from '../fixtures/truncData';
-import { PgDatabaseConnection } from '../../src/database';
+import { PgDatabaseConnection, truncData } from '../../src/database';
 import { Event } from '../../src/common/Event';
 import { createEvent, initializeSearchReceiversData } from '../fixtures/createSearchReceivers';
+import { ParseSyntaxError } from '../../src/errors';
 
 let app: AppServer;
 let server: Server;
@@ -65,6 +65,21 @@ describe(`POST /search/receivers`, () => {
       });
   });
   */
+
+  it(`Should return ParseSyntaxError if the body request isn't a valid JSON`, done => {
+    const payload = '{"",[}';
+    supertest(server)
+      .post('/search/receivers')
+      .set('Content-Type', 'application/json')
+      .send(payload)
+      .expect('Content-Type', /application\/json/)
+      .expect(response => {
+        expect(response.body).not.toHaveProperty('data');
+        expect(response.body).toHaveProperty('error');
+        expect(response.body).toMatchObject(new ParseSyntaxError('body').toJSON());
+      })
+      .expect(400, done);
+  });
 
   it(`The response data should be an empty array if no subscription is saved`, done => {
     const event: Event = createEvent();
