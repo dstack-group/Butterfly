@@ -14,7 +14,12 @@
  */
 
 import { ErrorType } from '../../src/common/errors';
-import { ValidationError, NotFoundError, getHTTPStatusFromErrorCode } from '../../src/errors';
+import {
+  ValidationError,
+  NotFoundError,
+  ParseSyntaxError,
+  getHTTPStatusFromErrorCode,
+} from '../../src/errors';
 import { DBUniqueConstraintError } from '../../src/errors/DBUniqueConstraintError';
 
 describe(`Application errors`, () => {
@@ -37,6 +42,24 @@ describe(`Application errors`, () => {
       code: ErrorType.NOT_FOUND_ERROR,
       error: true,
       message: notFoundErrorMessage,
+    });
+  });
+
+  it(`ParseSyntaxError's JSON has the correct structure and error message`, () => {
+    const syntaxErrorBody = new ParseSyntaxError('body');
+    const syntaxErrorBodyJSON = syntaxErrorBody.toJSON();
+    expect(syntaxErrorBodyJSON).toEqual({
+      code: ErrorType.PARSE_SYNTAX_ERROR,
+      error: true,
+      message: 'Invalid syntax in the HTTP request body.',
+    });
+
+    const syntaxErrorParams = new ParseSyntaxError('params');
+    const syntaxErrorParamsJSON = syntaxErrorParams.toJSON();
+    expect(syntaxErrorParamsJSON).toEqual({
+      code: ErrorType.PARSE_SYNTAX_ERROR,
+      error: true,
+      message: 'Invalid syntax in the HTTP request params.',
     });
   });
 
