@@ -2,9 +2,15 @@ import { Command } from '@oclif/command'
 import { RestRequests } from '../rest-client';
 import Table = require('cli-table')
 import chalk from 'chalk'
+import { LocalDb } from '../database/LocalDb';
 
 export abstract class BaseCommand extends Command {
     
+
+  // Path must be changed: its temporary and only for test
+  protected db: LocalDb = new LocalDb('db.json');
+
+
           /*importazione del server con il quale si capisce che client usare (se User, Project o Sistemi)*/ 
           /* inizializzo rest request, classe astratta che inizializza le richieste rest */
 

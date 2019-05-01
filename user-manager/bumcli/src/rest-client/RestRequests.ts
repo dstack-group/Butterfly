@@ -20,15 +20,13 @@ export abstract class RestRequests {
   private server: ServerConfig;
   private headers;
 
-  constructor() {
+  constructor(serverConfig: ServerConfig) {
 
-    // TODO: Fetch this variables from config file
-    this.server = {
-      hostname: 'http://localhost',
-      port: 5000,
-      timeout: 1000,
-    };
+    if (!serverConfig.hostname || !serverConfig.port) {
+      throw new Error('Invalid server configuration settings');
+    }
 
+    this.server = serverConfig;
     this.headers = {'Content-Type': 'application/json'};
   }
 

@@ -1,7 +1,12 @@
 import { User, CreateUser, UpdateUser, FindUser, RemoveUser } from './entities/UserEntities';
 import { RestRequests, HttpMethod } from './RestRequests';
+import { ServerConfig } from '../database/ServerConfig';
 
 export class UserRestRequests extends RestRequests {
+
+  constructor(serverConfig: ServerConfig) {
+    super(serverConfig);
+  }
 
   create(user: CreateUser): Promise<User> {
     return this.submitRequest<User>('users', HttpMethod.POST, user);
