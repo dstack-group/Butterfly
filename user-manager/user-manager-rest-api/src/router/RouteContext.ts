@@ -13,11 +13,13 @@
  * @description:
  */
 
+import { ValidateRoute } from './ValidateRoute';
+
 /**
  * RouteContext defines the read-only contract that a wrapper for an HTTP framework's request's context
  * must follow.
  */
-export interface RouteContext {
+export interface RouteContext extends ValidateRoute {
   /**
    * Returns the URL params.
    */
