@@ -1,5 +1,5 @@
 /*
- * ServerConfig contains all the variables necessary to make a http request
+ * ServerConfig contains all the settings necessary to make a http request
  */
 
 export interface ServerConfig {

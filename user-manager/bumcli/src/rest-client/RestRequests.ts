@@ -1,4 +1,4 @@
-import { ServerConfig } from './ServerConfig';
+import { ServerConfig } from '../database/ServerConfig';
 import { RequestException} from './exception';
 
 import fetch from 'node-fetch';
