@@ -18,6 +18,7 @@ import { TestLogger } from './TestLogger';
 import { TestMetricsProvider } from './TestMetricsProvider';
 import { getDatabaseConfig, DatabaseConfig, PgDatabaseConnection } from '../src/database';
 import { setup } from '../src/setup';
+import { AbstractConfigManager } from '../src/config';
 
 function setupConfigManager() {
   const configManager = new TestConfigManager();
@@ -33,8 +34,8 @@ function setupConfigManager() {
   return configManager;
 }
 
-export function setupTests() {
-  const configManager = setupConfigManager();
+export function setupTests(customConfigManager?: AbstractConfigManager) {
+  const configManager = customConfigManager || setupConfigManager();
   const logger = new TestLogger();
   const metricsProvider = new TestMetricsProvider();
   const databaseConfig: DatabaseConfig = getDatabaseConfig(configManager);

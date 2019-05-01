@@ -18,3 +18,4 @@ export * from './DatabaseConfig';
 export * from './DatabaseConnection';
 export * from './PgDatabaseConnection';
 export * from './getDatabaseConfig';
+export * from './truncData';
