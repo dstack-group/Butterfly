@@ -2,7 +2,7 @@
  * @project:   Butterfly
  * @author:    DStack Group
  * @module:    user-manager-rest-api
- * @fileName:  bodyParser.ts
+ * @fileName:  ParseSyntaxError.ts
  * @created:   2019-03-07
  *
  * --------------------------------------------------------------------------------------------
@@ -13,20 +13,18 @@
  * @description:
  */
 
-import koaBodyParser from 'koa-bodyparser';
-import { Middleware } from '../router/Router';
-import { ParseSyntaxError } from '../errors/ParseSyntaxError';
+import { AppError } from './AppError';
+import { ErrorType } from '../common/errors';
 
 /**
- * Middleware that adds the possibility to parse the body of
- * PUT, POST, PATCH HTTP requests.
+ * Error thrown when the payload isn't a valid JSON object
  */
-export function bodyParser(): Middleware {
-  return koaBodyParser({
-    enableTypes: ['json'],
-    onerror: () => {
-      throw new ParseSyntaxError('body');
-    },
-    strict: true,
-  });
+export class ParseSyntaxError extends AppError {
+  constructor(element: 'body' | 'params') {
+    super({
+      code: ErrorType.PARSE_SYNTAX_ERROR,
+      errorKey: 'PARSE_SYNTAX_ERROR',
+      message: `Invalid syntax in the HTTP request ${element}.`,
+    });
+  }
 }
