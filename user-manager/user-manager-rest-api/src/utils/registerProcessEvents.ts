@@ -27,21 +27,6 @@ export function registerProcessEvents(
   app: Server,
 ) {
   /**
-   * Emitted when an error isn't explicitly caught
-   */
-  process.on('uncaughtException', (error: Error) => {
-    logger.error('UncaughtException ' + error);
-  });
-
-  /**
-   * Emitted when a Promise terminates unexpectly and no `catch` clause
-   * has been applied
-   */
-  process.on('unhandledRejection', <T>(reason: unknown, promise: Promise<T>) => {
-    logger.error('unhandledRejection ' + reason);
-  });
-
-  /**
    * Emitted when the process in which the application is running gets unexpectedly and forcefully closed,
    * for instance after a CTRL+C event.
    */

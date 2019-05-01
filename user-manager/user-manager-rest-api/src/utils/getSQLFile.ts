@@ -15,6 +15,7 @@
 
 import * as path from 'path';
 import { as, QueryFile, TQueryFileOptions } from 'pg-promise';
+import { QueryFileError } from '../errors/QueryFileError';
 
 export function getSQLFile(directoryName: string, relativeFilename: string, schema = 'public'): string {
   const fullPath = path.join(directoryName, relativeFilename);
@@ -30,10 +31,7 @@ export function getSQLFile(directoryName: string, relativeFilename: string, sche
 
   if (queryFile.error) {
     // Something is wrong with our query file :(
-    // Testing all files through queries can be cumbersome,
-    // so we also report it here, while loading the module:
-    // tslint:disable-next-line:no-console
-    console.error(queryFile.error);
+    throw new QueryFileError(fullPath, queryFile.error);
   }
 
   // @ts-ignore
