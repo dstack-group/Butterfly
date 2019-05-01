@@ -18,7 +18,6 @@ import { ProjectManager } from './manager';
 import { ProjectRepository } from './repository';
 import { RoutesInjectionParams } from '../../routes/RoutesInjectionParams';
 import * as middlewares from '../../middlewares';
-// import * as validator from './validator';
 import { ProjectController } from './controller';
 
 export const getProjectRouter = (routesParams: RoutesInjectionParams) => {

@@ -13,23 +13,27 @@
  * @description:
  */
 
-import * as Joi from 'joi';
+import { ValidateCallback } from '../../common/Validation';
 
-export const createUser: Joi.SchemaMap = {
-  email: Joi.string()
+export const validateCreateUserBody: ValidateCallback = (validator => ({
+  email: validator.string()
     .email()
     .trim()
     .required(),
-  firstname: Joi.string().required(),
-  lastname: Joi.string().required(),
-};
+  enabled: validator.boolean(),
+  firstname: validator.string().required(),
+  lastname: validator.string().required(),
+}));
 
-export const updateUser: Joi.SchemaMap = {
-  email: Joi.string()
+export const validateUpdateUserBody: ValidateCallback = (validator => ({
+  enabled: validator.boolean(),
+  firstname: validator.string(),
+  lastname: validator.string(),
+}));
+
+export const validateEmailParam: ValidateCallback = (validator => ({
+  email: validator.string()
     .email()
     .trim()
     .required(),
-  enabled: Joi.boolean(),
-  firstname: Joi.string(),
-  lastname: Joi.string(),
-};
+}));

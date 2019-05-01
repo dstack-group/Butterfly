@@ -20,6 +20,11 @@ import { RouteContextReplierFactory } from '../../router/RouteContextReplierFact
 import { User, CreateUser, UpdateUser, UpdateUserBody, UserEmail } from './entity';
 import { RouteCommand } from '../../router/RouteCommand';
 import { Middleware } from '../../router/Router';
+import {
+  validateUpdateUserBody,
+  validateCreateUserBody,
+  validateEmailParam,
+} from './validator';
 
 export class UserController extends RouteController {
   private manager: UserManager;
@@ -40,7 +45,7 @@ export class UserController extends RouteController {
   }
 
   private createUserCommand: RouteCommand<User> = async routeContext => {
-    const userModel = routeContext.getRequestBody() as CreateUser;
+    const userModel = routeContext.getValidatedRequestBody<CreateUser>(validateCreateUserBody);
     const newUser = await this.manager.create<CreateUser, User>(userModel);
 
     return {
@@ -50,7 +55,7 @@ export class UserController extends RouteController {
   }
 
   private getUserByEmailCommand: RouteCommand<User> = async routeContext => {
-    const { email } = routeContext.getNamedParams() as { email: string };
+    const { email } = routeContext.getValidatedNamedParams<UserEmail>(validateEmailParam);
     const userParams: UserEmail = { email };
     const userFound = await this.manager.findOne<UserEmail, User>(userParams);
 
@@ -61,8 +66,8 @@ export class UserController extends RouteController {
   }
 
   private updateUserByEmailCommand: RouteCommand<User> = async routeContext => {
-    const { email } = routeContext.getNamedParams() as { email: string };
-    const userModel = routeContext.getRequestBody() as UpdateUserBody;
+    const { email } = routeContext.getValidatedNamedParams<UserEmail>(validateEmailParam);
+    const userModel = routeContext.getValidatedRequestBody<UpdateUserBody>(validateUpdateUserBody);
 
     /**
      * Here we need to manually set undefined values by default because if those fields
@@ -85,9 +90,9 @@ export class UserController extends RouteController {
   }
 
   private deleteUserByEmailCommand: RouteCommand<User> = async routeContext => {
-    const { email } = routeContext.getNamedParams() as { email: string };
+    const { email } = routeContext.getValidatedNamedParams<UserEmail>(validateEmailParam);
     const userParams = { email };
-    await this.manager.delete<User>(userParams as User);
+    await this.manager.delete<UserEmail>(userParams);
 
     return {
       data: null,

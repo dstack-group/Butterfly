@@ -18,7 +18,6 @@ import { UserManager } from './manager';
 import { UserRepository } from './repository';
 import { RoutesInjectionParams } from '../../routes/RoutesInjectionParams';
 import * as middlewares from '../../middlewares';
-// import * as validator from './validator';
 import { UserController } from './controller';
 
 export const getUserRouter = (routesParams: RoutesInjectionParams) => {
@@ -42,11 +41,6 @@ export const getUserRouter = (routesParams: RoutesInjectionParams) => {
     */
     .post('/',
       middlewares.bodyParser(),
-      /*
-      middlewares.validateRequest({
-        body: validator.createUser,
-      }),
-      */
       userController.createUser())
     .get('/:email', userController.getUserByEmail())
     .patch('/:email',

@@ -18,11 +18,11 @@ import { setupTests } from '../init';
 import supertest from 'supertest';
 import { Server as AppServer } from '../../src/server';
 import { Server } from 'http';
-import { truncData } from '../fixtures/truncData';
-import { PgDatabaseConnection } from '../../src/database';
+import { PgDatabaseConnection, truncData } from '../../src/database';
 import { createUsers, createUser } from '../fixtures/createUsers';
 import { isValidDate } from '../isValidDate';
 import { User, CreateUser } from '../../src/modules/users/entity';
+import { ParseSyntaxError } from '../../src/errors';
 
 let app: AppServer;
 let server: Server;
@@ -94,6 +94,21 @@ describe(`GET /users`, () => {
 });
 
 describe(`POST /users`, () => {
+  it(`Should return ParseSyntaxError if the body request isn't a valid JSON`, done => {
+    const payload = '{"enabled":true,"firstname"}';
+    supertest(server)
+      .post('/users')
+      .set('Content-Type', 'application/json')
+      .send(payload)
+      .expect('Content-Type', /application\/json/)
+      .expect(response => {
+        expect(response.body).not.toHaveProperty('data');
+        expect(response.body).toHaveProperty('error');
+        expect(response.body).toMatchObject(new ParseSyntaxError('body').toJSON());
+      })
+      .expect(400, done);
+  });
+
   it(`Should fail if another user with the same email address already exists`, done => {
     const { transaction, result } = createUser(databaseConnection);
     const { email } = result;
@@ -205,11 +220,25 @@ describe(`GET /users/:email`, () => {
 });
 
 describe(`PATCH /users/:email`, () => {
+  it(`Should return ParseSyntaxError if the body request isn't a valid JSON`, done => {
+    const payload = '{"enabled":true,"firstname"}';
+    supertest(server)
+      .patch('/users/email@email.it')
+      .set('Content-Type', 'application/json')
+      .send(payload)
+      .expect('Content-Type', /application\/json/)
+      .expect(response => {
+        expect(response.body).not.toHaveProperty('data');
+        expect(response.body).toHaveProperty('error');
+        expect(response.body).toMatchObject(new ParseSyntaxError('body').toJSON());
+      })
+      .expect(400, done);
+  });
+
   it(`Should update a user only if some record property changed`, done => {
     const { transaction, result } = createUser(databaseConnection);
     const { email, enabled, firstname, lastname } = result;
     const userPayload = {
-      email,
       enabled,
       firstname,
       lastname,
@@ -256,7 +285,6 @@ describe(`PATCH /users/:email`, () => {
     const { transaction, result } = createUser(databaseConnection);
     const { email, enabled, lastname } = result;
     const userPayload = {
-      email,
       enabled,
       firstname: 'NEW_FIRSTNAME',
       lastname,
@@ -304,7 +332,6 @@ describe(`PATCH /users/:email`, () => {
     const { transaction, result } = createUser(databaseConnection);
     const { email, enabled, firstname } = result;
     const userPayload = {
-      email,
       enabled,
       firstname,
       lastname: 'NEW_LASTNAME',
@@ -352,7 +379,6 @@ describe(`PATCH /users/:email`, () => {
     const { transaction, result } = createUser(databaseConnection);
     const { email, enabled, firstname, lastname } = result;
     const userPayload = {
-      email,
       enabled: !enabled,
       firstname,
       lastname,
@@ -400,7 +426,6 @@ describe(`PATCH /users/:email`, () => {
     const { transaction, result } = createUser(databaseConnection);
     const { email } = result;
     const userPayload = {
-      email,
       firstname: 'NEW_FIRSTNAME',
     };
 
@@ -466,7 +491,7 @@ describe(`DELETE /users`, () => {
 
   it(`Should return a NotFoundError if attempting to delete a user that doesn't exist`, done => {
     supertest(server)
-      .delete(`/users/PROJECT_NAME`)
+      .delete(`/users/USER_EMAIL@email.com`)
       .expect('Content-Type', /application\/json/)
       .expect(response => {
         expect(response.body).not.toHaveProperty('data');
