@@ -17,12 +17,12 @@ import { setupTests } from '../init';
 import supertest from 'supertest';
 import { Server as AppServer } from '../../src/server';
 import { Server } from 'http';
-import { truncData } from '../fixtures/truncData';
-import { PgDatabaseConnection } from '../../src/database';
+import { PgDatabaseConnection, truncData } from '../../src/database';
 import { createUser } from '../fixtures/createUsers';
 import { createUserContact } from '../fixtures/createUserContacts';
 import { ThirdPartyContactService } from '../../src/common/ThirdPartyContactService';
-import { UserContactInfo, ContactRef } from '../../src/modules/userContacts/entity';
+import { UserContactInfo, ContactRef, CreateUserContactBody } from '../../src/modules/userContacts/entity';
+import { ParseSyntaxError } from '../../src/errors';
 
 let app: AppServer;
 let server: Server;
@@ -131,6 +131,21 @@ describe(`GET /user-contacts/:userEmail`, () => {
 });
 
 describe(`POST /user-contacts/:contactService`, () => {
+  it(`Should return ParseSyntaxError if the body request isn't a valid JSON`, done => {
+    const payload = '{"contactRef":"REF","userEmail"}';
+    supertest(server)
+      .post(`/user-contacts/${ThirdPartyContactService.TELEGRAM}`)
+      .set('Content-Type', 'application/json')
+      .send(payload)
+      .expect('Content-Type', /application\/json/)
+      .expect(response => {
+        expect(response.body).not.toHaveProperty('data');
+        expect(response.body).toHaveProperty('error');
+        expect(response.body).toMatchObject(new ParseSyntaxError('body').toJSON());
+      })
+      .expect(400, done);
+  });
+
   it(`Should fail if the given contactService is already linked to the given user`, done => {
     const {
       transaction: createUserTransaction,
@@ -147,17 +162,20 @@ describe(`POST /user-contacts/:contactService`, () => {
 
     const {
       transaction: createUserContactTransaction,
-      result: userContactResult,
     } = createUserContact(databaseConnection, createUserContactParams);
 
     const endpoint = `/user-contacts/${createUserContactParams.contactService}`;
+    const payload: CreateUserContactBody = {
+      contactRef: createUserContactParams.contactRef,
+      userEmail,
+    };
 
     createUserTransaction
       .then(async () => await createUserContactTransaction)
       .then(() => {
         supertest(server)
           .post(endpoint)
-          .send(userContactResult)
+          .send(payload)
           .expect('Content-Type', /application\/json/)
           .expect(response => {
             expect(response.body).not.toHaveProperty('data');
@@ -171,9 +189,6 @@ describe(`POST /user-contacts/:contactService`, () => {
       });
   });
 
-  /**
-   * TODO: this test seems to create a new user account even if no user exists. This shouldn't be possible.
-   */
   it(`Should create a new user contact account if the given contactService isn't already linked to the
       existing user identified by the given email`, done => {
     const {
@@ -193,22 +208,66 @@ describe(`POST /user-contacts/:contactService`, () => {
       ...createUserContactParams,
     };
 
+    const payload: CreateUserContactBody = {
+      contactRef: createUserContactParams.contactRef,
+      userEmail,
+    };
+
+    createUserTransaction
+      .then(() => {
+        supertest(server)
+        .post(endpoint)
+        .send(payload)
+        .expect('Content-Type', /application\/json/)
+        .expect(response => {
+          expect(response.body).not.toHaveProperty('error');
+          expect(response.body).toHaveProperty('data');
+          expect(response.body.data).toMatchObject(userContactResult);
+          expect(response.body.data).toHaveProperty('userContactId');
+          expect(typeof response.body.data.userContactId).toBe('string');
+        })
+        .expect(201, done);
+      });
+  });
+
+  it(`Shouldn't create a new user contact account if the user doesn't exist yet`, done => {
+    const userEmail = 'NON_EXISTING_EMAIL@email.com';
+    const endpoint = `/user-contacts/${ThirdPartyContactService.EMAIL}`;
+    const payload = {
+      contactRef: 'CONTACT_REF@email.it',
+      userEmail,
+    };
+
     supertest(server)
       .post(endpoint)
-      .send(createUserContactParams)
+      .send(payload)
       .expect('Content-Type', /application\/json/)
       .expect(response => {
-        expect(response.body).not.toHaveProperty('error');
-        expect(response.body).toHaveProperty('data');
-        expect(response.body.data).toMatchObject(userContactResult);
-        expect(response.body.data).toHaveProperty('userContactId');
-        expect(typeof response.body.data.userContactId).toBe('string');
+        expect(response.body).not.toHaveProperty('data');
+        expect(response.body).toHaveProperty('error');
+        expect(response.body.error).toBe(true);
       })
-      .expect(201, done);
+      .expect(500, done); // TODO: this should be 422
   });
 });
 
 describe(`PUT /user-contacts/:userEmail/:contactService`, () => {
+  it(`Should return ParseSyntaxError if the body request isn't a valid JSON`, done => {
+    const payload = '{"contactRef":}';
+    const userEmail = 'asd@email.com';
+    supertest(server)
+      .put(`/user-contacts/${userEmail}/${ThirdPartyContactService.TELEGRAM}`)
+      .set('Content-Type', 'application/json')
+      .send(payload)
+      .expect('Content-Type', /application\/json/)
+      .expect(response => {
+        expect(response.body).not.toHaveProperty('data');
+        expect(response.body).toHaveProperty('error');
+        expect(response.body).toMatchObject(new ParseSyntaxError('body').toJSON());
+      })
+      .expect(400, done);
+  });
+
   it(`Should update an existing user contact account`, done => {
     const {
       transaction: createUserTransaction,

@@ -23,8 +23,11 @@ export interface ContactRef {
   contactRef: string;
 }
 
-export interface ContactServiceUserEmailURLParams {
+export interface ContactService {
   contactService: ThirdPartyContactService;
+}
+
+export interface ContactServiceUserEmailURLParams extends ContactService {
   userEmail: string;
 }
 
@@ -36,16 +39,15 @@ export interface UserContactInfoData {
   data: UserContactInfo;
 }
 
-export interface CreateUserContactURLParams {
-  contactService: ThirdPartyContactService;
-  userEmail?: string; // only in DELETE
-}
-
-export interface CreateUserContact extends CreateUserContactURLParams, ContactRef {
+export interface CreateUserContactBody extends UserEmail, ContactRef {
 
 }
 
-export interface UpdateUserContact extends CreateUserContactURLParams, ContactRef {
+export interface CreateUserContact extends CreateUserContactBody, ContactService {
+
+}
+
+export interface UpdateUserContact extends ContactService, ContactRef {
 
 }
 
