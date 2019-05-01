@@ -1,7 +1,7 @@
-import {Command, flags} from '@oclif/command';
+import { flags } from '@oclif/command';
 import { BaseCommand } from '../../base/base';
 import { Validator } from '../../utils/Validator';
-import { LocalDb, Config } from '../../database/LocalDb';
+import { Config } from '../../database/LocalDb';
 import { ServerConfig } from '../../database/ServerConfig';
 
 export default class Server extends BaseCommand {
@@ -23,7 +23,6 @@ export default class Server extends BaseCommand {
       dependsOn: ['hostname'],
       description: 'Set the port of the user-manager server',
       required: true,
-
     }),
 
     timeout: flags.integer({char: 't', description: 'Set a timeout for the server connection'}),
@@ -54,6 +53,6 @@ export default class Server extends BaseCommand {
     }
 
     this.db.setValues(Config.Server, serverConfig);
-    this.log(this.db.getValues(Config.Server));
+    this.log(this.showJSONFormat(this.db.getValues(Config.Server)));
   }
 }

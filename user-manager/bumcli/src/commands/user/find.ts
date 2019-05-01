@@ -26,7 +26,7 @@ export default class Find extends BaseCommand {
         if (flagss.table) {
           this.lista(dataUser);
         } else {
-          this.log(dataUser);
+          this.log(this.showJSONFormat(dataUser));
         }
       }
     } catch (error) {

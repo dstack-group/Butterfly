@@ -1,7 +1,6 @@
 import {Command, flags} from '@oclif/command';
 import { BaseCommand } from '../../base/base';
-import { LocalDb, Config } from '../../database/LocalDb';
-import { ServerConfig } from '../../database/ServerConfig';
+import { Config } from '../../database/LocalDb';
 
 export default class List extends BaseCommand {
 
@@ -19,18 +18,18 @@ export default class List extends BaseCommand {
 
     if (!flagss.user && !flagss.server) {
       this.log('All configuration:');
-      this.log(this.db.getValues(Config.User));
-      this.log(this.db.getValues(Config.Server));
+      this.log(this.showJSONFormat(this.db.getValues(Config.User)));
+      this.log(this.showJSONFormat(this.db.getValues(Config.Server)));
     }
 
     if (flagss.user) {
       this.log('User informations:');
-      this.log(this.db.getValues(Config.User));
+      this.log(this.showJSONFormat(this.db.getValues(Config.User)));
     }
 
     if (flagss.server) {
       this.log('Server configuration settings:');
-      this.log(this.db.getValues(Config.Server));
+      this.log(this.showJSONFormat(this.db.getValues(Config.Server)));
     }
   }
 }

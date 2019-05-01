@@ -1,7 +1,7 @@
-import {Command, flags} from '@oclif/command';
+import { flags } from '@oclif/command';
 import { BaseCommand } from '../../base/base';
 import { Validator } from '../../utils/Validator';
-import { LocalDb, Config } from '../../database/LocalDb';
+import { Config } from '../../database/LocalDb';
 import { UserInfo } from '../../database/UserInfo';
 
 export default class User extends BaseCommand {
@@ -44,6 +44,6 @@ export default class User extends BaseCommand {
     }
 
     this.db.setValues(Config.User, userInfo);
-    this.log(this.db.getValues(Config.User));
+    this.log(this.showJSONFormat(this.db.getValues(Config.User)));
   }
 }
