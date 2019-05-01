@@ -17,8 +17,11 @@ import { AppError } from './AppError';
 import { ErrorType, ErrorToJSON } from '../common/errors';
 import { ValidationErrorItem } from '../middlewares/ValidationErrorItem';
 
+export type FieldValidationType = 'body' | 'params';
+
 export interface FieldValidationErrorToJSON extends ErrorToJSON {
   fields: ValidationErrorItem[];
+  type: FieldValidationType;
 }
 
 /**
@@ -26,14 +29,16 @@ export interface FieldValidationErrorToJSON extends ErrorToJSON {
  */
 export class FieldValidationError extends AppError {
   private fields: ValidationErrorItem[];
+  private type: FieldValidationType;
 
-  constructor(message: string, fields: ValidationErrorItem[]) {
+  constructor(message: string, type: FieldValidationType, fields: ValidationErrorItem[]) {
     super({
       code: ErrorType.FIELD_VALIDATION_ERROR,
       errorKey: 'FIELD_VALIDATION_ERROR',
       message,
     });
     this.fields = fields;
+    this.type = type;
   }
 
   /**
@@ -42,6 +47,7 @@ export class FieldValidationError extends AppError {
   toJSON(): FieldValidationErrorToJSON {
     const json = super.toJSON() as FieldValidationErrorToJSON;
     json.fields = this.fields;
+    json.type = this.type;
     return json;
   }
 }
