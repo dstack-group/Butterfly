@@ -44,7 +44,7 @@ CREATE TYPE public.service_event_type AS ENUM (
 );
 
 /**
- * `public.service` assigns an id to services like 'TELEGRAM' or 'GITLAB' to link them later in the
+ * `public.service` assigns an id to services like 'REDMINE' or 'GITLAB' to link them later in the
  * `public.x_service_event_type` association.
  */
 CREATE SEQUENCE public.service_id_seq;
@@ -104,19 +104,21 @@ CREATE TABLE public.project (
 	project_url jsonb,
 	created TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
 	modified TIMESTAMP WITH TIME ZONE DEFAULT NULL,
-	CONSTRAINT project_pkey PRIMARY KEY (project_id),
-	CONSTRAINT project_project_name_unique
-        UNIQUE (project_name)
+	CONSTRAINT project_pkey PRIMARY KEY (project_id) -- ,
+	-- CONSTRAINT project_project_name_unique
+      --   UNIQUE (project_name)
 );
 ALTER SEQUENCE public.project_id_seq OWNED BY public.project.project_id;
+CREATE UNIQUE INDEX project_name_unique_idx
+	ON public.project (LOWER(project_name));  
 
 CREATE SEQUENCE public.user_id_seq;
 CREATE TABLE public.user (
 	user_id BIGINT NOT NULL DEFAULT nextval('public.user_id_seq'),
 	-- username VARCHAR(16) NOT NULL
   --      UNIQUE, -- TODO: to remove
-	email VARCHAR(30) NOT NULL
-        UNIQUE,
+	email VARCHAR(30) NOT NULL CHECK (LOWER(email) = email),
+        -- UNIQUE,
 	firstname VARCHAR(30) NOT NULL,
 	lastname VARCHAR(30) NOT NULL,
 	-- password VARCHAR(30) NOT NULL, -- TODO: for the future
@@ -126,6 +128,8 @@ CREATE TABLE public.user (
 	CONSTRAINT user_pkey PRIMARY KEY (user_id)
 );
 ALTER SEQUENCE public.user_id_seq OWNED BY public.user.user_id;
+CREATE UNIQUE INDEX user_email_unique_idx
+	ON public.user (LOWER(email));  
 
 CREATE SEQUENCE public.user_contact_id_seq;
 CREATE TABLE public.user_contact (
@@ -234,7 +238,7 @@ CREATE TABLE public.event_sent_log (
 */
 CREATE OR REPLACE VIEW public.v_filtered_users AS (
 	SELECT DISTINCT u.user_id,
-		u.email,
+		LOWER(u.email) AS email,
 		u.firstname,
 		u.lastname
 	 FROM public.user u
@@ -260,7 +264,7 @@ BEGIN
 			    enum_range(enum_first(null::%s), null::%s)
 			)::text', enum_name, enum_name);
 END;
-$$
+$$;
 
 DROP TYPE IF EXISTS public.subscription_denormalized_type CASCADE;
 CREATE TYPE public.subscription_denormalized_type AS (
@@ -304,7 +308,7 @@ BEGIN
 	-- If it doesn't, 'USER_NOT_FOUND' is thrown.
 	SELECT u.user_id
 	FROM public.user u
-	WHERE u.email = in_user_email
+	WHERE u.email = LOWER(in_user_email)
 	INTO v_user_id;
 	
 	IF v_user_id IS NULL THEN
@@ -469,7 +473,7 @@ BEGIN
 	-- If it doesn't, 'USER_NOT_FOUND' is thrown.
 	SELECT u.user_id
 	FROM public.user u
-	WHERE u.email = in_user_email
+	WHERE u.email = LOWER(in_user_email)
 	INTO v_user_id;
 	
 	IF v_user_id IS NULL THEN
@@ -1296,7 +1300,7 @@ BEGIN
 	INSERT INTO public.user(email, firstname, lastname) VALUES ('alberto.schiabel@gmail.com', 'Alberto', 'Schiabel');
 	INSERT INTO public.user(email, firstname, lastname) VALUES ('federico.rispo@gmail.com', 'Federico', 'Rispo');
 	INSERT INTO public.user(email, firstname, lastname) VALUES ('enrico.trinco@gmail.com', 'Enrico', 'Trinco');
-	INSERT INTO public.user(email, firstname, lastname) VALUES ('TheAlchemist97@gmail.com', 'Niccolò', 'Vettorello');
+	INSERT INTO public.user(email, firstname, lastname) VALUES ('thealchemist97@gmail.com', 'Niccolò', 'Vettorello');
 	INSERT INTO public.user(email, firstname, lastname) VALUES ('eleonorasignor@gmail.com', 'Eleonora', 'Signor');
 	INSERT INTO public.user(email, firstname, lastname) VALUES ('elton97@gmail.com', 'Elton', 'Stafa');
 	INSERT INTO public.user(email, firstname, lastname) VALUES ('singh@gmail.com', 'Harwinder', 'Singh');
@@ -1309,13 +1313,13 @@ BEGIN
 	PERFORM public.create_user_contact('federico.rispo@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
 	PERFORM public.create_user_contact('enrico.trinco@gmail.com', 'TELEGRAM', 'enrico_dogen');
 	PERFORM public.create_user_contact('enrico.trinco@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
-	PERFORM public.create_user_contact('TheAlchemist97@gmail.com', 'TELEGRAM', '191751378');
-	PERFORM public.create_user_contact('TheAlchemist97@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
+	PERFORM public.create_user_contact('thealchemist97@gmail.com', 'TELEGRAM', '191751378');
+	PERFORM public.create_user_contact('thealchemist97@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
 
   PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, FIX, CLOSE}'::text[]);
   PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'REDMINE_TICKET_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, DOGE}'::text[]);
-	PERFORM public.create_subscription('TheAlchemist97@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{EMAIL}'::public.consumer_service[], '{DOGE, BREAK, VSCODE}'::text[]);
-	PERFORM public.create_subscription('TheAlchemist97@gmail.com', 'Butterfly', 'GITLAB_ISSUE_EDITED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{DOGE, BREAK, BUG}'::text[]);
+	PERFORM public.create_subscription('thealchemist97@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{EMAIL}'::public.consumer_service[], '{DOGE, BREAK, VSCODE}'::text[]);
+	PERFORM public.create_subscription('thealchemist97@gmail.com', 'Butterfly', 'GITLAB_ISSUE_EDITED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{DOGE, BREAK, BUG}'::text[]);
 
   -- PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_COMMIT_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, FIX, CLOSE}'::text[]);
 	-- PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{BUG}'::text[]);
@@ -1323,7 +1327,7 @@ BEGIN
 	-- PERFORM public.create_subscription('federico.rispo@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{FIX, BUG, RESOLVE}'::text[]);
 	-- PERFORM public.create_subscription('federico.rispo@gmail.com', 'Amazon', 'GITLAB_ISSUE_EDITED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{FIX, BUG, RESOLVE}'::text[]);
 	-- PERFORM public.create_subscription('enrico.trinco@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM}'::public.consumer_service[], '{FIX, STRANGE}'::text[]);
-	-- PERFORM public.create_subscription('TheAlchemist97@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{FIX, STRANGE, BUG}'::text[]);
+	-- PERFORM public.create_subscription('thealchemist97@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{FIX, STRANGE, BUG}'::text[]);
 END;
 $$;
 

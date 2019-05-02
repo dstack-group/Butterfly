@@ -83,7 +83,7 @@ export function createUsers(database: PgDatabaseConnection, userResults?: User[]
       userId: '4',
       ...commonValues,
     }, {
-      email: 'TheAlchemist97@gmail.com',
+      email: 'thealchemist97@gmail.com',
       firstname: 'Niccolò',
       lastname: 'Vettorello',
       userId: '5',
