@@ -244,6 +244,24 @@ CREATE OR REPLACE VIEW public.v_filtered_users AS (
 
 ------------------ FUNCTIONS ----------------
 
+/**
+ * `get_enum_values(regtype)` is a utility function that, given an enum type passed as string,
+ * it returns a list of its values.
+ */
+CREATE OR REPLACE FUNCTION public.get_enum_values(enum_name regtype)
+RETURNS SETOF text
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    RETURN QUERY
+        EXECUTE format('
+		    SELECT unnest(
+			    enum_range(enum_first(null::%s), null::%s)
+			)::text', enum_name, enum_name);
+END;
+$$
+
 DROP TYPE IF EXISTS public.subscription_denormalized_type CASCADE;
 CREATE TYPE public.subscription_denormalized_type AS (
 	"subscriptionId" BIGINT,
