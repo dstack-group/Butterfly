@@ -19,7 +19,7 @@ import { Server as AppServer } from '../../src/server';
 import { Server } from 'http';
 import { PgDatabaseConnection, truncData } from '../../src/database';
 import { createUser } from '../fixtures/createUsers';
-import { createUserContact } from '../fixtures/createUserContacts';
+import { createUserContact, createUserContacts } from '../fixtures/createUserContacts';
 import { ThirdPartyContactService } from '../../src/common/ThirdPartyContactService';
 import { UserContactInfo, ContactRef, CreateUserContactBody } from '../../src/modules/userContacts/entity';
 import { ParseSyntaxError } from '../../src/errors';
@@ -74,11 +74,11 @@ describe(`GET /user-contacts/:userEmail`, () => {
       userEmail,
     };
 
-    const createUserContactPromises = [
+    const { transaction: createUserContactsTransaction } = createUserContacts(databaseConnection, [
       createUserContactTelegramParams,
       createUserContactEmailParams,
       createUserContactSlackParams,
-    ].map(params => createUserContact(databaseConnection, params).transaction);
+    ]);
 
     const result: UserContactInfo = {
       [ThirdPartyContactService.EMAIL]: createUserContactEmailParams.contactRef,
@@ -86,9 +86,7 @@ describe(`GET /user-contacts/:userEmail`, () => {
       [ThirdPartyContactService.TELEGRAM]: createUserContactTelegramParams.contactRef,
     };
 
-    const createUserContactsTransaction = Promise.all(createUserContactPromises);
-
-    createUserContactsTransaction
+    createUserContactsTransaction()
       .then(() => {
         supertest(server)
           .get(endpoint)
@@ -171,7 +169,7 @@ describe(`POST /user-contacts/:contactService`, () => {
     };
 
     createUserTransaction
-      .then(async () => await createUserContactTransaction)
+      .then(async () => await createUserContactTransaction())
       .then(() => {
         supertest(server)
           .post(endpoint)
@@ -293,7 +291,7 @@ describe(`PUT /user-contacts/:userEmail/:contactService`, () => {
     };
 
     createUserTransaction
-      .then(async () => await createUserContactTransaction)
+      .then(async () => await createUserContactTransaction())
       .then(() => {
         supertest(server)
           .put(endpoint)
@@ -341,7 +339,7 @@ describe(`DELETE /user-contacts/:userEmail/:contactService`, () => {
     const endpoint = `/user-contacts/${createUserContactParams.userEmail}/${createUserContactParams.contactService}`;
 
     createUserTransaction
-      .then(async () => await createUserContactTransaction)
+      .then(async () => await createUserContactTransaction())
       .then(() => {
         supertest(server)
           .delete(endpoint)

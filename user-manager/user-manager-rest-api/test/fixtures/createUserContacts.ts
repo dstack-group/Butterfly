@@ -27,7 +27,7 @@ export const createUserContactsQuery = query;
 
 export interface CreateUserContactResult {
   result: UserContact;
-  transaction: Promise<void>;
+  transaction: () => Promise<void>;
 }
 
 export function createUserContact(database: PgDatabaseConnection, params: CreateUserContact): CreateUserContactResult {
@@ -42,63 +42,25 @@ export function createUserContact(database: PgDatabaseConnection, params: Create
 
   return {
     result: userContactResult,
-    transaction: database.transaction(getUserContactQuery),
+    transaction: () => database.transaction(getUserContactQuery),
   };
 }
 
-/*
-export function createUserContacts(database: PgDatabaseConnection): Promise<void> {
-  const getUserContactQueries: GetQueries<unknown> = t => {
-    const createUserContactQueries: Array<Promise<Array<unknown>>> = [];
-    createUserContactQueries.push(t.any(query, {
-      contactRef: 'jkomyno',
-      contactType: ThirdPartyContactService.TELEGRAM,
-      userId: 1,
-    }));
-    createUserContactQueries.push(t.any(query, {
-      contactRef: 'jkomyno',
-      contactType: ThirdPartyContactService.SLACK,
-      userId: 1,
-    }));
-    createUserContactQueries.push(t.any(query, {
-      contactRef: 'alberto.schiabel@gmail.com',
-      contactType: ThirdPartyContactService.EMAIL,
-      userId: 1,
-    }));
-    createUserContactQueries.push(t.any(query, {
-      contactRef: 'frispo',
-      contactType: ThirdPartyContactService.TELEGRAM,
-      userId: 2,
-    }));
-    createUserContactQueries.push(t.any(query, {
-      contactRef: 'frispo@gmail.com',
-      contactType: ThirdPartyContactService.EMAIL,
-      userId: 2,
-    }));
-    createUserContactQueries.push(t.any(query, {
-      contactRef: 'enrico_dogen',
-      contactType: ThirdPartyContactService.TELEGRAM,
-      userId: 3,
-    }));
-    createUserContactQueries.push(t.any(query, {
-      contactRef: 'enrico_dogen',
-      contactType: ThirdPartyContactService.TELEGRAM,
-      userId: 3,
-    }));
-    createUserContactQueries.push(t.any(query, {
-      contactRef: 'eleonora_signor',
-      contactType: ThirdPartyContactService.TELEGRAM,
-      userId: 4,
-    }));
-    createUserContactQueries.push(t.any(query, {
-      contactRef: 'eleonora_signor@gmail.com',
-      contactType: ThirdPartyContactService.EMAIL,
-      userId: 4,
-    }));
+export interface CreateUserContactsResult {
+  results: UserContact[];
+  transaction: () => Promise<void>;
+}
 
-    return createUserContactQueries;
+export function createUserContacts(
+  database: PgDatabaseConnection,
+  userContacts: CreateUserContact[],
+): CreateUserContactsResult {
+  const getUserContactQueries: GetQueries<UserContact> = t => {
+    return userContacts.map(user => t.any(query, user));
   };
 
-  return database.transaction(getUserContactQueries);
+  return {
+    results: userContacts,
+    transaction: () => database.transaction(getUserContactQueries),
+  };
 }
-*/
