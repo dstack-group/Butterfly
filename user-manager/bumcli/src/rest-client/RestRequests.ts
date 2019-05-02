@@ -18,7 +18,7 @@ export enum HttpMethod {
 export abstract class RestRequests {
 
   private server: ServerConfig;
-  private headers;
+  private headers: {[key: string]: string};
 
   constructor(serverConfig: ServerConfig) {
 
@@ -34,7 +34,7 @@ export abstract class RestRequests {
     return `${this.server.hostname}:${this.server.port}`;
   }
 
-  submitRequest<T>(endpoint: string, method: HttpMethod, body?: object): Promise<T> {
+  submitRequest<T>(path: string, method: HttpMethod, body?: object): Promise<T> {
 
     // Create options parameters necessary for the request
     const options = {
@@ -46,7 +46,7 @@ export abstract class RestRequests {
 
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await fetch(`${this.getURL()}/${endpoint}`, options);
+        const response = await fetch(`${this.getURL()}/${path}`, options);
         const content = await response.json();
 
         /*
