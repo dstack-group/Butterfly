@@ -4,15 +4,15 @@ import { Validator } from '../../utils/Validator';
 import { Config } from '../../database/LocalDb';
 import { UserInfo } from '../../database/UserInfo';
 
-export default class User extends BaseCommand {
+export class User extends BaseCommand {
 
   static description = `Set all the user informations or only a subset of them.
   Remember that every time that config:user is invoked all the old user informations will be overwritten`;
 
   static flags = {
+    ...BaseCommand.flags,
     email: flags.string({char: 'e', description: 'Set a default email'}),
     firstname: flags.string({char: 'f', description: 'Set your firstname'}),
-    help: flags.help({char: 'h'}),
     lastname: flags.string({char: 'l', description: 'Set your lastname'}),
   };
 
@@ -44,6 +44,6 @@ export default class User extends BaseCommand {
     }
 
     this.db.setValues(Config.User, userInfo);
-    this.log(this.showJSONFormat(this.db.getValues(Config.User)));
+    this.print(this.db.getValues(Config.User), flagss.json);
   }
 }

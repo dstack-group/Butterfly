@@ -4,13 +4,13 @@ import { Validator } from '../../utils/Validator';
 import { Config } from '../../database/LocalDb';
 import { ServerConfig } from '../../database/ServerConfig';
 
-export default class Server extends BaseCommand {
+export class Server extends BaseCommand {
 
   static description = `Set all the server settings or only a subset of them.
   Remember that every time that config:server is invoked all the old server settings will be overwritten`;
 
   static flags = {
-    help: flags.help({char: 'h'}),
+    ...BaseCommand.flags,
 
     hostname: flags.string({
       char: 'n',
@@ -53,6 +53,6 @@ export default class Server extends BaseCommand {
     }
 
     this.db.setValues(Config.Server, serverConfig);
-    this.log(this.showJSONFormat(this.db.getValues(Config.Server)));
+    this.print(this.db.getValues(Config.Server), flagss.json);
   }
 }
