@@ -64,8 +64,8 @@ export interface CreateProjectsResult {
   transaction: Promise<void>;
 }
 
-export function createProjects(database: PgDatabaseConnection): CreateProjectsResult {
-  const projectResults: Project[] = [
+export function createProjects(database: PgDatabaseConnection, projectResults?: Project[]): CreateProjectsResult {
+  const defaultProjectResults: Project[] = [
     {
       projectId: '1',
       projectName: 'Butterfly',
@@ -95,15 +95,17 @@ export function createProjects(database: PgDatabaseConnection): CreateProjectsRe
         GITLAB: 'gitlab.twitter.com/twitter/twitter.git',
         SONARQUBE: 'sonarqube.twitter.com/twitter/twitter.git',
       },
-    }
+    },
   ];
 
+  const actualProjectResults = projectResults || defaultProjectResults;
+
   const getProjectQueries: GetQueries<Project> = t => {
-    return projectResults.map(project => t.any(query, project));
+    return actualProjectResults.map(project => t.any(query, project));
   };
 
   return {
-    results: projectResults,
+    results: actualProjectResults,
     transaction: database.transaction(getProjectQueries),
   };
 }

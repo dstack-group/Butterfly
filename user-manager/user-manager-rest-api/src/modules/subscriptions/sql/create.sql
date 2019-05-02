@@ -1,5 +1,8 @@
+/**
+ * Creates a new subscription identified by the given user email, project name, and event type.
+ */
 SELECT *
-FROM ${schema~}.create_subscription(
+FROM public.create_subscription(
   ${userEmail},
   ${projectName},
   ${eventType},

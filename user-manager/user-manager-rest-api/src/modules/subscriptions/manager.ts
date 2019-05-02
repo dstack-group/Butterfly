@@ -13,17 +13,11 @@
  * @description:
  */
 
-import { Subscription, CreateSubscription } from './entity';
 import { SubscriptionRepository } from './repository';
+import { AbstractCRUDManager } from '../../common/AbstractCRUDManager';
 
-export class SubscriptionManager {
-  private repository: SubscriptionRepository;
-
+export class SubscriptionManager extends AbstractCRUDManager<any, SubscriptionRepository> {
   constructor(repository: SubscriptionRepository) {
-    this.repository = repository;
-  }
-
-  async createSubscription(params: CreateSubscription): Promise<Subscription> {
-    return this.repository.createSubscription(params);
+    super(repository);
   }
 }

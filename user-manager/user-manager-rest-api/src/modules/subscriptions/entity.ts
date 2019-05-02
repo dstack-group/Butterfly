@@ -17,21 +17,37 @@ import { UserPriority } from '../../common/UserPriority';
 import { ServiceEventType } from '../../common/Event';
 import { ThirdPartyContactService } from '../../common/ThirdPartyContactService';
 
-export interface CreateSubscription {
-  contactServices: ThirdPartyContactService[];
-  eventType: ServiceEventType;
-  keywords: string[];
-  projectName: string;
+export interface UserEmail {
   userEmail: string;
+}
+
+export interface SubscriptionParams extends UserEmail {
+  eventType: ServiceEventType;
+  projectName: string;
+}
+
+export interface CreateSubscriptionBody extends SubscriptionParams {
+  contactServices: ThirdPartyContactService[];
+  keywords: string[];
   userPriority: UserPriority;
+}
+
+export interface UpdateSubscriptionBody {
+  contactServices?: ThirdPartyContactService[];
+  keywords?: string[];
+  userPriority?: UserPriority;
+}
+
+export interface UpdateSubscription extends SubscriptionParams, UpdateSubscriptionBody {
+
 }
 
 export interface Subscription {
   eventType: ServiceEventType;
   keywordList: string[]; // each keyword associated with this subscription
   projectName: string;
-  subscriptionId: string;
-  userContactMap: {
+  subscriptionId?: string;
+  contacts: {
     [key in ThirdPartyContactService]?: string;
   };
   userEmail: string;

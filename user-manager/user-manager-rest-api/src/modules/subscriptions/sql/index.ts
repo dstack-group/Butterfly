@@ -20,6 +20,10 @@ const dirName = __dirname;
 
 const queryProvider: SubscriptionQueryProvider = {
   create: sql('./create.sql'),
+  delete: sql('./delete.sql'),
+  find: sql('./find.sql'),
+  findOne: sql('./findOne.sql'),
+  update: sql('./update.sql'),
 };
 
 export default queryProvider;

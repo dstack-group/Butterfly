@@ -13,21 +13,13 @@
  * @description:
  */
 
-import { Database } from '../../database';
-import { SubscriptionQueryProvider } from './SubscriptionQueryProvider';
 import sqlProvider from './sql';
-import { CreateSubscription, Subscription } from './entity';
+import { Database } from '../../database';
+import { AbstractCRUDRepository } from '../../common/repository/AbstractCRUDRepository';
+import { SubscriptionQueryProvider } from './SubscriptionQueryProvider';
 
-export class SubscriptionRepository {
-  private database: Database;
-  private sqlProvider: SubscriptionQueryProvider;
-
+export class SubscriptionRepository extends AbstractCRUDRepository<SubscriptionQueryProvider> {
   constructor(database: Database) {
-    this.database = database;
-    this.sqlProvider = sqlProvider;
-  }
-
-  createSubscription(params: CreateSubscription): Promise<Subscription> {
-    return this.database.one(this.sqlProvider.create, params) as Promise<Subscription>;
+    super(database, sqlProvider);
   }
 }

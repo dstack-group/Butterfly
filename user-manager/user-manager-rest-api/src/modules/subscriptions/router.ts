@@ -18,7 +18,6 @@ import { SubscriptionManager } from './manager';
 import { SubscriptionRepository } from './repository';
 import { RoutesInjectionParams } from '../../routes/RoutesInjectionParams';
 import * as middlewares from '../../middlewares';
-// import * as validator from './validator';
 import { SubscriptionController } from './controller';
 
 export const getSubscriptionRouter = (routesParams: RoutesInjectionParams) => {
@@ -29,9 +28,18 @@ export const getSubscriptionRouter = (routesParams: RoutesInjectionParams) => {
     new SubscriptionController(routesParams.routeContextReplierFactory, subscriptionManager);
 
   subscriptionRouter
+    .get('/users/:userEmail',
+      subscriptionController.getSubscriptionsByUserEmail())
+    .get('/users/:userEmail/projects/:projectName/event-types/:eventType',
+      subscriptionController.getSubscription())
     .post('/',
       middlewares.bodyParser(),
-      subscriptionController.createSubscription());
+      subscriptionController.createSubscription())
+    .patch('/users/:userEmail/projects/:projectName/event-types/:eventType',
+      middlewares.bodyParser(),
+      subscriptionController.updateSubscription())
+    .delete('/users/:userEmail/projects/:projectName/event-types/:eventType',
+      subscriptionController.deleteSubscription());
 
   return subscriptionRouter;
 };

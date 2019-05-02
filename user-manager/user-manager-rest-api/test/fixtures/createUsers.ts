@@ -56,8 +56,8 @@ export interface CreateUsersResult {
   transaction: Promise<void>;
 }
 
-export function createUsers(database: PgDatabaseConnection): CreateUsersResult {
-  const userResults: User[] = [
+export function createUsers(database: PgDatabaseConnection, userResults?: User[]): CreateUsersResult {
+  const defaultUserResults: User[] = [
     {
       email: 'alberto.schiabel@gmail.com',
       firstname: 'Alberto',
@@ -103,12 +103,14 @@ export function createUsers(database: PgDatabaseConnection): CreateUsersResult {
     },
   ];
 
+  const actualUserResults = userResults || defaultUserResults;
+
   const getUserQueries: GetQueries<User> = t => {
-    return userResults.map(user => t.any(query, user));
+    return actualUserResults.map(user => t.any(query, user));
   };
 
   return {
-    results: userResults,
+    results: actualUserResults,
     transaction: database.transaction(getUserQueries),
   };
 }

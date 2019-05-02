@@ -14,10 +14,13 @@
  */
 
 import { PgDatabaseConnection, GetQueries } from '../../src/database';
-import { CreateSubscription, Subscription } from '../../src/modules/subscriptions/entity';
-import { ServiceEventType } from '../../src/common/Event';
-import { UserPriority } from '../../src/common/UserPriority';
-import { ThirdPartyContactService } from '../../src/common/ThirdPartyContactService';
+import { CreateSubscriptionBody, Subscription } from '../../src/modules/subscriptions/entity';
+import { User } from '../../src/modules/users/entity';
+import { Project } from '../../src/modules/projects/entity';
+import { createUsers } from './createUsers';
+import { createProjects } from './createProjects';
+import { createUserContacts } from './createUserContacts';
+import { UserContact } from '../../src/modules/userContacts/entity';
 
 const query = `SELECT *
                FROM public.create_subscription(
@@ -31,43 +34,45 @@ const query = `SELECT *
 
 export const createSubscriptionQuery = query;
 
-export interface CreateSubscriptionResult {
-  result: Subscription;
-  transaction: Promise<void>;
+export interface CreateSubscriptionParams {
+  createSubscriptionBodies: CreateSubscriptionBody[];
+  expectedSubscriptionResults?: Subscription[];
+  projects: Project[];
+  userContacts: UserContact[];
+  users: User[];
 }
 
-export function createSubscription(database: PgDatabaseConnection): CreateSubscriptionResult {
-  const subscriptionParams: CreateSubscription = {
-    userEmail: 'federico.rispo@gmail.com',
-    projectName: 'Amazon',
-    eventType: ServiceEventType.GITLAB_ISSUE_CREATED,
-    userPriority: UserPriority.LOW,
-    contactServices: [
-      ThirdPartyContactService.TELEGRAM,
-      ThirdPartyContactService.EMAIL,
-    ],
-    keywords: ['FIX', 'BUG', 'RESOLVE'],
-  };
+export interface CreateSubscriptionsResult {
+  results?: Subscription[];
+  transaction: () => Promise<void>;
+}
 
-  const { contactServices, keywords, ...other } = subscriptionParams;
+export async function createSubscriptionsWithInitialization(
+  database: PgDatabaseConnection,
+  params: CreateSubscriptionParams,
+): Promise<CreateSubscriptionsResult> {
+  const {
+    projects,
+    users,
+    userContacts,
+    createSubscriptionBodies,
+    expectedSubscriptionResults,
+  } = params;
 
-  const subscriptionResult: Subscription = {
-    ...other,
-    keywordList: keywords,
-    subscriptionId: '1',
-    userContactMap: {
-      [ThirdPartyContactService.TELEGRAM]: 'frispo',
-      [ThirdPartyContactService.EMAIL]: 'dstackgroup@gmail.com',
-    },
-  };
+  const { transaction: createUserTransaction } = createUsers(database, users);
+  const { transaction: createProjectTransaction } = createProjects(database, projects);
+  const { transaction: createUserContactsTransaction } = createUserContacts(database, userContacts);
 
-  const getSubscriptionQuery: GetQueries<Subscription> = t => {
-    const subscriptionQuery = t.any(query, subscriptionParams);
-    return [subscriptionQuery];
+  await createUserTransaction;
+  await createProjectTransaction;
+  await createUserContactsTransaction();
+
+  const getSubscriptionQueries: GetQueries<Subscription> = t => {
+    return createSubscriptionBodies.map(createSubscription => t.any(query, createSubscription));
   };
 
   return {
-    result: subscriptionResult,
-    transaction: database.transaction(getSubscriptionQuery),
+    results: expectedSubscriptionResults,
+    transaction: () => database.transaction(getSubscriptionQueries),
   };
 }

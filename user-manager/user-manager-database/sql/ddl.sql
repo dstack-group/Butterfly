@@ -251,7 +251,7 @@ CREATE TYPE public.subscription_denormalized_type AS (
 	"projectName" text,
 	"eventType" public.service_event_type,
 	"userPriority" public.user_priority,
-	"userContactMap" jsonb, -- each user contact associated with this subscription 
+	"contacts" jsonb, -- each user contact associated with this subscription 
 	"keywordList" text[] -- each keyword associated with this subscription
 );
 
@@ -312,8 +312,7 @@ BEGIN
 		v_user_contact_id_list = v_user_contact_id_list || v_curr_user_contact_id;
 		v_curr_user_contact_id = NULL; -- resets v_curr_user_contact_id
 	END LOOP;
-	-- TODO: use v_user_contact_id_list in a FOR loop to write into public.x_subscription_user_contact
-	
+
 	-- Check that the project associated with the project name `in_project_name` exists.
 	-- If it doesn't, 'PROJECT_NOT_FOUND' is thrown.
 	SELECT p.project_id
@@ -391,12 +390,9 @@ BEGIN
 				p.project_name AS "projectName",
 				i.event_type AS "eventType",
 				i.user_priority AS "userPriority",
-				json_agg(
-						json_build_object(
-								'contactType', uc.contact_type,
-								'contactRef', uc.contact_ref
-						)
-				) AS "userContactMap"
+				jsonb_object_agg(
+					uc.contact_type, uc.contact_ref
+				) AS "contacts"
 		FROM INS i
 		JOIN public.user_contact uc
 				ON uc.user_contact_id = ANY(v_user_contact_id_list)
@@ -407,8 +403,16 @@ BEGIN
 		GROUP BY 1, 2, 3, 4, 5
 	)
 	SELECT s.*,
-			in_keyword_name_list AS "keywordList"
+			sk.keyword_list AS "keywordList"
 	FROM SEL s
+	-- sorts keyword_list
+	JOIN LATERAL (
+		SELECT array_agg(x) AS keyword_list
+		FROM (
+			SELECT unnest(in_keyword_name_list) AS x
+			ORDER BY x ASC
+		) AS _
+	) sk ON true
 	INTO v_result;
 
 	FOREACH v_curr_keyword_id IN ARRAY v_keyword_id_list
@@ -423,6 +427,449 @@ BEGIN
 		VALUES (v_result."subscriptionId", v_curr_user_contact_id);
 	END LOOP;
 	
+	RETURN v_result;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.find_subscription(
+	in_user_email text,
+	in_project_name text,
+	in_event_type_key public.service_event_type -- GITLAB_COMMIT_CREATED, GITLAB_ISSUE_CREATED, ...
+)
+RETURNS SETOF public.subscription_denormalized_type
+LANGUAGE plpgsql
+COST 1
+VOLATILE
+AS $$
+#variable_conflict use_variable
+DECLARE v_user_id BIGINT;
+DECLARE v_project_id BIGINT;
+DECLARE v_event_type_id BIGINT;
+DECLARE v_result public.subscription_denormalized_type;
+BEGIN
+	-- Check that the user associated with the user email `in_user_email` exists.
+	-- If it doesn't, 'USER_NOT_FOUND' is thrown.
+	SELECT u.user_id
+	FROM public.user u
+	WHERE u.email = in_user_email
+	INTO v_user_id;
+	
+	IF v_user_id IS NULL THEN
+		RAISE EXCEPTION 'USER_NOT_FOUND';
+	END IF;
+
+	-- Check that the project associated with the project name `in_project_name` exists.
+	-- If it doesn't, 'PROJECT_NOT_FOUND' is thrown.
+	SELECT p.project_id
+	FROM public.project p
+	WHERE p.project_name = in_project_name
+	INTO v_project_id;
+	
+	IF v_project_id IS NULL THEN
+		RAISE EXCEPTION 'PROJECT_NOT_FOUND';
+	END IF;
+
+	-- Check that the event type identified by `in_event_type_key` exists.
+	-- If it doesn't, 'EVENT_TYPE_NOT_FOUND' is thrown.
+	SELECT e.event_type_id
+	FROM public.event_type e
+	WHERE e.event_type_key = in_event_type_key
+	INTO v_event_type_id;
+	
+	IF v_event_type_id IS NULL THEN
+		RAISE EXCEPTION 'EVENT_TYPE_NOT_FOUND';
+	END IF;
+	
+	RETURN QUERY
+	SELECT s.subscription_id AS "subscriptionId",
+			u.email::text AS "userEmail",
+			p.project_name::text AS "projectName",
+			et.event_type_key AS "eventType",
+			s.user_priority AS "userPriority",
+			suc.contacts,
+			sk.keyword_list::text[] AS "keywordList"
+	FROM public.subscription s
+	JOIN public.user u
+			ON u.user_id = s.user_id
+	JOIN public.project p
+			ON p.project_id = s.project_id
+	JOIN public.x_service_event_type xse
+		ON xse.x_service_event_type_id = s.x_service_event_type_id
+	JOIN public.event_type et
+		ON et.event_type_id = xse.event_type_id
+	JOIN LATERAL (
+		-- sorts keyword_list
+		SELECT array_agg(k.keyword_name ORDER BY k.keyword_name ASC)::text[] AS keyword_list
+		FROM public.x_subscription_keyword xsk
+		JOIN public.keyword k
+			ON k.keyword_id = xsk.keyword_id
+		WHERE xsk.subscription_id = s.subscription_id
+	) sk ON true
+	JOIN LATERAL (
+		SELECT jsonb_object_agg(
+			uc.contact_type, uc.contact_ref
+		) AS contacts
+		FROM public.x_subscription_user_contact xsuc
+		JOIN public.user_contact uc
+			ON uc.user_contact_id = xsuc.user_contact_id
+		WHERE xsuc.subscription_id = s.subscription_id
+	) suc ON true
+	WHERE u.user_id = v_user_id
+		AND p.project_id = v_project_id
+		AND et.event_type_key = in_event_type_key;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.find_subscriptions_by_email(in_user_email text)
+RETURNS SETOF public.subscription_denormalized_type
+LANGUAGE plpgsql
+COST 100
+VOLATILE
+AS $$
+#variable_conflict use_variable
+DECLARE v_user_id BIGINT;
+BEGIN
+	-- Check that the user associated with the user email `in_user_email` exists.
+	-- If it doesn't, 'USER_NOT_FOUND' is thrown.
+	SELECT u.user_id
+	FROM public.user u
+	WHERE u.email = in_user_email
+	INTO v_user_id;
+	
+	IF v_user_id IS NULL THEN
+		RAISE EXCEPTION 'USER_NOT_FOUND';
+	END IF;
+	
+	RETURN QUERY
+	SELECT s.subscription_id AS "subscriptionId",
+			u.email::text AS "userEmail",
+			p.project_name::text AS "projectName",
+			et.event_type_key AS "eventType",
+			s.user_priority AS "userPriority",
+			suc.contacts AS "contacts",
+			sk.keyword_list::text[] AS "keywordList"
+	FROM public.subscription s
+	JOIN public.user u
+			ON u.user_id = s.user_id
+	JOIN public.project p
+			ON p.project_id = s.project_id
+	JOIN public.x_service_event_type xse
+		ON xse.x_service_event_type_id = s.x_service_event_type_id
+	JOIN public.event_type et
+		ON et.event_type_id = xse.event_type_id
+	JOIN LATERAL (
+		-- sorts keyword_list
+		SELECT array_agg(k.keyword_name ORDER BY k.keyword_name ASC) AS keyword_list
+		FROM public.x_subscription_keyword xsk
+		JOIN public.keyword k
+			ON k.keyword_id = xsk.keyword_id
+		WHERE xsk.subscription_id = s.subscription_id
+	) sk ON true
+	JOIN LATERAL (
+		SELECT jsonb_object_agg(
+			uc.contact_type, uc.contact_ref
+		) AS contacts
+		FROM public.x_subscription_user_contact xsuc
+		JOIN public.user_contact uc
+			ON uc.user_contact_id = xsuc.user_contact_id
+		WHERE xsuc.subscription_id = s.subscription_id
+	) suc ON true
+	WHERE u.user_id = v_user_id;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.update_subscription(
+	in_user_email text,
+	in_project_name text,
+	in_event_type_key public.service_event_type, -- GITLAB_COMMIT_CREATED, GITLAB_ISSUE_CREATED, ...
+	in_user_priority public.user_priority DEFAULT NULL,
+	in_contact_type_list public.consumer_service[] DEFAULT NULL, -- TELEGRAM, EMAIL, SLACK
+	in_keyword_name_list text[] DEFAULT NULL
+)
+RETURNS public.subscription_denormalized_type
+LANGUAGE plpgsql
+COST 100
+VOLATILE 
+AS $$
+#variable_conflict use_variable
+DECLARE v_user_id BIGINT;
+DECLARE v_curr_contact_type public.consumer_service;
+DECLARE v_user_contact_id_list BIGINT[];
+DECLARE v_curr_user_contact_id BIGINT;
+DECLARE v_project_id BIGINT;
+DECLARE v_event_type_id BIGINT;
+DECLARE v_x_service_event_type_id BIGINT;
+DECLARE v_subscription_id BIGINT;
+DECLARE v_result public.subscription_denormalized_type;
+DECLARE v_curr_keyword_name text;
+DECLARE v_curr_keyword_name_upper text;
+DECLARE v_curr_keyword_id BIGINT;
+DECLARE v_keyword_id_list BIGINT[];
+BEGIN
+	-- Check that the user associated with the user email `in_user_email` exists.
+	-- If it doesn't, 'USER_NOT_FOUND' is thrown.
+	SELECT u.user_id
+	FROM public.user u
+	WHERE u.email = in_user_email
+	INTO v_user_id;
+	
+	IF v_user_id IS NULL THEN
+		RAISE EXCEPTION 'USER_NOT_FOUND';
+	END IF;
+	
+	-- Check that the project associated with the project name `in_project_name` exists.
+	-- If it doesn't, 'PROJECT_NOT_FOUND' is thrown.
+	SELECT p.project_id
+	FROM public.project p
+	WHERE p.project_name = in_project_name
+	INTO v_project_id;
+	
+	IF v_project_id IS NULL THEN
+		RAISE EXCEPTION 'PROJECT_NOT_FOUND';
+	END IF;
+	
+	-- Check that the event type identified by `in_event_type_key` exists.
+	-- If it doesn't, 'EVENT_TYPE_NOT_FOUND' is thrown.
+	SELECT e.event_type_id
+	FROM public.event_type e
+	WHERE e.event_type_key = in_event_type_key
+	INTO v_event_type_id;
+	
+	IF v_event_type_id IS NULL THEN
+		RAISE EXCEPTION 'EVENT_TYPE_NOT_FOUND';
+	END IF;
+	
+	SELECT xse.x_service_event_type_id
+	FROM public.x_service_event_type xse
+	WHERE xse.event_type_id = v_event_type_id
+	INTO v_x_service_event_type_id;
+	
+	-- Sets v_subscription_id to the current subscription id
+	SELECT subscription_id
+	FROM public.subscription
+	WHERE user_id = v_user_id
+		AND project_id = v_project_id
+		AND x_service_event_type_id = v_x_service_event_type_id
+	INTO v_subscription_id;
+
+	-- Populates v_user_contact_id_list with the list of user contact ids for the current subscription
+	IF in_contact_type_list IS NULL THEN
+		-- in_contact_type_list is null, so v_user_contact_id_list must be populated taking into
+		-- consideration the already existing user contacts for the current subscription.
+		-- Populates v_user_contact_id_list with the ids of the previous user contacts.
+		SELECT array_agg(user_contact_id)
+		FROM public.x_subscription_user_contact
+		WHERE subscription_id = v_subscription_id
+		INTO v_user_contact_id_list;
+	ELSE
+		v_user_contact_id_list = array[]::BIGINT[];
+		-- Check that every contact type in the list is associated with the user
+		-- identified by `v_user_id`. If it doesn't, 'CONTACT_NOT_FOUND' is thrown.
+		FOREACH v_curr_contact_type IN ARRAY in_contact_type_list
+		LOOP
+			SELECT xuc.user_contact_id
+			FROM public.user_contact xuc
+			WHERE xuc.user_id = v_user_id
+				AND xuc.contact_type = v_curr_contact_type
+			INTO v_curr_user_contact_id;
+
+			IF v_curr_user_contact_id IS NULL THEN
+				RAISE EXCEPTION 'CONTACT_NOT_FOUND';
+			END IF;
+
+			-- pushes `v_curr_user_contact_id` into the array `v_user_contact_id_list`
+			v_user_contact_id_list = v_user_contact_id_list || v_curr_user_contact_id;
+			v_curr_user_contact_id = NULL; -- resets v_curr_user_contact_id
+		END LOOP;
+
+		-- The previously existing user contact associations with the current subscription should be overridden.
+		DELETE
+		FROM public.x_subscription_user_contact
+		WHERE subscription_id = v_subscription_id;
+
+		-- Creates the new user contact associations.
+		FOREACH v_curr_user_contact_id IN ARRAY v_user_contact_id_list
+		LOOP
+			INSERT INTO public.x_subscription_user_contact (subscription_id, user_contact_id)
+			VALUES (v_subscription_id, v_curr_user_contact_id);
+		END LOOP;
+	END IF;
+
+	RAISE LOG 'user_contact_id_list: %', v_user_contact_id_list;
+	RAISE LOG 'project_id: %', v_project_id;
+	RAISE LOG 'event_type_id: %', v_event_type_id;
+	RAISE LOG 'x_service_event_type_id: %', v_x_service_event_type_id;
+	
+	IF in_keyword_name_list IS NULL THEN
+		-- Populates in_keyword_name_list with the ids of the previous keywords for the current subscription.
+		SELECT array_agg(k.keyword_name ORDER BY k.keyword_name)
+		FROM public.x_subscription_keyword xk
+		JOIN public.keyword k
+			ON k.keyword_id = xk.keyword_id
+		WHERE xk.subscription_id = v_subscription_id
+		INTO in_keyword_name_list;
+	ELSE
+		v_keyword_id_list = array[]::text[];
+		-- Check that every contact type in the list is associated with the user
+		-- identified by `v_user_id`. If it doesn't, 'CONTACT_NOT_FOUND' is thrown.
+
+		-- The following block ensures that for keywords that already exists, the previous ids are used,
+		-- and for keywords that didn't, a new record in `public.keyword` is created.
+		FOREACH v_curr_keyword_name IN ARRAY in_keyword_name_list
+		LOOP
+			v_curr_keyword_name_upper = UPPER(v_curr_keyword_name);
+
+			SELECT k.keyword_id
+			FROM public.keyword k
+			WHERE k.keyword_name = v_curr_keyword_name_upper
+			INTO v_curr_keyword_id;
+
+			IF v_curr_keyword_id IS NULL THEN
+				INSERT INTO public.keyword (keyword_id, keyword_name)
+				VALUES (DEFAULT, v_curr_keyword_name_upper)
+				RETURNING keyword_id INTO v_curr_keyword_id;
+			END IF;
+
+			-- pushes `v_curr_keyword_id` into the array `v_keyword_id_list`
+			v_keyword_id_list = v_keyword_id_list || v_curr_keyword_id;
+			v_curr_keyword_id = NULL; -- resets v_curr_keyword_id
+		END LOOP;
+
+		RAISE LOG 'keyword_id_list: %', v_keyword_id_list;
+
+		-- The previously existing keyword associations with the current subscription should be overridden.
+		DELETE
+		FROM public.x_subscription_keyword
+		WHERE subscription_id = v_subscription_id;
+
+		-- Creates the new keyword associations.
+		FOREACH v_curr_keyword_id IN ARRAY v_keyword_id_list
+		LOOP
+			INSERT INTO public.x_subscription_keyword (subscription_id, keyword_id)
+			VALUES (v_subscription_id, v_curr_keyword_id);
+		END LOOP;
+	END IF;
+
+	WITH PATCH_PARAMS AS (
+		SELECT v_subscription_id AS subscription_id,
+			v_user_id AS user_id,
+			v_project_id AS project_id,
+			v_x_service_event_type_id AS x_service_event_type_id,
+			in_user_priority AS user_priority -- NULLABLE
+	),
+	UPD AS (
+		UPDATE public.subscription AS s
+		SET user_priority = COALESCE(p.user_priority, s.user_priority)
+		FROM PATCH_PARAMS p
+    WHERE s.subscription_id = p.subscription_id
+		RETURNING s.subscription_id,
+			s.user_id,
+			s.project_id,
+			in_event_type_key AS event_type,
+			s.user_priority
+	),
+	GROUP_UPD AS (
+		SELECT s.subscription_id AS "subscriptionId",
+				u.email AS "userEmail",
+				p.project_name AS "projectName",
+				s.event_type AS "eventType",
+				s.user_priority AS "userPriority",
+				jsonb_object_agg(
+					uc.contact_type, uc.contact_ref
+				) AS "contacts"
+		FROM UPD s
+		JOIN public.user_contact uc
+				ON uc.user_contact_id = ANY(v_user_contact_id_list)
+		JOIN public.user u
+				ON u.user_id = s.user_id
+		JOIN public.project p
+				ON p.project_id = s.project_id
+		GROUP BY 1, 2, 3, 4, 5
+	)
+	SELECT s.*,
+		sk.keyword_list AS "keywordList"
+	FROM GROUP_UPD s
+	-- sorts keyword_list
+	JOIN LATERAL (
+		SELECT array_agg(x) AS keyword_list
+		FROM (
+			SELECT unnest(in_keyword_name_list) AS x
+			ORDER BY x ASC
+		) AS _
+	) sk ON true
+	INTO v_result;
+	
+	RETURN v_result;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.delete_subscription(
+	in_user_email text,
+	in_project_name text,
+	in_event_type_key public.service_event_type -- GITLAB_COMMIT_CREATED, GITLAB_ISSUE_CREATED, ...
+)
+RETURNS INT
+LANGUAGE plpgsql
+COST 1
+VOLATILE
+AS $$
+#variable_conflict use_variable
+DECLARE v_user_id BIGINT;
+DECLARE v_project_id BIGINT;
+DECLARE v_event_type_id BIGINT;
+DECLARE v_x_service_event_type_id BIGINT;
+DECLARE v_result INT;
+BEGIN
+	-- Check that the user associated with the user email `in_user_email` exists.
+	-- If it doesn't, 'USER_NOT_FOUND' is thrown.
+	SELECT u.user_id
+	FROM public.user u
+	WHERE u.email = in_user_email
+	INTO v_user_id;
+	
+	IF v_user_id IS NULL THEN
+		RAISE EXCEPTION 'USER_NOT_FOUND';
+	END IF;
+
+	-- Check that the project associated with the project name `in_project_name` exists.
+	-- If it doesn't, 'PROJECT_NOT_FOUND' is thrown.
+	SELECT p.project_id
+	FROM public.project p
+	WHERE p.project_name = in_project_name
+	INTO v_project_id;
+	
+	IF v_project_id IS NULL THEN
+		RAISE EXCEPTION 'PROJECT_NOT_FOUND';
+	END IF;
+
+	-- Check that the event type identified by `in_event_type_key` exists.
+	-- If it doesn't, 'EVENT_TYPE_NOT_FOUND' is thrown.
+	SELECT e.event_type_id
+	FROM public.event_type e
+	WHERE e.event_type_key = in_event_type_key
+	INTO v_event_type_id;
+	
+	IF v_event_type_id IS NULL THEN
+		RAISE EXCEPTION 'EVENT_TYPE_NOT_FOUND';
+	END IF;
+	
+	SELECT xse.x_service_event_type_id
+	FROM public.x_service_event_type xse
+	WHERE xse.event_type_id = v_event_type_id
+	INTO v_x_service_event_type_id;
+
+	WITH DEL AS (
+		DELETE
+		FROM public.subscription
+		WHERE user_id = v_user_id
+			AND project_id = v_project_id
+			AND x_service_event_type_id = v_x_service_event_type_id
+			RETURNING *
+	)
+	SELECT COUNT(*)::INT
+	FROM DEL
+	INTO v_result;
+
 	RETURN v_result;
 END;
 $$;
@@ -742,8 +1189,9 @@ $$;
 ----------------- PROCEDURES -----------------
 
 /*
-`trunc_data()` deletes every data inserted by the user
-*/
+ * `trunc_data()` deletes every data inserted by the user, keeping only the pre-configured table records
+ * in `public.service`, `public.event_type` and `public.x_service_event_type`.
+ */
 CREATE OR REPLACE PROCEDURE public.trunc_data()
 LANGUAGE plpgsql
 AS $$
@@ -751,13 +1199,22 @@ DECLARE
     truncate_query varchar;
 BEGIN
     FOR truncate_query IN
-        SELECT 'TRUNCATE ' || table_id || ' CASCADE;' AS truncate_query
-        FROM (
-            SELECT (schemaname || '.' || tablename) AS table_id
-            FROM pg_catalog.pg_tables
-            WHERE schemaname NOT LIKE 'pg_%'
-            AND schemaname != 'information_schema'
-        ) user_tables
+			WITH ALL_USER_TABLES AS (
+				SELECT schemaname,
+					tablename,
+					(schemaname || '.' || tablename) AS table_id
+				FROM pg_catalog.pg_tables
+				WHERE schemaname NOT LIKE 'pg_%'
+								AND schemaname NOT LIKE ''
+								AND schemaname != 'information_schema'
+			)
+			SELECT 'TRUNCATE ' || table_id || ' CASCADE;' AS truncate_query
+			FROM ALL_USER_TABLES
+			WHERE table_id NOT IN (
+				'public.service',
+				'public.event_type',
+				'public.x_service_event_type'
+			)
     LOOP
         EXECUTE truncate_query;
     END LOOP;
@@ -781,6 +1238,10 @@ BEGIN
 	INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(10, 'GITLAB_COMMIT_CREATED');
 	INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(11, 'GITLAB_ISSUE_CREATED');
 	INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(12, 'GITLAB_ISSUE_EDITED');
+	INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(13, 'GITLAB_MERGE_REQUEST_CREATED');
+	INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(14, 'GITLAB_MERGE_REQUEST_EDITED');
+	INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(15, 'GITLAB_MERGE_REQUEST_MERGED');
+	INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(16, 'GITLAB_MERGE_REQUEST_CLOSED');
 
 	INSERT INTO public.event_type(event_type_id, event_type_key) VALUES(20, 'SONARQUBE_PROJECT_ANALYSIS_COMPLETED');
 
@@ -792,9 +1253,13 @@ BEGIN
 	INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (5, 2, 10);
 	INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (6, 2, 11);
 	INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (7, 2, 12);
+	INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (8, 2, 13);
+	INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (9, 2, 14);
+	INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (10, 2, 15);
+	INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (11, 2, 16);
 
-    -- SONARQUBE event types
-    INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (8, 3, 20);
+	-- SONARQUBE event types
+	INSERT INTO public.x_service_event_type(x_service_event_type_id, service_id, event_type_id) VALUES (12, 3, 20);
 END;
 $$;
 

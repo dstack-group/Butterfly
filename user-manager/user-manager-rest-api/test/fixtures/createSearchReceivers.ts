@@ -24,7 +24,7 @@ import { ThirdPartyContactService } from '../../src/common/ThirdPartyContactServ
 import { createProjectQuery } from './createProjects';
 import { createUserQuery } from './createUsers';
 import { createUserContactsQuery } from './createUserContacts';
-import { CreateSubscription } from '../../src/modules/subscriptions/entity';
+import { CreateSubscriptionBody } from '../../src/modules/subscriptions/entity';
 import { createSubscriptionQuery } from './createSubscriptions';
 
 export function createEvent(partialEvent: Partial<Event> = {}): Event {
@@ -110,29 +110,29 @@ export function initializeSearchReceiversData(database: PgDatabaseConnection): I
     },
   ];
 
-  const subscriptions: CreateSubscription[] = [
+  const subscriptions: CreateSubscriptionBody[] = [
     {
-      userEmail: 'federico.rispo@gmail.com',
-      projectName: 'Amazon',
-      eventType: ServiceEventType.GITLAB_ISSUE_CREATED,
-      userPriority: UserPriority.LOW,
       contactServices: [
         ThirdPartyContactService.TELEGRAM,
         ThirdPartyContactService.EMAIL,
       ],
+      eventType: ServiceEventType.GITLAB_ISSUE_CREATED,
       keywords: ['FIX', 'BUG', 'RESOLVE'],
+      projectName: 'Amazon',
+      userEmail: 'federico.rispo@gmail.com',
+      userPriority: UserPriority.LOW,
     },
   ];
 
   const searchReceiversResult: EventReceiversResult = {
     userContactList: [
       {
-        firstname: 'Federico',
-        lastname: 'Rispo',
         contactInfo: {
           [ThirdPartyContactService.TELEGRAM]: 'frispo',
           [ThirdPartyContactService.EMAIL]: 'dstackgroup@gmail.com',
         },
+        firstname: 'Federico',
+        lastname: 'Rispo',
       },
     ],
   };
