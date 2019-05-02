@@ -51,7 +51,6 @@ services:
   user-manager:
     build:
       context: ./user-manager-rest-api
-    restart: always
     ports:
       - "5000:5000"
     links:
@@ -61,6 +60,12 @@ services:
     env_file: ./user-manager-rest-api/.user-manager-rest-api.env
     environment:
       NODE_ENV: "production"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://user-manager:5000/health"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     networks:
       - user-manager-network
       - middleware-dispatcher-network
