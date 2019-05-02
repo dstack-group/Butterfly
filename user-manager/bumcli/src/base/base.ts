@@ -1,4 +1,4 @@
-import { Command } from '@oclif/command';
+import { Command, flags } from '@oclif/command';
 import Table = require('cli-table');
 import chalk from 'chalk';
 import { LocalDb } from '../database/LocalDb';
@@ -8,12 +8,23 @@ export abstract class BaseCommand extends Command {
   // @ts-ignore
   protected db: LocalDb;
 
+  static flags = {
+    help: flags.help({char: 'h'}),
+    json: flags.boolean({char: 'j', description: 'display results in json format'}),
+  }
+
   async init() {
     // Path must be changed (${this.config.configDir}): its temporary and only for test
     this.db = new LocalDb(`db.json`);
   }
 
-  protected showJSONFormat(data: object): string {
+  protected print(data: object | object, jsonEnabled: boolean): void {
+    (jsonEnabled) ?
+      this.log(this.showJSONFormat(data)) :
+      this.lista(data);
+  }
+
+  private showJSONFormat(data: object): string {
     return (Object.keys(data).length === 0) ?
       `Ops! Empty result` :
       JSON.stringify(data, null, 2);
@@ -32,7 +43,7 @@ export abstract class BaseCommand extends Command {
   // QUESTO METODO E' UN PROTOTIPO IN FASE DI SVILUPPO DATO CHE FUNZIONA CON USER
   // prendo in input il JSON
 
-  protected lista(data: object): void {
+  private lista(data: object): void {
     /*faccio un for in base al numero di campi totali del JSON per indicare l'head della tabella
      * 6 campi totali per lo User    (Email, Nome, Cognome, Enabled, Data creazione, Data ultima modifica)
      *
