@@ -30,43 +30,61 @@ export abstract class BaseCommand extends Command {
       JSON.stringify(data, null, 2);
   }
 
-  // TABELLA + COMMENTI ENRICO
-  /*importazione del server con il quale si capisce che client usare (se User, Project o Sistemi)*/
-  /* inizializzo rest request, classe astratta che inizializza le richieste rest */
-
-  /*
-  mostrare risposta in formato tabellare
-  o metodi protetti che servono a tutti
-  */
-
-  // Fare un metodo tabellare per vedere come i Todo dell'esempio
-  // QUESTO METODO E' UN PROTOTIPO IN FASE DI SVILUPPO DATO CHE FUNZIONA CON USER
-  // prendo in input il JSON
-
-  private lista(data: object): void {
-    /*faccio un for in base al numero di campi totali del JSON per indicare l'head della tabella
-     * 6 campi totali per lo User    (Email, Nome, Cognome, Enabled, Data creazione, Data ultima modifica)
-     *
-     * 3 campi totali per il Project (Progetto, Servizio di terzi, URL).
-     * Si ripete per ora il progetto per ogni servizio inserito
-     *
-     * 3 campi totali per il Sistema di contatto (Email, sistema di contatto, identificativo).
-     * Si ripete per ogni servizio inserito
+  // The function show the result inside an ASCII table, giving to the user a better view of the result
+  protected lista(arrData: object[]): void {
+    
+    /*extracting the first element to find witch keys need to insert
+     * into the table's header
      */
-    const dataKeys: string[] = Object.keys(data);
-    const numberOfJSONElement = dataKeys.length;
-    const header: string[] = [];
-    for (let headValue = 0; headValue < numberOfJSONElement; ++headValue) {
-      header.push(chalk.blueBright(dataKeys[headValue]));
+    const data : object = arrData[0]
+    const dataKeys : string[] = Object.keys(data)
+    const numberOfJSONElement = dataKeys.length 
+    const arrDataJson = <JSON[]> arrData
+    const h: string[] = []
+   
+    for(let headValue = 0; headValue < numberOfJSONElement; ++headValue){
+    h.push(chalk.blueBright(dataKeys[headValue]))
     }
 
-    const table = new Table({ head: header });
+    //filling the header of the table information of the JSON
+    const table= new Table({head:h})
 
-    const dataJson: JSON = data as JSON;
-    const dataString = JSON.stringify(dataJson);
-    const dataToJson = JSON.parse(dataString);
+    //Users specific info table
+    if(dataKeys[0] == "email"){
+      for (let i = 0; i < arrDataJson.length; i++) {
+        const dataJson = <JSON> arrDataJson[i];
+        const dataString = JSON.stringify(dataJson)
+        const dataToJson = JSON.parse(dataString)
+        if(Object.keys(dataToJson)[0] == dataKeys[0]){                                                        //da rivedere (Ha senso?)
+          table.push([dataToJson.email, dataToJson.firstname, dataToJson.lastname, dataToJson.enabled])
+        } else{
+          console.error("The JSON file is corrupted and can't show the table")
+          return;
+        }
+     }
+   } 
 
-    table.push([dataToJson.email, dataToJson.firstname, dataToJson.lastname, dataToJson.enabled]);
-    this.log(table.toString());
+    //Projects specific info table
+    else if (dataKeys[0] == "projectId"){
+      for (let i = 0; i < arrDataJson.length; ++i){
+        const dataJson = <JSON> arrDataJson[i];
+        const dataString = JSON.stringify(dataJson)
+        const dataToJson = JSON.parse(dataString)
+
+        //Copy of the inner JSON
+        const projectURLs = dataToJson.projectURL     
+    
+        //Check if the project have or not any URL inserted
+        if(!Object.keys(projectURLs)){
+            table.push([dataToJson.projectId, dataToJson.projectName, "Non sono presenti URL"])
+        } else {
+          projectURLs.REDMINE &&  table.push([dataToJson.projectId, dataToJson.projectName, projectURLs.REDMINE]) 
+          projectURLs.GITLAB &&  table.push([dataToJson.projectId, dataToJson.projectName, projectURLs.GITLAB])
+          projectURLs.SONARQUBE &&  table.push([dataToJson.projectId, dataToJson.projectName, projectURLs.SONARQUBE]) 
+        }
+      }
+    }
+    //table output
+    console.log(table.toString())
   }
 }
