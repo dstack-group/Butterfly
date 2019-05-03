@@ -15,19 +15,14 @@
  * the RedmineWebhookManager class. The JSON payloads for the HTTP requests are read from the test/resources folder.
  */
 
-package it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient;
+package it.unipd.dstack.butterfly.producer.redmine.webhookmanager;
 
 import it.unipd.dstack.butterfly.producer.avro.ServiceEventTypes;
-import it.unipd.dstack.butterfly.producer.redmine.ReadJSONFile;
-import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.RedmineWebhookException;
-import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.RedmineWebhookListener;
-import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.RedmineWebhookListenerObserver;
-import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.RedmineWebhookManager;
+import it.unipd.dstack.butterfly.producer.redmine.testutils.TestUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.stubbing.Answer;
-import org.springframework.mock.web.MockHttpServletRequest;
 import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.producer.avro.Services;
 
@@ -54,19 +49,12 @@ public class RedmineWebhookManagerTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    private ReadJSONFile readJSONFile = new ReadJSONFile();
-
-    private HttpServletRequest prepareMockHTTPRequest(String jsonFilename) throws IOException {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        String payload = readJSONFile.readJSONFile(jsonFilename);
-        request.setContent(payload.getBytes());
-        return request;
-    }
+    private TestUtils testUtils = new TestUtils();
 
     @Test
     public void shouldParseIssueCreatedEventsFromHTTPRequest() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
-        HttpServletRequest request = prepareMockHTTPRequest("REDMINE_TICKET_CREATED.json");
+        HttpServletRequest request = testUtils.prepareMockHTTPRequest("REDMINE_TICKET_CREATED.json");
         Set<String> prioritiesToConsider = new HashSet<>(Arrays.asList("Alta", "Altissima"));
 
         RedmineWebhookManager redmineWebhookManager =
@@ -95,7 +83,7 @@ public class RedmineWebhookManagerTest {
     @Test
     public void shouldParseIssueEditedEventsFromHTTPRequest() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
-        HttpServletRequest request = prepareMockHTTPRequest("REDMINE_TICKET_EDITED.json");
+        HttpServletRequest request = testUtils.prepareMockHTTPRequest("REDMINE_TICKET_EDITED.json");
         Set<String> prioritiesToConsider = new HashSet<>(Arrays.asList("Alta", "Altissima"));
 
         RedmineWebhookManager redmineWebhookManager =
@@ -123,7 +111,7 @@ public class RedmineWebhookManagerTest {
 
     @Test
     public void shouldThrowErrorIfCantParseHTTPRequestBody() throws IOException {
-        HttpServletRequest request = prepareMockHTTPRequest("BAD_JSON.json");
+        HttpServletRequest request = testUtils.prepareMockHTTPRequest("BAD_JSON.json");
         Set<String> prioritiesToConsider = new HashSet<>(Arrays.asList("Alta", "Altissima"));
 
         RedmineWebhookManager redmineWebhookManager =
@@ -134,7 +122,7 @@ public class RedmineWebhookManagerTest {
 
     @Test
     public void noEventShouldBeEmittedIfPriorityDoesntMatch() throws Exception {
-        HttpServletRequest request = prepareMockHTTPRequest("REDMINE_TICKET_CREATED.json");
+        HttpServletRequest request = testUtils.prepareMockHTTPRequest("REDMINE_TICKET_CREATED.json");
         Set<String> prioritiesToConsider = new HashSet<>(Arrays.asList("Bassa"));
 
         RedmineWebhookManager redmineWebhookManager =
@@ -143,21 +131,5 @@ public class RedmineWebhookManagerTest {
         redmineWebhookManager.onNewRedmineEvent(request);
 
         verify(redmineWebhookListener, never()).onIssueCreatedEvent(any(Event.class));
-    }
-
-    @Test
-    public void noEventShouldBeEmittedIfThereAreNoListeners() throws Exception {
-        HttpServletRequest request = prepareMockHTTPRequest("REDMINE_TICKET_CREATED.json");
-        Set<String> prioritiesToConsider = new HashSet<>(Arrays.asList("Alta", "Altissima"));
-
-        var redmineWebhookClient = new RedmineWebhookClient(prioritiesToConsider);
-        RedmineWebhookListenerObserver redmineWebhookListenerObserver = new RedmineWebhookListenerObserver(redmineWebhookListener);
-        redmineWebhookClient.addListener(redmineWebhookListenerObserver);
-        redmineWebhookClient.removeListener(redmineWebhookListenerObserver);
-
-        redmineWebhookClient.handleEvent(request);
-
-        verify(redmineWebhookListener, never()).onIssueCreatedEvent(any(Event.class));
-        verify(redmineWebhookListener, never()).onIssueEditedEvent(any(Event.class));
     }
 }
