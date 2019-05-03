@@ -25,11 +25,11 @@ import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.m
 import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.model.IssueEditedEvent;
 import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.model.IssueEditedPayload;
 import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.utils.HttpRequestUtils;
+import it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.utils.RedmineWebhookClientUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -39,10 +39,14 @@ public class RedmineWebhookClient {
     private final List<WebhookListener> webhookListeners = new CopyOnWriteArrayList<>();
 
     public static final JSONConverter jsonConverter = new JSONConverterImpl();
+
+    /**
+     * Redmine's priorities are saved as a lowercase only Set.
+     */
     private final Set<String> prioritiesToConsider;
 
     public RedmineWebhookClient(Set<String> prioritiesToConsider) {
-        this.prioritiesToConsider = prioritiesToConsider;
+        this.prioritiesToConsider = RedmineWebhookClientUtils.transformToLowerCase(prioritiesToConsider);
     }
 
     /**
@@ -51,7 +55,6 @@ public class RedmineWebhookClient {
      * @param listener the SystemHookListener to add
      */
     public void addListener(WebhookListener listener) {
-
         if (!webhookListeners.contains(listener)) {
             webhookListeners.add(listener);
         }
@@ -103,13 +106,18 @@ public class RedmineWebhookClient {
             } else {
                 throw new RedmineWebhookException();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RedmineWebhookException();
         }
     }
 
     private boolean matchesPrioritiesToConsider(GeneralPayload payload) {
-        return this.prioritiesToConsider.contains(payload.getIssue().getPriority().getName());
+        /**
+         * The current issue priority needs to be converted to lower case since the <code>prioritiesToConsider</code>
+         * Set is guaranteed to be lower case only.
+         */
+        String priority = payload.getIssue().getPriority().getName();
+        return this.prioritiesToConsider.contains(priority.toLowerCase());
     }
 
     private void fireIssueCreatedEvent(IssueCreatedPayload event) {

@@ -25,6 +25,8 @@ import org.apache.avro.AvroRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 public class RedmineWebhookListenerObserver implements WebhookListener {
     private static final Logger logger = LoggerFactory.getLogger(RedmineWebhookListenerObserver.class);
     private final RedmineWebhookListener<Event> listener;
@@ -44,9 +46,13 @@ public class RedmineWebhookListenerObserver implements WebhookListener {
             eventBuilder.setEventId(Long.toString(issueEvent.getIssue().getId())); // TODO: extract to utils
             eventBuilder.setEventType(ServiceEventTypes.REDMINE_TICKET_CREATED);
             eventBuilder.setUsername(issueEvent.getIssue().getAuthor().getLogin());
-            eventBuilder.setUserEmail(issueEvent.getIssue().getAuthor().getEmail());
+            eventBuilder.setUserEmail(issueEvent.getIssue().getAuthor().getMail());
             eventBuilder.setTitle(issueEvent.getIssue().getSubject());
             eventBuilder.setDescription(issueEvent.getIssue().getDescription());
+
+            List<String> tags = List.of(issueEvent.getIssue().getTracker().getName());
+            eventBuilder.setTags(tags);
+
             Event event = eventBuilder.build();
             this.listener.onIssueCreatedEvent(event);
 
@@ -67,11 +73,15 @@ public class RedmineWebhookListenerObserver implements WebhookListener {
             eventBuilder.setEventId(Long.toString(issueEvent.getIssue().getId())); // TODO: extract to utils
             eventBuilder.setEventType(ServiceEventTypes.REDMINE_TICKET_EDITED);
             eventBuilder.setUsername(issueEvent.getIssue().getAuthor().getLogin());
-            eventBuilder.setUserEmail(issueEvent.getIssue().getAuthor().getEmail());
+            eventBuilder.setUserEmail(issueEvent.getIssue().getAuthor().getMail());
             eventBuilder.setTitle(issueEvent.getIssue().getSubject());
             eventBuilder.setDescription(issueEvent.getIssue().getDescription());
+
+            List<String> tags = List.of(issueEvent.getIssue().getTracker().getName());
+            eventBuilder.setTags(tags);
+
             Event event = eventBuilder.build();
-            this.listener.onIssueCreatedEvent(event);
+            this.listener.onIssueEditedEvent(event);
 
             logger.info("Created AVRO Event after onIssueEditedEvent");
         } catch (AvroRuntimeException e) {

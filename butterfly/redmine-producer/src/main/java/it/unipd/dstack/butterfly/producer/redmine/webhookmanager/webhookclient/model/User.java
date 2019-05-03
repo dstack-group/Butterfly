@@ -18,7 +18,7 @@ package it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.
 public class User {
     private long id;
     private String login;
-    private String email;
+    private String mail;
     private String firstname;
     private String lastname;
 
@@ -30,8 +30,8 @@ public class User {
         return login;
     }
 
-    public String getEmail() {
-        return email;
+    public String getMail() {
+        return mail;
     }
 
     public String getFirstname() {

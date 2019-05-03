@@ -17,23 +17,28 @@ package it.unipd.dstack.butterfly.producer.redmine.webhookmanager.webhookclient.
 
 public class JournalDetail {
     private long id;
-    private String notes;
-    private boolean privateNotes;
-    private User author;
+    private String value;
+    private String oldValue;
+    private String propKey;
+    private String property;
 
     public long getId() {
         return id;
     }
 
-    public String getNotes() {
-        return notes;
+    public String getValue() {
+        return value;
     }
 
-    public boolean getPrivateNotes() {
-        return privateNotes;
+    public String getOldValue() {
+        return oldValue;
     }
 
-    public User getAuthor() {
-        return author;
+    public String getPropKey() {
+        return propKey;
+    }
+
+    public String getProperty() {
+        return property;
     }
 }
