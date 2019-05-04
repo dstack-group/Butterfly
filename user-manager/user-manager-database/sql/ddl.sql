@@ -906,6 +906,24 @@ BEGIN
 END;
 $$;
 
+/**
+ * `public.trigger_create_email_user_contact_on_new_user` creates a default user contact email account
+ * for each newly inserted user. The default email used as contact reference is the same email used by the
+ * user to register into the system.
+CREATE FUNCTION public.trigger_create_email_user_contact_on_new_user()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	IF TG_OP = 'INSERT' THEN
+		INSERT INTO public.user_contact(user_id, contact_type, contact_ref) VALUES (NEW.user_id, 'EMAIL', NEW.email);
+	END IF;
+
+	RETURN NEW;
+END;
+$$;
+ */
+
 CREATE OR REPLACE FUNCTION public.search_event_receivers(in_event_record json, in_save_event boolean DEFAULT false)
 RETURNS TABLE (
 	"userContactList" json
@@ -1306,32 +1324,32 @@ BEGIN
 	INSERT INTO public.user(email, firstname, lastname) VALUES ('singh@gmail.com', 'Harwinder', 'Singh');
 
 	-- PERFORM is used when we're not interesting in the actual data returned from the called stored function.
-	PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'TELEGRAM', '38442289');
-	PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'SLACK', 'jkomyno');
-	PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
-	PERFORM public.create_user_contact('federico.rispo@gmail.com', 'TELEGRAM', 'frispo');
-	PERFORM public.create_user_contact('federico.rispo@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
-	PERFORM public.create_user_contact('enrico.trinco@gmail.com', 'TELEGRAM', 'enrico_dogen');
-	PERFORM public.create_user_contact('enrico.trinco@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
-	PERFORM public.create_user_contact('thealchemist97@gmail.com', 'TELEGRAM', '191751378');
-	PERFORM public.create_user_contact('thealchemist97@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
+	-- PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'TELEGRAM', '38442289');
+	-- PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'SLACK', 'jkomyno');
+	-- PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
+	-- PERFORM public.create_user_contact('federico.rispo@gmail.com', 'TELEGRAM', 'frispo');
+	-- PERFORM public.create_user_contact('federico.rispo@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
+	-- PERFORM public.create_user_contact('enrico.trinco@gmail.com', 'TELEGRAM', 'enrico_dogen');
+	-- PERFORM public.create_user_contact('enrico.trinco@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
+	-- PERFORM public.create_user_contact('thealchemist97@gmail.com', 'TELEGRAM', '191751378');
+	-- PERFORM public.create_user_contact('thealchemist97@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
 
-  PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, FIX, CLOSE}'::text[]);
-  PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'REDMINE_TICKET_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, DOGE}'::text[]);
-	PERFORM public.create_subscription('thealchemist97@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{EMAIL}'::public.consumer_service[], '{DOGE, BREAK, VSCODE}'::text[]);
-	PERFORM public.create_subscription('thealchemist97@gmail.com', 'Butterfly', 'GITLAB_ISSUE_EDITED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{DOGE, BREAK, BUG}'::text[]);
+  -- PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, FIX, CLOSE}'::text[]);
+  -- PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'REDMINE_TICKET_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, DOGE}'::text[]);
+	-- PERFORM public.create_subscription('thealchemist97@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{EMAIL}'::public.consumer_service[], '{DOGE, BREAK, VSCODE}'::text[]);
+	-- PERFORM public.create_subscription('thealchemist97@gmail.com', 'Butterfly', 'GITLAB_ISSUE_EDITED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{DOGE, BREAK, BUG}'::text[]);
 
-  -- PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_COMMIT_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, FIX, CLOSE}'::text[]);
-	-- PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{BUG}'::text[]);
-	-- PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'REDMINE_TICKET_CREATED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{PROJECT, BUG, DEADLINE}'::text[]);
-	-- PERFORM public.create_subscription('federico.rispo@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{FIX, BUG, RESOLVE}'::text[]);
-	-- PERFORM public.create_subscription('federico.rispo@gmail.com', 'Amazon', 'GITLAB_ISSUE_EDITED', 'LOW', '{TELEGRAM}'::public.consumer_service[], '{FIX, BUG, RESOLVE}'::text[]);
-	-- PERFORM public.create_subscription('enrico.trinco@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM}'::public.consumer_service[], '{FIX, STRANGE}'::text[]);
-	-- PERFORM public.create_subscription('thealchemist97@gmail.com', 'Amazon', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{FIX, STRANGE, BUG}'::text[]);
 END;
 $$;
 
 ------------------ TRIGGER ------------------
+
+/*
+CREATE TRIGGER create_email_user_contact_on_new_user
+AFTER INSERT ON public.user
+FOR EACH ROW
+EXECUTE PROCEDURE public.trigger_create_email_user_contact_on_new_user();
+*/
 
 CREATE TRIGGER update_project_timestamp
 BEFORE UPDATE ON public.project
