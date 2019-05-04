@@ -6,7 +6,7 @@ import { Validator } from '../../utils/Validator';
 
 export class Remove extends BaseCommand {
 
-  static description = 'Find all users or a specific user identified by email';
+  static description = 'Remove a specific user identified by email';
 
   static flags = {
     ...BaseCommand.flags,

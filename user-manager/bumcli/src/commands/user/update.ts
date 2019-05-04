@@ -7,7 +7,7 @@ import { UpdateUser } from '../../rest-client/entities';
 
 export class Update extends BaseCommand {
 
-  static description = 'Update an existing user';
+  static description = 'Update an existing user identified by email';
 
   static flags = {
     ...BaseCommand.flags,

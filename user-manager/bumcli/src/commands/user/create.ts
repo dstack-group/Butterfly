@@ -7,7 +7,7 @@ import { CreateUser } from '../../rest-client/entities';
 
 export class Create extends BaseCommand {
 
-  static description = 'Create new user';
+  static description = 'Create a new user';
 
   static flags = {
     ...BaseCommand.flags,
