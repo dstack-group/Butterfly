@@ -41,12 +41,10 @@ export class Server extends BaseCommand {
 
     // Thanks to 'required' and 'dependOn'properties this check is not necessary
     // (flagss.hostname !== undefined && flagss.port !== undefined)
-    if (Validator.isHostnameValid(flagss.hostname)) {
-      serverConfig.hostname = flagss.hostname;
-      serverConfig.port = flagss.port;
-    } else {
-      this.error(`${flagss.hostname} is an invalid hostname format!`);
-    }
+
+    Validator.isURLValid(flagss.hostname);
+    serverConfig.hostname = flagss.hostname;
+    serverConfig.port = flagss.port;
 
     if (flagss.timeout !== undefined) {
       serverConfig.timeout = flagss.timeout;
