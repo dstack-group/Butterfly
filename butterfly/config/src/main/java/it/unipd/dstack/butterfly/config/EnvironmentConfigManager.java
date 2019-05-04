@@ -1,6 +1,16 @@
-package it.unipd.dstack.butterfly.config;
-
 /**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    config
+ * @fileName:  EnvironmentConfigManager.java
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
  * EnvironmentConfigManager gives the user the possibility to read configuration properties among the environment
  * variables, setting default values and explicitly cast them to the following types:
  * - String;
@@ -8,6 +18,9 @@ package it.unipd.dstack.butterfly.config;
  * - Boolean;
  * In case of errors, an instance of <code>ConfigurationException</code> is thrown.
  */
+
+package it.unipd.dstack.butterfly.config;
+
 public class EnvironmentConfigManager extends AbstractConfigManager {
     public EnvironmentConfigManager() {
         super();

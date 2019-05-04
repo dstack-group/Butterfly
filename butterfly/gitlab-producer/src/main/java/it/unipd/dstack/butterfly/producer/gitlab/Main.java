@@ -1,9 +1,27 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    gitlab-producer
+ * @fileName:  Main.java
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 package it.unipd.dstack.butterfly.producer.gitlab;
 
 import it.unipd.dstack.butterfly.config.AbstractConfigManager;
 import it.unipd.dstack.butterfly.config.EnvironmentConfigManager;
 import it.unipd.dstack.butterfly.producer.avro.Event;
-import it.unipd.dstack.butterfly.producer.producer.*;
+import it.unipd.dstack.butterfly.producer.producer.Producer;
+import it.unipd.dstack.butterfly.producer.producer.ProducerImpl;
+import it.unipd.dstack.butterfly.producer.producer.OnWebhookEventFromTopic;
+import it.unipd.dstack.butterfly.producer.producer.OnWebhookEventFromTopicImpl;
 
 public class Main {
     public static void main(String[] args) {

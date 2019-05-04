@@ -1,3 +1,18 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    user-manager-rest-api
+ * @fileName:  health.spec.ts
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 import { setupTests } from '../init';
 import supertest from 'supertest';
 import { Server as AppServer } from '../../src/server';

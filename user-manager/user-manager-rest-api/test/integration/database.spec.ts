@@ -1,4 +1,20 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    user-manager-rest-api
+ * @fileName:  database.spec.ts
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 import { setupTests } from '../init';
+import { TestConfigManager } from '../TestConfigManager';
 
 describe(`Database connection`, () => {
   it(`Should connect to the test database if the server is properly setup`, done => {
@@ -13,10 +29,18 @@ describe(`Database connection`, () => {
       });
   });
 
-  /*
-  TODO: setup a different test command that invokes only this that doesn't launch docker-compose with Postgres
   it(`Shouldn't be able to connect to the test database if the server isn't setup`, done => {
-    const { app } = setupTests();
+    const configManager = new TestConfigManager();
+    configManager.setProperty('APP_NAME', 'user-manager-rest-api');
+    configManager.setProperty('APP_HOST', 'localhost');
+    configManager.setProperty('APP_PORT', '5000');
+    configManager.setProperty('DATABASE_HOST', 'postgres-test');
+    configManager.setProperty('DATABASE_USER', 'NOT_EXISTING_USER');
+    configManager.setProperty('DATABASE_NAME', 'butterfly');
+    configManager.setProperty('DATABASE_PASSWORD', 'butterfly_user');
+    configManager.setProperty('DATABASE_PORT', '5432');
+
+    const { app } = setupTests(configManager);
 
     app.isConnectedToDatabase()
       .then(connected => {
@@ -26,5 +50,4 @@ describe(`Database connection`, () => {
         app.closeServer().then(done);
       });
   });
-  */
 });

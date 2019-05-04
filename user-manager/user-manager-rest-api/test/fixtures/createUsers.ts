@@ -1,3 +1,18 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    user-manager-rest-api
+ * @fileName:  createUsers.ts
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 import { PgDatabaseConnection, GetQueries } from '../../src/database';
 import { User } from '../../src/modules/users/entity';
 
@@ -41,8 +56,8 @@ export interface CreateUsersResult {
   transaction: Promise<void>;
 }
 
-export function createUsers(database: PgDatabaseConnection): CreateUsersResult {
-  const userResults: User[] = [
+export function createUsers(database: PgDatabaseConnection, userResults?: User[]): CreateUsersResult {
+  const defaultUserResults: User[] = [
     {
       email: 'alberto.schiabel@gmail.com',
       firstname: 'Alberto',
@@ -68,7 +83,7 @@ export function createUsers(database: PgDatabaseConnection): CreateUsersResult {
       userId: '4',
       ...commonValues,
     }, {
-      email: 'TheAlchemist97@gmail.com',
+      email: 'thealchemist97@gmail.com',
       firstname: 'Niccolò',
       lastname: 'Vettorello',
       userId: '5',
@@ -88,12 +103,14 @@ export function createUsers(database: PgDatabaseConnection): CreateUsersResult {
     },
   ];
 
+  const actualUserResults = userResults || defaultUserResults;
+
   const getUserQueries: GetQueries<User> = t => {
-    return userResults.map(user => t.any(query, user));
+    return actualUserResults.map(user => t.any(query, user));
   };
 
   return {
-    results: userResults,
+    results: actualUserResults,
     transaction: database.transaction(getUserQueries),
   };
 }

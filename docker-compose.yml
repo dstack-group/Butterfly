@@ -101,6 +101,23 @@ services:
     networks:
       - kafka-network
       - redmine-producer-network
+
+  sonarqube-producer:
+    build:
+      context: ./butterfly/sonarqube-producer
+      args:
+        SERVER_PORT: 6000
+        JAR_FILE: 'sonarqube-producer-1.0-SNAPSHOT-jar-with-dependencies'
+    env_file: ./butterfly/sonarqube-producer/.sonarqube-producer.env
+    depends_on:
+      - kafka
+      - zookeeper
+      - schema-registry
+    ports:
+      - 6000:6000
+    networks:
+      - kafka-network
+      - sonarqube-producer-network
       
   telegram-consumer:
     build:
@@ -153,6 +170,8 @@ networks:
     name: gitlab-producer-network
   redmine-producer-network:
     name: redmine-producer-network
+  sonarqube-producer-network:
+    name: sonarqube-producer-network
   middleware-dispatcher-network:
     name: middleware-dispatcher-network
   telegram-consumer-network:

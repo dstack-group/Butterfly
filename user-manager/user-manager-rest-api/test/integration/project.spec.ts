@@ -1,13 +1,28 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    user-manager-rest-api
+ * @fileName:  project.spec.ts
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 import { setupTests } from '../init';
 import supertest from 'supertest';
 import { Server as AppServer } from '../../src/server';
 import { Server } from 'http';
-import { truncData } from '../fixtures/truncData';
-import { PgDatabaseConnection } from '../../src/database';
+import { PgDatabaseConnection, truncData } from '../../src/database';
 import { createProjects, createProject } from '../fixtures/createProjects';
 import { isValidDate } from '../isValidDate';
-import { Project, CreateProject, UpdateProject } from '../../src/modules/projects/entity';
+import { CreateProject, UpdateProjectBody } from '../../src/modules/projects/entity';
 import { ThirdPartyProducerService } from '../../src/common/ThirdPartyProducerService';
+import { ParseSyntaxError } from '../../src/errors';
 
 let app: AppServer;
 let server: Server;
@@ -67,6 +82,21 @@ describe(`GET /projects`, () => {
 });
 
 describe(`POST /projects`, () => {
+  it(`Should return ParseSyntaxError if the body request isn't a valid JSON`, done => {
+    const payload = '{"projectName":true,"projectURL"}';
+    supertest(server)
+      .post('/projects')
+      .set('Content-Type', 'application/json')
+      .send(payload)
+      .expect('Content-Type', /application\/json/)
+      .expect(response => {
+        expect(response.body).not.toHaveProperty('data');
+        expect(response.body).toHaveProperty('error');
+        expect(response.body).toMatchObject(new ParseSyntaxError('body').toJSON());
+      })
+      .expect(400, done);
+  });
+
   it(`Should fail if another project with the same name already exists`, done => {
     const { transaction, result } = createProject(databaseConnection);
     const { projectName } = result;
@@ -178,6 +208,21 @@ describe(`GET /projects/:projectName`, () => {
 });
 
 describe(`PUT /projects/:projectName`, () => {
+  it(`Should return ParseSyntaxError if the body request isn't a valid JSON`, done => {
+    const payload = '{"projectURL":{]}';
+    supertest(server)
+      .put('/projects/PROJECT_NAME')
+      .set('Content-Type', 'application/json')
+      .send(payload)
+      .expect('Content-Type', /application\/json/)
+      .expect(response => {
+        expect(response.body).not.toHaveProperty('data');
+        expect(response.body).toHaveProperty('error');
+        expect(response.body).toMatchObject(new ParseSyntaxError('body').toJSON());
+      })
+      .expect(400, done);
+  });
+
   it(`Should update a project if it exists`, done => {
     const { transaction, result } = createProject(databaseConnection);
     const { projectName } = result;
@@ -228,15 +273,15 @@ describe(`PUT /projects/:projectName`, () => {
   });
 
   it(`Should return a NotFound error if no project exists with the given project name`, done => {
-    const project: UpdateProject = {
-      projectName: 'RANDOM_PROJECT_NAME',
+    const projectName = 'RANDOM_PROJECT_NAME';
+    const project: UpdateProjectBody = {
       projectURL: {
         [ThirdPartyProducerService.SONARQUBE]: 'http://new-sonarqube-URL',
       },
     };
 
     supertest(server)
-      .put(`/projects/${project.projectName}`)
+      .put(`/projects/${projectName}`)
       .send(project)
       .expect('Content-Type', /application\/json/)
       .expect(response => {

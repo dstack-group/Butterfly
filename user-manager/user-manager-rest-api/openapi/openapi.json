@@ -329,7 +329,7 @@
         }
       }
     },
-    "/users/{email}/contacts": {
+    "/user-contacts/{userEmail}": {
       "get": {
         "operationId": "getUserContacts",
         "summary": "Lists all the contact platforms and accounts associated with the user identified by the given email.",
@@ -339,7 +339,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "email",
+            "name": "userEmail",
             "schema": {
               "type": "string",
               "format": "email"
@@ -382,7 +382,7 @@
         }
       }
     },
-    "/users/{email}/contacts/{contactService}": {
+    "/user-contacts/{contactService}": {
       "post": {
         "operationId": "createUserContact",
         "summary": "Creates a new association between an existing user and a new contact platform where the user wishes to receive event notifications",
@@ -390,15 +390,6 @@
           "USER-CONTACTS"
         ],
         "parameters": [
-          {
-            "in": "path",
-            "name": "email",
-            "schema": {
-              "type": "string",
-              "format": "email"
-            },
-            "required": true
-          },
           {
             "in": "path",
             "name": "contactService",
@@ -490,7 +481,9 @@
             }
           }
         }
-      },
+      }
+    },
+    "/user-contacts/{userEmail}/{contactService}": {
       "put": {
         "operationId": "editUserContact",
         "summary": "Edits an existing association between a user and a contact platform where the user wishes to receive event notifications",
@@ -500,7 +493,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "email",
+            "name": "userEmail",
             "schema": {
               "type": "string",
               "format": "email"
@@ -592,7 +585,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "email",
+            "name": "userEmail",
             "schema": {
               "type": "string",
               "format": "email"

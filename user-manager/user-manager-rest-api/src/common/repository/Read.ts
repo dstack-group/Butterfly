@@ -1,4 +1,19 @@
 /**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    user-manager-rest-api
+ * @fileName:  Read.ts
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
+/**
  * General contract for the readonly database operations.
  */
 export interface Read {

@@ -1,3 +1,18 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    middleware-dispatcher
+ * @fileName:  MiddlewareDispatcherController.java
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 package it.unipd.dstack.butterfly.middleware.dispatcher;
 
 import it.unipd.dstack.butterfly.config.AbstractConfigManager;
@@ -125,7 +140,7 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
             logger.info("Trying to assemble producerRecordList");
             var producerRecordList = Utils.processMessageDataList(
                     eventWithUserContactList,
-                    this::extractTopicStrategy,
+                    Utils.extractTopicStrategy(this.messageTopicPrefix),
                     Utils::getProducerRecord
             );
 
@@ -143,16 +158,5 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
         } catch (RuntimeException e) {
             logger.error("Unexpected error while parsing REST API JSON response " + e);
         }
-    }
-
-    /**
-     * Returns the destination topic from eventWithUserContact's contact platform.
-     *
-     * @param eventWithUserContact
-     * @return the destination topic
-     */
-    private String extractTopicStrategy(EventWithUserContact eventWithUserContact) {
-        return ConsumerUtils.getLowerCaseTopicFromEnum(this.messageTopicPrefix,
-                eventWithUserContact.getUserContact().getContact());
     }
 }

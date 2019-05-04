@@ -1,3 +1,18 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    user-manager-rest-api
+ * @fileName:  PgDatabaseConnection.ts
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 import pgPromiseFactory, { IMain, IDatabase } from 'pg-promise';
 import { DatabaseConnection, DatabaseConnectionValues } from './DatabaseConnection';
 import { DatabaseConfig } from './DatabaseConfig';
