@@ -34,4 +34,20 @@ public class UserManagerResponseData {
     public Map<Contacts, String> getContacts() {
         return contacts;
     }
+
+    /**
+     * Setters are for testability purposes only.
+     */
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public void setContacts(Map<Contacts, String> contacts) {
+        this.contacts = contacts;
+    }
 }

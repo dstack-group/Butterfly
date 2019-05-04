@@ -17,6 +17,7 @@ package it.unipd.dstack.butterfly.middleware.dispatcher.utils;
 
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.avro.UserSingleContact;
+import it.unipd.dstack.butterfly.consumer.utils.ConsumerUtils;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponseData;
 import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.controller.record.Record;
@@ -38,7 +39,8 @@ public final class Utils {
     ) {
         return data.stream()
                 .flatMap(user -> {
-                    var userSingleContactListStream = user.getContacts().entrySet()
+                    var userSingleContactListStream = user.getContacts().
+                            entrySet()
                             .stream()
                             .map(contactInfoEntry -> {
                                 logger.info("Trying to build UserSingleContact");
@@ -74,6 +76,25 @@ public final class Utils {
      */
     public static <T extends SpecificRecord> Record<T> getProducerRecord(String topic, T avroRecord) {
         return new Record<>(topic, avroRecord);
+    }
+
+    /**
+     * Returns the destination topic from eventWithUserContact's contact platform.
+     *
+     * @param eventWithUserContact
+     * @return the destination topic
+     */
+
+    /**
+     * Returns the destination topic from eventWithUserContact's contact platform using a prefix.
+     * @param messageTopicPrefix
+     * @return a lowercase concatenation of the topic prefix and the actual contact type of the given event with
+     * user contact info attached.
+     */
+    public static Function<EventWithUserContact, String> extractTopicStrategy(String messageTopicPrefix) {
+        return (EventWithUserContact eventWithUserContact) ->
+            ConsumerUtils.getLowerCaseTopicFromEnum(messageTopicPrefix,
+                    eventWithUserContact.getUserContact().getContact());
     }
 
     /**

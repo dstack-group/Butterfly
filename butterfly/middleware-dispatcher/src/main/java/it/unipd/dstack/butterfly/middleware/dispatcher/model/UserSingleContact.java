@@ -21,10 +21,6 @@ public class UserSingleContact extends User {
     private Contacts contact;
     private String contactRef;
 
-    public UserSingleContact() {
-
-    }
-
     public UserSingleContact(User user) {
         super(user);
     }

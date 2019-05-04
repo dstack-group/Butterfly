@@ -140,7 +140,7 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
             logger.info("Trying to assemble producerRecordList");
             var producerRecordList = Utils.processMessageDataList(
                     eventWithUserContactList,
-                    this::extractTopicStrategy,
+                    Utils.extractTopicStrategy(this.messageTopicPrefix),
                     Utils::getProducerRecord
             );
 
@@ -158,16 +158,5 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
         } catch (RuntimeException e) {
             logger.error("Unexpected error while parsing REST API JSON response " + e);
         }
-    }
-
-    /**
-     * Returns the destination topic from eventWithUserContact's contact platform.
-     *
-     * @param eventWithUserContact
-     * @return the destination topic
-     */
-    private String extractTopicStrategy(EventWithUserContact eventWithUserContact) {
-        return ConsumerUtils.getLowerCaseTopicFromEnum(this.messageTopicPrefix,
-                eventWithUserContact.getUserContact().getContact());
     }
 }
