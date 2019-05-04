@@ -17,11 +17,11 @@ export class ProjectRestRequests extends RestRequests {
   }
 
   update(project: UpdateProject): Promise<Project> {
-    return this.submitRequest<Project>(`${this.path}/${project.name}`, HttpMethod.PATCH, project);
+    return this.submitRequest<Project>(`${this.path}/${project.projectName}`, HttpMethod.PUT, project);
   }
 
   find(project: FindProject): Promise<Project> {
-    return this.submitRequest<Project>(`${this.path}/${project.name}`, HttpMethod.GET);
+    return this.submitRequest<Project>(`${this.path}/${project.projectName}`, HttpMethod.GET);
   }
 
   findAll(): Promise<Project[]> {
@@ -30,7 +30,7 @@ export class ProjectRestRequests extends RestRequests {
 
   remove(project: RemoveProject): Promise<void> {
     return (project.service === undefined) ?
-      this.submitRequest<void>(`${this.path}/${project.name}`, HttpMethod.DELETE) :
-      this.submitRequest<void>(`${this.path}/${project.name}/${project.service}`, HttpMethod.DELETE);
+      this.submitRequest<void>(`${this.path}/${project.projectName}`, HttpMethod.DELETE) :
+      this.submitRequest<void>(`${this.path}/${project.projectName}/${project.service}`, HttpMethod.DELETE);
   }
 }

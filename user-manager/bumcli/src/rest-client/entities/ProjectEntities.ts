@@ -4,25 +4,22 @@ export enum Service {
   SONARQUBE = 'SONARQUBE',
 }
 
-export interface CreateProject {
-  name: string;
-  urls: {[key in Service]?: string};
+export interface FindProject {
+  projectName: string;
+}
+
+export interface CreateProject extends FindProject {
+  projectURL: {[key in Service]?: string};
 }
 
 export type UpdateProject = CreateProject;
-
-export interface FindProject {
-  name: string;
-}
 
 export interface RemoveProject extends FindProject {
   service?: Service;
 }
 
-export interface Project {
+export interface Project extends CreateProject {
   projectId: number;
-  projectName: string;
-  projectURL: {[key in Service]?: string};
   created: Date;
   modified: Date;
 }
