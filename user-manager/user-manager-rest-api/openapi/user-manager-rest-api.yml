@@ -240,7 +240,7 @@ paths:
                     type: boolean
                     description: error message
 
-  /users/{email}/contacts:
+  /user-contacts/{userEmail}:
     get:
       operationId: getUserContacts
       summary: >-
@@ -248,7 +248,7 @@ paths:
       tags: [ 'USER-CONTACTS' ]
       parameters:
         - in: path
-          name: email
+          name: userEmail
           schema:
             type: string
             format: email
@@ -275,7 +275,7 @@ paths:
                     type: boolean
                     description: error message
 
-  /users/{email}/contacts/{contactService}:
+  /user-contacts/{contactService}:
     post:
       operationId: createUserContact
       summary: >-
@@ -283,12 +283,6 @@ paths:
         to receive event notifications
       tags: [ 'USER-CONTACTS' ]
       parameters:
-        - in: path
-          name: email
-          schema:
-            type: string
-            format: email
-          required: true
         - in: path
           name: contactService
           schema:
@@ -351,6 +345,7 @@ paths:
                     type: boolean
                     description: error message
 
+  /user-contacts/{userEmail}/{contactService}:
     put:
       operationId: editUserContact
       summary: >-
@@ -359,7 +354,7 @@ paths:
       tags: [ 'USER-CONTACTS' ]
       parameters:
         - in: path
-          name: email
+          name: userEmail
           schema:
             type: string
             format: email
@@ -421,7 +416,7 @@ paths:
       tags: [ 'USER-CONTACTS' ]
       parameters:
         - in: path
-          name: email
+          name: userEmail
           schema:
             type: string
             format: email
