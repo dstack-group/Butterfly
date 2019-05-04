@@ -51,6 +51,7 @@ services:
   user-manager:
     build:
       context: ./user-manager-rest-api
+    restart: always
     ports:
       - "5000:5000"
     links:
