@@ -21,8 +21,8 @@ export class Find extends BaseCommand {
       if (flagss.name === undefined) {
         this.print(await client.findAll(), flagss.json);
       } else {
-        Validator.isStringValid('name', flagss.name, 0, 50)
-        this.print(await client.find({name: flagss.name}), flagss.json);
+        Validator.isStringValid('name', flagss.name, 0, 50);
+        this.print(await client.find({projectName: flagss.name}), flagss.json);
       }
 
     } catch (error) {
