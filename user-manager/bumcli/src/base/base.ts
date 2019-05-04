@@ -21,7 +21,7 @@ export abstract class BaseCommand extends Command {
   protected print(data: object | object, jsonEnabled: boolean): void {
     (jsonEnabled) ?
       this.log(this.showJSONFormat(data)) :
-      this.lista(data);
+      this.log('table');
   }
 
   private showJSONFormat(data: object): string {
