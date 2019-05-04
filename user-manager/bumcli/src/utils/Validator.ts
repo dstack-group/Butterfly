@@ -1,4 +1,4 @@
-import { CommandFlagException } from './../rest-client/exception/CommandFlagException';
+import { CommandFlagException } from '../exceptions/CommandFlagException';
 
 export class Validator {
 
@@ -29,7 +29,7 @@ export class Validator {
     return email;
   }
 
-  static isHostnameValid(hostname: string): string {
+  static isURLValid(url: string): string {
     // TODO: Find a regexp for the hostname check
     /*
     const hostRegExp: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -39,6 +39,6 @@ export class Validator {
     }
     */
 
-    return hostname;
+    return url;
   }
 }
