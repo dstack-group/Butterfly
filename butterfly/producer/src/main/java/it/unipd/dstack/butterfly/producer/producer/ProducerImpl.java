@@ -58,7 +58,11 @@ public class ProducerImpl<V> implements Producer<V> {
     public CompletableFuture<Void> send(Record<V> record) {
         return ProducerUtils.getCompletableFuture(callback -> {
             var kafkaRecord = new ProducerRecord<String, V>(record.getTopic(), record.getData());
-            logger.info("KafkaRecord being sent to topic " + kafkaRecord.topic());
+
+            if (logger.isInfoEnabled()) {
+                logger.info(String.format("KafkaRecord being sent to topic %s", kafkaRecord.topic()));
+            }
+
             this.kafkaProducer.send(kafkaRecord, callback);
         });
     }
@@ -101,10 +105,10 @@ public class ProducerImpl<V> implements Producer<V> {
             this.latch.await();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt(); // set interrupt flag
-            logger.error("InterruptingException error: " + e);
+            logger.error(String.format("InterruptingException error: %s", e));
             error = e;
         } catch (RuntimeException e) {
-            logger.error("RuntimeException error: " + e);
+            logger.error(String.format("RuntimeException error: %s", e));
             error = e;
         } finally {
             this.latch.countDown();

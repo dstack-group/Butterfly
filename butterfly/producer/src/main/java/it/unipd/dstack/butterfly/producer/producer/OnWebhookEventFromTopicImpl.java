@@ -26,7 +26,7 @@ public class OnWebhookEventFromTopicImpl<T> implements OnWebhookEventFromTopic<T
      */
     @Override
     public OnWebhookEvent<T> onEvent(Producer<T> producer, String topic) {
-        return (event) -> {
+        return event -> {
             Record<T> record = new Record<>(topic, event);
             return producer.send(record);
         };

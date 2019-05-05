@@ -100,19 +100,19 @@ public abstract class ProducerController<V> implements Controller {
      * Invoked when an exception is thrown.
      * @param e
      */
-    abstract public void onProduceException(Exception e);
+    public abstract void onProduceException(Exception e);
 
     /**
      * Invoked when a webhook request isn't properly parseable.
      * @param e
      */
-    abstract public void onWebhookException(Exception e);
+    public abstract void onWebhookException(Exception e);
 
     /**
      * Called when the third-party service sends an HTTP request to the producer app.
      * @param request
      */
-    abstract public void onWebhookRequest(HttpServletRequest request);
+    public abstract void onWebhookRequest(HttpServletRequest request);
 
     /**
      * Releases ProducerController's implementation's resources

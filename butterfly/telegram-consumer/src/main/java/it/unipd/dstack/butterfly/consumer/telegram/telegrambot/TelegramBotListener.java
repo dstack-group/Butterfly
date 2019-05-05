@@ -68,25 +68,28 @@ class TelegramBotListener extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage()) {
             Message message = update.getMessage();
-            logger.info("Message received " + message);
-            logger.info("message.isCommand() " + message.isCommand());
-            long chatId = message.getChatId();
-            logger.info("message chatId " + chatId);
+            Long chatId = message.getChatId();
+
+            if (logger.isInfoEnabled()) {
+                logger.info(String.format("Message received: %s", message));
+                logger.info(String.format("message.isCommand(): %s", message.isCommand()));
+                logger.info(String.format("message chatId %s", chatId));
+            }
 
             String text = message.getText();
             if (text.startsWith(BotCommand.COMMAND_INIT_CHARACTER)) {
                 String commandMessage = text.substring(1);
 
-                logger.info("commandMessage " + commandMessage);
+                logger.info(String.format("commandMessage: %s", commandMessage));
 
                 String[] commandSplit = commandMessage.split(BotCommand.COMMAND_PARAMETER_SEPARATOR_REGEXP);
                 String[] parameters = Arrays.copyOfRange(commandSplit, 1, commandSplit.length);
                 List<String> paramsList = Arrays.asList(parameters);
 
-                logger.info("paramsList " + paramsList);
+                logger.info(String.format("paramsList: %s", paramsList));
 
                 String commandName = commandSplit[0];
-                logger.info("CommandName " + commandName);
+                logger.info(String.format("commandName: %s", commandName));
 
                 Command command = this.commandRegister.getCommand(commandName);
 
@@ -95,7 +98,7 @@ class TelegramBotListener extends TelegramLongPollingBot {
                 if (command != null) {
                     TelegramResponse response = new TelegramResponse(message.getChatId().toString(), paramsList);
                     commandHandler.executeCommand(command, sender, response);
-                    logger.info("command executed! " + response);
+                    logger.info(String.format("command executed! %s", response));
                 }
             }
         }

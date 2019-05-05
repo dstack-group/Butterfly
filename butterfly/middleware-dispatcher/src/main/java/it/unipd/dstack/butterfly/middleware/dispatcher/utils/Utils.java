@@ -33,6 +33,8 @@ import java.util.stream.Collectors;
 public final class Utils {
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
+    private Utils() {}
+
     public static List<EventWithUserContact> parseUserManagerResponseData(
             List<UserManagerResponseData> data,
             Event event
@@ -52,9 +54,9 @@ public final class Utils {
                                 return userSingleContactBuilder.build();
                             });
 
-                    logger.info("userSingleContactListStream " + userSingleContactListStream);
+                    logger.info(String.format("userSingleContactListStream: %s", userSingleContactListStream));
 
-                    var eventWithUserContactStream = userSingleContactListStream
+                    return userSingleContactListStream
                             .map(userSingleContact -> {
                                 logger.info("Trying to build EventWithUserContact");
                                 var eventWithUserContactBuilder = EventWithUserContact.newBuilder();
@@ -62,7 +64,6 @@ public final class Utils {
                                 eventWithUserContactBuilder.setUserContact(userSingleContact);
                                 return eventWithUserContactBuilder.build();
                             });
-                    return eventWithUserContactStream;
                 }).collect(Collectors.toList());
     }
 

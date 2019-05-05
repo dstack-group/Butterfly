@@ -166,7 +166,7 @@ public class ConsumerImpl <V> extends AbstractSubject<V> implements Consumer<V> 
             ConsumerRecords<String, V> consumerRecordList = kafkaConsumer.poll(this.pollDuration);
             List<Record<V>> recordList = ConsumerUtils.consumerRecordsToList(consumerRecordList);
 
-            if (recordList.size() > 0) {
+            if (!recordList.isEmpty()) {
                 recordList.forEach(super::notifyObservers);
 
                 if (this.mustManuallyCommit) {

@@ -59,12 +59,13 @@ public class GitlabProducerController extends ProducerController<Event> {
 
     /**
      * Invoked when an exception is thrown
-     *
      * @param e
      */
     @Override
     public void onProduceException(Exception e) {
-        logger.error("Exception: " + e);
+        if (logger.isErrorEnabled()) {
+            logger.error(String.format("Producer exception: %s", e));
+        }
         this.close();
     }
 
@@ -74,7 +75,9 @@ public class GitlabProducerController extends ProducerController<Event> {
      */
     @Override
     public void onWebhookException(Exception e) {
-        logger.error(serviceName + " Exception " + e);
+        if (logger.isErrorEnabled()) {
+            logger.error(String.format("%s webhook exception: %s", this.serviceName, e));
+        }
     }
 
     /**

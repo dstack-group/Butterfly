@@ -1,7 +1,7 @@
 /**
  * @project:   Butterfly
  * @author:    DStack Group
- * @module:    gitlab-producer
+ * @module:    redmine-producer
  * @fileName:  WebhookManagerUtils.java
  * @created:   2019-03-07
  *
@@ -14,12 +14,12 @@
  * WebhookManagerUtils contains common utilities for GitLab's WebhookManager.
  */
 
-package it.unipd.dstack.butterfly.producer.gitlab.webhookmanager;
+package it.unipd.dstack.butterfly.producer.redmine.webhookmanager;
 
-class WebhookManagerUtils {
+public class WebhookManagerUtils {
     private WebhookManagerUtils() {}
 
-    static <T extends Number> String numberToString(T number) {
-        return String.valueOf(number);
+    static String longToString(Long number) {
+        return Long.toString(number);
     }
 }

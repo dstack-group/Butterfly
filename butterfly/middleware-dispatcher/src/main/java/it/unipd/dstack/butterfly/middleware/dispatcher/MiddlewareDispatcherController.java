@@ -75,7 +75,11 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
     protected void onMessageConsume(Record<Event> record) {
         String topic = record.getTopic();
         Event event = record.getData();
-        logger.info("Read message from topic " + topic + ": " + event.toString());
+
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("Read message from topic %s: %s", topic, event.toString()));
+        }
+
         this.processEvent(event);
     }
 
@@ -119,12 +123,12 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
                     if (response == null) {
                         logger.error("Response lost from eventProcessor");
                     } else {
-                        logger.info("Response received from eventProcessor: " + response);
+                        logger.info(String.format("Response received from eventProcessor: %s", response));
                         this.onValidResponse(response, event);
                     }
                 })
                 .exceptionally(e -> {
-                    logger.error("Exception in processEvent: " + e);
+                    logger.error(String.format("Exception in processEvent: %s", e));
                     return null;
                 });
     }
@@ -135,14 +139,17 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
      */
     private void onValidResponse(UserManagerResponse userManagerResponse, Event event) {
         try {
-            logger.info(String.format("Parsing valid response in thread %s", Thread.currentThread().getId()));
+            if (logger.isInfoEnabled()) {
+                logger.info(String.format("Parsing valid response in thread %s", Thread.currentThread().getId()));
+            }
+
             List<UserManagerResponseData> data = userManagerResponse.getData();
 
             /**
              * Extracts every possible association between a user and 1 to N contact platforms, and aggregates this
              * information with the original event.
              */
-            logger.info("Trying to parse eventWithUserContactList " + data);
+            logger.info(String.format("Trying to parse eventWithUserContactList: %s", data));
             List<EventWithUserContact> eventWithUserContactList =
                     Utils.parseUserManagerResponseData(data, event);
 
@@ -157,20 +164,25 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
                     Utils::getProducerRecord
             );
 
-            logger.info(String.format("Parsed producerRecordList in thread %s", Thread.currentThread().getId()));
+            if (logger.isInfoEnabled()) {
+                logger.info(String.format("Parsed producerRecordList in thread %s", Thread.currentThread().getId()));
+            }
+
             this.producer.send(producerRecordList)
                     .thenAccept((Void v) -> {
                         logger.info("SENT EVERYTHING, NOW COMMITTING");
                         this.consumer.commitSync();
                     })
                     .exceptionally(e -> {
-                        logger.error("Couldn't sendMessage batch of messages " + e);
+                        logger.error(String.format("Couldn't sendMessage batch of messages: %s", e));
                         return null;
                     });
         } catch (AvroRuntimeException e) {
-            logger.error("AVRO EXCEPTION " + e.getCause() + " " + e);
+            if (logger.isErrorEnabled()) {
+                logger.error(String.format("AVRO EXCEPTION %s %s", e.getCause(), e));
+            }
         } catch (RuntimeException e) {
-            logger.error("Unexpected error while parsing REST API JSON response " + e);
+            logger.error(String.format("Unexpected error while parsing REST API JSON response %s", e));
         }
     }
 }

@@ -28,8 +28,6 @@ import it.unipd.dstack.butterfly.consumer.email.sender.EmailSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.mail.MessagingException;
-
 public class EmailConsumerController extends ConsumerController<EventWithUserContact> {
     private static final Logger logger = LoggerFactory.getLogger(EmailConsumerController.class);
 
@@ -88,7 +86,10 @@ public class EmailConsumerController extends ConsumerController<EventWithUserCon
     protected void onMessageConsume(Record<EventWithUserContact> record) {
         EventWithUserContact eventWithUserContact = record.getData();
 
-        logger.info("Consuming new event");
+        if (logger.isInfoEnabled()) {
+            logger.info("Consuming new event");
+        }
+
         var event = eventWithUserContact.getEvent();
         String subject = String.format("[%s] %s in project %s",
                 event.getService(),
@@ -96,10 +97,12 @@ public class EmailConsumerController extends ConsumerController<EventWithUserCon
                 event.getProjectName());
         String content = this.formatStrategy.format(eventWithUserContact);
         String recipient = eventWithUserContact.getUserContact().getContactRef();
-        logger.info("Contact ref " + recipient);
+
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("Sending email to %s", recipient));
+        }
 
         EmailMessage emailMessage = new EmailMessage(recipient, content, subject);
-
         this.emailSender.sendMessage(emailMessage);
     }
 }
