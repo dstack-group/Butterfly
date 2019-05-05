@@ -11,6 +11,17 @@
  * --------------------------------------------------------------------------------------------
  *
  * @description:
+ * MiddlewareDispatcherController is the core controller of Butterfly. Even though it only extends
+ * the ConsumerController class, it actually manages both a consumer and a producer. In fact, it
+ * continuously consumes all the messages produced by the topics defined in the KAFKA_TOPICS configuration
+ * variabile, then it asks the User Manager which users should receive notifications about the incoming events,
+ * and then it produces new messages based on the original event and the User Manager response.
+ * The new messages are sent to the contact-{SERVICE} topic, where {SERVICE} is the destination contact service.
+ * For example, if a user present in the User Manager response has two contact accounts, one associated with
+ * <b>TELEGRAM</b> and one with <b>SLACK</b>, the same event will be sent to the consumers which listen to the
+ * <pre>contact-telegram</pre> and the <pre>contact-slack</pre> topics.
+ * The incoming event messages are committed only when their aggregate counterpart (the event messages with the
+ * user contact info attached) have been successfully produced.
  */
 
 package it.unipd.dstack.butterfly.middleware.dispatcher;
@@ -102,6 +113,7 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
      * @param event Event record to be processed
      */
     private void processEvent(Event event) {
+        logger.info(String.format("Processing event in thread %s", Thread.currentThread().getId()));
         eventProcessor.processEvent(event, UserManagerResponse.class)
                 .thenAcceptAsync(response -> {
                     if (response == null) {
@@ -123,6 +135,7 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
      */
     private void onValidResponse(UserManagerResponse userManagerResponse, Event event) {
         try {
+            logger.info(String.format("Parsing valid response in thread %s", Thread.currentThread().getId()));
             List<UserManagerResponseData> data = userManagerResponse.getData();
 
             /**
@@ -144,10 +157,11 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
                     Utils::getProducerRecord
             );
 
-            logger.info("Parsed producerRecordList");
+            logger.info(String.format("Parsed producerRecordList in thread %s", Thread.currentThread().getId()));
             this.producer.send(producerRecordList)
                     .thenAccept((Void v) -> {
-                        logger.info("SENT EVERYTHING");
+                        logger.info("SENT EVERYTHING, NOW COMMITTING");
+                        this.consumer.commitSync();
                     })
                     .exceptionally(e -> {
                         logger.error("Couldn't sendMessage batch of messages " + e);
