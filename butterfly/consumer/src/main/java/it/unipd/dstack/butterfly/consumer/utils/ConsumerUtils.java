@@ -1,3 +1,19 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    consumer
+ * @fileName:  ConsumerUtils.java
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ * ConsumerUtils contains a set of utilities for the Consumer classes.
+ */
+
 package it.unipd.dstack.butterfly.consumer.utils;
 
 import it.unipd.dstack.butterfly.controller.record.Record;

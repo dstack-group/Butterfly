@@ -1,3 +1,20 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    consumer
+ * @fileName:  KafkaConsumerProperties.java
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ * KafkaConsumerProperties reads configuration properties at runtime to return the appropriate
+ * settings for a new KafkaConsumer instance.
+ */
+
 package it.unipd.dstack.butterfly.consumer.consumer;
 
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;

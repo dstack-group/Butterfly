@@ -1,3 +1,16 @@
+# @project:   Butterfly
+# @author:    DStack Group
+# @module:    user-manager-rest-api
+# @fileName:  user-manager-rest-api.yml
+# @created:   2019-03-07
+#
+# --------------------------------------------------------------------------------------------
+# Copyright (c) 2019 DStack Group.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
+#
+# @description:
+
 # OpenAPI Specification version
 openapi: 3.0.0
 info:
@@ -227,7 +240,7 @@ paths:
                     type: boolean
                     description: error message
 
-  /users/{email}/contacts:
+  /user-contacts/{userEmail}:
     get:
       operationId: getUserContacts
       summary: >-
@@ -235,7 +248,7 @@ paths:
       tags: [ 'USER-CONTACTS' ]
       parameters:
         - in: path
-          name: email
+          name: userEmail
           schema:
             type: string
             format: email
@@ -262,7 +275,7 @@ paths:
                     type: boolean
                     description: error message
 
-  /users/{email}/contacts/{contactService}:
+  /user-contacts/{contactService}:
     post:
       operationId: createUserContact
       summary: >-
@@ -270,12 +283,6 @@ paths:
         to receive event notifications
       tags: [ 'USER-CONTACTS' ]
       parameters:
-        - in: path
-          name: email
-          schema:
-            type: string
-            format: email
-          required: true
         - in: path
           name: contactService
           schema:
@@ -338,6 +345,7 @@ paths:
                     type: boolean
                     description: error message
 
+  /user-contacts/{userEmail}/{contactService}:
     put:
       operationId: editUserContact
       summary: >-
@@ -346,7 +354,7 @@ paths:
       tags: [ 'USER-CONTACTS' ]
       parameters:
         - in: path
-          name: email
+          name: userEmail
           schema:
             type: string
             format: email
@@ -408,7 +416,7 @@ paths:
       tags: [ 'USER-CONTACTS' ]
       parameters:
         - in: path
-          name: email
+          name: userEmail
           schema:
             type: string
             format: email

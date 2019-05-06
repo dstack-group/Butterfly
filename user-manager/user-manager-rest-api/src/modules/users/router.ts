@@ -1,9 +1,23 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    user-manager-rest-api
+ * @fileName:  router.ts
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 import { Router } from '../../router/Router';
 import { UserManager } from './manager';
 import { UserRepository } from './repository';
 import { RoutesInjectionParams } from '../../routes/RoutesInjectionParams';
 import * as middlewares from '../../middlewares';
-// import * as validator from './validator';
 import { UserController } from './controller';
 
 export const getUserRouter = (routesParams: RoutesInjectionParams) => {
@@ -27,11 +41,6 @@ export const getUserRouter = (routesParams: RoutesInjectionParams) => {
     */
     .post('/',
       middlewares.bodyParser(),
-      /*
-      middlewares.validateRequest({
-        body: validator.createUser,
-      }),
-      */
       userController.createUser())
     .get('/:email', userController.getUserByEmail())
     .patch('/:email',

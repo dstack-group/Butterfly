@@ -1,3 +1,18 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    user-manager-rest-api
+ * @fileName:  Database.ts
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 import { DatabaseConnection, DatabaseConnectionValues } from './DatabaseConnection';
 
 /**
@@ -54,14 +69,10 @@ export class Database implements DatabaseConnection {
    * @param values the named value parameters to be passed to the query
    */
   async result(query: string, values?: DatabaseConnectionValues): Promise<number> {
-    return new Promise<number>(async (resolve, reject) => {
-      try {
-        const resultObject = await this.connection.one<{ count: number }>(query, values);
-        const count = resultObject ? resultObject.count : 0;
-        resolve(count);
-      } catch (error) {
-        reject(error);
-      }
+    return new Promise<number>(async resolve => {
+      const resultObject = await this.connection.one<{ count: number }>(query, values);
+      const count = resultObject ? resultObject.count : 0;
+      resolve(count);
     });
   }
 

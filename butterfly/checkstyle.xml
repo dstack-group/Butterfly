@@ -18,9 +18,6 @@
             <property name="exceptionVariableName" value="expected"/>
         </module>
         <module name="AvoidStarImport"/>
-        <module name="IllegalImport">
-            <property name="illegalPkgs" value="java.io"/>
-        </module>
         <module name="NeedBraces"/>
         <module name="WhitespaceAround">
             <property name="allowEmptyConstructors" value="true"/>
@@ -64,7 +61,7 @@
             <property name="tokens" value="VARIABLE_DEF,CLASS_DEF"/>
             <property name="ignoreStatic" value="false"/>
             <property name="allowedAbbreviationLength" value="0"/>
-            <property name="allowedAbbreviations" value="XML,URL,JSON"/>
+            <property name="allowedAbbreviations" value="XML,URL,JSON,SMTP,MS"/>
         </module>
         <module name="OverloadMethodsDeclarationOrder"/>
         <module name="VariableDeclarationUsageDistance"/>
@@ -75,7 +72,7 @@
         <module name="CommentsIndentation"/>
     </module>
     <module name="FileLength">
-        <property name="max" value="200"/>
+        <property name="max" value="215"/> <!-- ~15 lines are for the header only -->
     </module>
     <module name="FileTabCharacter">
         <property name="eachLine" value="true"/>

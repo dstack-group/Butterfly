@@ -1,3 +1,18 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    gitlab-producer
+ * @fileName:  GitlabWebhookListenerObserver.java
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 package it.unipd.dstack.butterfly.producer.gitlab.webhookmanager;
 
 import it.unipd.dstack.butterfly.producer.avro.Event;
@@ -63,10 +78,9 @@ class GitlabWebhookListenerObserver implements WebHookListener {
      *
      * @param mergeRequestEvent the EventObject instance containing info on the merge request
      */
+    @Override
     public void onMergeRequestEvent(MergeRequestEvent mergeRequestEvent) {
         logger.info("Creating AVRO Event onMergeRequestEvent");
-        logger.info("STATE " + mergeRequestEvent.getObjectAttributes().getState());
-        logger.info("ACTION " + mergeRequestEvent.getObjectAttributes().getAction());
         var eventTypeAndListenerPair = this.getEventTypeAndListenerFromMergeRequestEvent(mergeRequestEvent);
         var eventId = mergeRequestEvent.getObjectAttributes().getId();
         Event.Builder eventBuilder = Event.newBuilder();
@@ -176,7 +190,9 @@ class GitlabWebhookListenerObserver implements WebHookListener {
                 logger.info("Created AVRO Event after onIssueEvent");
             }
         } catch (AvroRuntimeException e) {
-            logger.error(String.format("AvroRuntimeException: %s %s", e.getMessage(), e.getStackTrace()));
+            if (logger.isErrorEnabled()) {
+                logger.error(String.format("AvroRuntimeException: %s %s", e.getMessage(), e.getStackTrace()));
+            }
         }
     }
 

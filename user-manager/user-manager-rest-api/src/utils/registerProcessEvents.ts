@@ -1,3 +1,18 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    user-manager-rest-api
+ * @fileName:  registerProcessEvents.ts
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 import { Logger } from '../logger';
 import { Server } from '../server/Server';
 
@@ -11,21 +26,6 @@ export function registerProcessEvents(
   logger: Logger,
   app: Server,
 ) {
-  /**
-   * Emitted when an error isn't explicitly caught
-   */
-  process.on('uncaughtException', (error: Error) => {
-    logger.error('UncaughtException ' + error);
-  });
-
-  /**
-   * Emitted when a Promise terminates unexpectly and no `catch` clause
-   * has been applied
-   */
-  process.on('unhandledRejection', <T>(reason: unknown, promise: Promise<T>) => {
-    logger.error('unhandledRejection ' + reason);
-  });
-
   /**
    * Emitted when the process in which the application is running gets unexpectedly and forcefully closed,
    * for instance after a CTRL+C event.

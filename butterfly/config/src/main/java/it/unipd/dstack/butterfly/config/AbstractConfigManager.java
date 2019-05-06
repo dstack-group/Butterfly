@@ -1,13 +1,16 @@
-package it.unipd.dstack.butterfly.config;
-
-import it.unipd.dstack.butterfly.config.exception.ConfigurationCastException;
-import it.unipd.dstack.butterfly.config.exception.ConfigurationException;
-import it.unipd.dstack.butterfly.config.exception.ConfigurationUndefinedException;
-
-import java.util.Optional;
-import java.util.function.Function;
-
 /**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    config
+ * @fileName:  AbstractConfigManager.java
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
  * AbstractConfigManager is an abstract class that defines the contract for reading configuration properties,
  * setting default values and explicitly cast them to the following types:
  * - String;
@@ -16,6 +19,15 @@ import java.util.function.Function;
  * It implements the Template Method Pattern via the readConfigValue method.
  * In case of errors, an instance of <code>ConfigurationException</code> is thrown.
  */
+
+package it.unipd.dstack.butterfly.config;
+
+import it.unipd.dstack.butterfly.config.exception.ConfigurationCastException;
+import it.unipd.dstack.butterfly.config.exception.ConfigurationUndefinedException;
+
+import java.util.Optional;
+import java.util.function.Function;
+
 public abstract class AbstractConfigManager {
     /**
      * Reads a value from a configuration resource.

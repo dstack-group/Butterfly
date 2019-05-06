@@ -45,7 +45,7 @@ if [ -z $SHOULD_TEST ];
 then OPTION+=" -DskipTests";
 fi
 
-COMMAND="mvn ${SUBCOMMAND}package $OPTION";
+COMMAND="mvn checkstyle:check ${SUBCOMMAND}package $OPTION";
 echo "Executing command $COMMAND";
 
 docker run --rm \

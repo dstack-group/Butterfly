@@ -1,6 +1,20 @@
-package it.unipd.dstack.butterfly.consumer.utils;
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    consumer
+ * @fileName:  EmailValidatorTest.java
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ * Unit Tests for EmailValidator.
+ */
 
-import it.unipd.dstack.butterfly.consumer.utils.EmailValidator;
+package it.unipd.dstack.butterfly.consumer.utils;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;

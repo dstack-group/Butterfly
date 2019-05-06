@@ -1,3 +1,18 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    event-processor
+ * @fileName:  EventProcessor.java
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 package it.unipd.dstack.butterfly.eventprocessor;
 
 import it.unipd.dstack.butterfly.jsonconverter.JSONConverter;
@@ -68,17 +83,19 @@ public class EventProcessor {
         var request = this.prepareRequest(json);
         return this.sendRequest(request)
                 .exceptionally(ex -> {
-                    logger.error("Exception in processEvent " + ex);
+                    logger.error(String.format("Exception in processEvent %s", ex));
+
                     return null;
                 })
                 .thenApply(response -> {
-                    logger.info("STATUS CODE ON RESPONSE: " + response.statusCode());
+                    if (logger.isInfoEnabled()) {
+                        logger.info(String.format("STATUS CODE ON RESPONSE: %s", response.statusCode()));
+                    }
+
                     String responseJSON = response.body(); // return response's payload
                     try {
-                        logger.info("Trying to parse UserManagerResponse: " + responseJSON);
-                        T userManagerResponseFromJson =
-                                this.jsonConverter.fromJson(responseJSON, klass);
-                        return userManagerResponseFromJson;
+                        logger.info(String.format("Trying to parse UserManagerResponse: %s", responseJSON));
+                        return this.jsonConverter.fromJson(responseJSON, klass);
                     } catch (JSONConverterException e) {
                         throw new UnprocessableEventException(e);
                     }
@@ -116,13 +133,10 @@ public class EventProcessor {
     /**
      * Builder pattern implementation for the EventProcessor class
      */
-    static public class Builder {
+    public static class Builder {
         private int threadsNumber = 0;
         private String userManagerURL;
         private int timeoutInMs;
-
-        public Builder() {
-        }
 
         public Builder setUserManagerURL(String userManagerURL) {
             this.userManagerURL = userManagerURL;

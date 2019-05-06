@@ -1,0 +1,62 @@
+{
+  "payload": {
+    "action": "opened",
+    "issue": {
+      "id": 2,
+      "subject": "New bug created by Doge",
+      "description": "A doge has to fix a new bug that affects the User Manager",
+      "created_on": "2019-03-26T14:52:20.643Z",
+      "updated_on": "2019-03-26T14:52:20.643Z",
+      "closed_on": null,
+      "root_id": 2,
+      "parent_id": null,
+      "done_ratio": 10,
+      "start_date": "2019-03-26",
+      "due_date": "2019-03-27",
+      "estimated_hours": 5,
+      "is_private": false,
+      "lock_version": 0,
+      "custom_field_values": [],
+      "project": {
+        "id": 1,
+        "identifier": "Butterfly",
+        "name": "Butterfly",
+        "description": "",
+        "created_on": "2019-03-26T14:23:27.244Z",
+        "homepage": "http://redmine.dstackgroup.com/butterfly/butterfly"
+      },
+      "status": {
+        "id": 1,
+        "name": "new"
+      },
+      "tracker": {
+        "id": 1,
+        "name": "Bug"
+      },
+      "priority": {
+        "id": 1,
+        "name": "alta"
+      },
+      "author": {
+        "id": 1,
+        "login": "admin",
+        "mail": "admin@example.net",
+        "firstname": "Redmine",
+        "lastname": "Admin",
+        "identity_url": null,
+        "icon_url": "//www.gravatar.com/avatar/cb4f282fed12016bd18a879c1f27ff97?rating=PG&size=50"
+      },
+      "assignee": {
+        "id": 1,
+        "login": "admin",
+        "mail": "admin@example.net",
+        "firstname": "Redmine",
+        "lastname": "Admin",
+        "identity_url": null,
+        "icon_url": "//www.gravatar.com/avatar/cb4f282fed12016bd18a879c1f27ff97?rating=PG&size=50"
+      },
+      "watchers": []
+    },
+    "url": "http://localhost:15000/issues/2"
+  }
+}

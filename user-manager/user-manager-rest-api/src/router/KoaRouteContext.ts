@@ -1,5 +1,23 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    user-manager-rest-api
+ * @fileName:  KoaRouteContext.ts
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 import { Context } from './Router';
 import { RouteContextReplier } from './RouteContextReplier';
+import { FieldValidationType } from '../errors/FieldValidationError';
+import { Validator, ValidationErrorItem, ValidateCallback } from '../common/Validation';
+import { FieldValidationError } from '../errors';
 
 /**
  * KoaRouteContext is a RouteContextReplier implementation based on the Koa framework's
@@ -20,6 +38,16 @@ export class KoaRouteContext implements RouteContextReplier {
   }
 
   /**
+   * Returns the validated URL parameters, or throws a ValidationError.
+   * @param validateCallback a validation callback that, given a ValidationSchema, checks whether the given
+   * named URL parameters matches the expected schema structure.
+   */
+  getValidatedNamedParams<T>(validateCallback: ValidateCallback): T {
+    const params = this.getNamedParams();
+    return this.handleValidation(validateCallback, params, 'params');
+  }
+
+  /**
    * Returns the query params.
    */
   getQueryParams() {
@@ -31,6 +59,15 @@ export class KoaRouteContext implements RouteContextReplier {
    */
   getRequestBody() {
     return this.context.request.body;
+  }
+
+  /**
+   * Returns the validated request body, or throws a ValidationError.
+   * @param schema a ValidationSchema to check whether the given body matches the expected structure.
+   */
+  getValidatedRequestBody<T>(validateCallback: ValidateCallback): T {
+    const body = this.getRequestBody();
+    return this.handleValidation(validateCallback, body, 'body');
   }
 
   /**
@@ -61,5 +98,26 @@ export class KoaRouteContext implements RouteContextReplier {
       this.context.body = isError ? body : { data: body };
       this.context.set('Content-Type', 'application/json');
     }
+  }
+
+  private handleValidation<T>(validateCallback: ValidateCallback, entity: unknown, type: FieldValidationType): T {
+    const schema = validateCallback(Validator);
+    const { value, error } = Validator.validate(entity, schema, {
+      abortEarly: true,
+      allowUnknown: false,
+    });
+
+    if (error) {
+      const { message, details } = error;
+      const fieldErrors: ValidationErrorItem[] = details.map(f => ({
+        message: f.message,
+        path: f.path,
+        type: f.type,
+      }));
+
+      throw new FieldValidationError(message, type, fieldErrors);
+    }
+
+    return value as T;
   }
 }

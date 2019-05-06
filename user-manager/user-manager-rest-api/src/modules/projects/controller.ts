@@ -1,3 +1,18 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    user-manager-rest-api
+ * @fileName:  controller.ts
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 import * as HttpStatus from 'http-status-codes';
 import { ProjectManager } from './manager';
 import { RouteController } from '../../common/controller/RouteController';
@@ -12,7 +27,12 @@ import {
 } from './entity';
 import { RouteCommand } from '../../router/RouteCommand';
 import { Middleware } from '../../router/Router';
-import { ThirdPartyProducerService } from '../../common/ThirdPartyProducerService';
+import {
+  validateCreateProjectBody,
+  validateUpdateProjectBody,
+  validateProjectNameParam,
+  validateRemoveServiceFromProjectParams,
+} from './validator';
 
 export class ProjectController extends RouteController {
   private manager: ProjectManager;
@@ -34,7 +54,7 @@ export class ProjectController extends RouteController {
   }
 
   private createProjectCommand: RouteCommand<Project> = async routeContext => {
-    const projectModel = routeContext.getRequestBody() as CreateProject;
+    const projectModel = routeContext.getValidatedRequestBody<CreateProject>(validateCreateProjectBody);
     const newProject = await this.manager.create<CreateProject, Project>(projectModel);
 
     return {
@@ -44,8 +64,7 @@ export class ProjectController extends RouteController {
   }
 
   private getProjectByNameCommand: RouteCommand<Project> = async routeContext => {
-    const { projectName } = routeContext.getNamedParams() as { projectName: string };
-    const projectParams: ProjectName = { projectName };
+    const projectParams = routeContext.getValidatedNamedParams<ProjectName>(validateProjectNameParam);
     const projectFound = await this.manager.findOne<ProjectName, Project>(projectParams);
 
     return {
@@ -55,8 +74,8 @@ export class ProjectController extends RouteController {
   }
 
   private updateProjectByNameCommand: RouteCommand<Project> = async routeContext => {
-    const { projectName } = routeContext.getNamedParams() as { projectName: string };
-    const projectModel = routeContext.getRequestBody() as UpdateProjectBody;
+    const { projectName } = routeContext.getValidatedNamedParams<ProjectName>(validateProjectNameParam);
+    const projectModel = routeContext.getValidatedRequestBody<UpdateProjectBody>(validateUpdateProjectBody);
     const projectParams: UpdateProject = { ...projectModel, projectName };
     const projectUpdated = await this.manager.update<UpdateProjectBody, Project>(projectParams);
 
@@ -67,8 +86,7 @@ export class ProjectController extends RouteController {
   }
 
   private deleteProjectByNameCommand: RouteCommand<Project> = async routeContext => {
-    const { projectName } = routeContext.getNamedParams() as { projectName: string };
-    const projectParams: ProjectName = { projectName };
+    const projectParams = routeContext.getValidatedNamedParams<ProjectName>(validateProjectNameParam);
     await this.manager.delete<ProjectName>(projectParams);
 
     return {
@@ -78,11 +96,8 @@ export class ProjectController extends RouteController {
   }
 
   private removeServiceURLCommand: RouteCommand<Project> = async routeContext => {
-    const { projectName, producerService } = routeContext.getNamedParams() as {
-      projectName: string,
-      producerService: ThirdPartyProducerService,
-    };
-    const projectParams: RemoveServiceFromProject = { projectName, producerService };
+    const projectParams =
+      routeContext.getValidatedNamedParams<RemoveServiceFromProject>(validateRemoveServiceFromProjectParams);
     const project = await this.manager.removeServiceURL(projectParams);
 
     return {

@@ -1,3 +1,18 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    user-manager-rest-api
+ * @fileName:  Event.ts
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 import { ThirdPartyProducerService } from './ThirdPartyProducerService';
 
 export enum ServiceEventType {
@@ -6,6 +21,10 @@ export enum ServiceEventType {
   GITLAB_COMMIT_CREATED = 'GITLAB_COMMIT_CREATED',
   GITLAB_ISSUE_CREATED = 'GITLAB_ISSUE_CREATED',
   GITLAB_ISSUE_EDITED = 'GITLAB_ISSUE_EDITED',
+  GITLAB_MERGE_REQUEST_CREATED = 'GITLAB_MERGE_REQUEST_CREATED',
+  GITLAB_MERGE_REQUEST_EDITED = 'GITLAB_MERGE_REQUEST_EDITED',
+  GITLAB_MERGE_REQUEST_MERGED = 'GITLAB_MERGE_REQUEST_MERGED',
+  GITLAB_MERGE_REQUEST_CLOSED = 'GITLAB_MERGE_REQUEST_CLOSED',
   SONARQUBE_PROJECT_ANALYSIS_COMPLETED = 'SONARQUBE_PROJECT_ANALYSIS_COMPLETED',
 }
 
@@ -44,6 +63,10 @@ export interface Event {
    * - GITLAB_COMMIT_CREATED
    * - GITLAB_ISSUE_CREATED
    * - GITLAB_ISSUE_EDITED
+   * - GITLAB_MERGE_REQUEST_CREATED
+   * - GITLAB_MERGE_REQUEST_EDITED
+   * - GITLAB_MERGE_REQUEST_MERGED
+   * - GITLAB_MERGE_REQUEST_CLOSED
    *
    * If `service` is REDMINE:
    * - REDMINE_TICKET_CREATED

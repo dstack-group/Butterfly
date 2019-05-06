@@ -1,3 +1,18 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    redmine-producer
+ * @fileName:  RedmineProducerController.java
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 package it.unipd.dstack.butterfly.producer.redmine;
 
 import it.unipd.dstack.butterfly.config.AbstractConfigManager;
@@ -48,23 +63,25 @@ public class RedmineProducerController extends ProducerController<Event> {
 
     /**
      * Invoked when an exception is thrown
-     *
      * @param e
      */
     @Override
     public void onProduceException(Exception e) {
-        logger.error("Exception: " + e);
+        if (logger.isErrorEnabled()) {
+            logger.error(String.format("Producer exception: %s", e));
+        }
         this.close();
     }
 
     /**
      * Invoked when a webhook request isn't properly parseable
-     *
      * @param e
      */
     @Override
     public void onWebhookException(Exception e) {
-        logger.error(serviceName + " Exception " + e);
+        if (logger.isErrorEnabled()) {
+            logger.error(String.format("%s webhook exception: %s", this.serviceName, e));
+        }
     }
 
     /**

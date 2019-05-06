@@ -1,3 +1,18 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    redmine-producer
+ * @fileName:  RedmineWebhookManager.java
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 package it.unipd.dstack.butterfly.producer.redmine.webhookmanager;
 
 import it.unipd.dstack.butterfly.producer.avro.Event;
@@ -16,14 +31,14 @@ public class RedmineWebhookManager {
     private final WebhookListener webHookListener;
 
     public RedmineWebhookManager(RedmineWebhookListener<Event> listener, Set<String> prioritiesToConsider) {
-        webHookManager = new RedmineWebhookClient(prioritiesToConsider);
+        this.webHookManager = new RedmineWebhookClient(prioritiesToConsider);
         this.webHookListener = new RedmineWebhookListenerObserver(listener);
-        webHookManager.addListener(this.webHookListener);
+        this.webHookManager.addListener(this.webHookListener);
     }
 
     public void onNewRedmineEvent(HttpServletRequest request) throws RedmineWebhookException {
         try {
-            webHookManager.handleEvent(request);
+            this.webHookManager.handleEvent(request);
             if (logger.isInfoEnabled()) {
                 logger.info(String.format("NEW EVENT FROM %s", request.getRequestURI()));
             }
@@ -39,7 +54,6 @@ public class RedmineWebhookManager {
      * Removes attached listeners
      */
     public void close() {
-        logger.info("CALLING CLOSE()");
-        webHookManager.removeListener(this.webHookListener);
+        this.webHookManager.removeListener(this.webHookListener);
     }
 }

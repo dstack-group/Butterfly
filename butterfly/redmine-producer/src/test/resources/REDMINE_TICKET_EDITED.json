@@ -1,0 +1,100 @@
+{
+  "payload": {
+    "action": "updated",
+    "issue": {
+      "id": 3,
+      "subject": "new new bug 2",
+      "description": "Descrizione di prova 2",
+      "created_on": "2019-03-26T14:52:20.643Z",
+      "updated_on": "2019-03-26T15:41:33.657Z",
+      "closed_on": null,
+      "root_id": 3,
+      "parent_id": null,
+      "done_ratio": 20,
+      "start_date": "2019-03-26",
+      "due_date": "2019-03-27",
+      "estimated_hours": 6,
+      "is_private": false,
+      "lock_version": 5,
+      "custom_field_values": [],
+      "project": {
+        "id": 1,
+        "identifier": "Amazon",
+        "name": "Amazon",
+        "description": "",
+        "created_on": "2019-03-26T14:23:27.244Z",
+        "homepage": "http://redmine.dstackgroup.com/amazon/amazon"
+      },
+      "status": {
+        "id": 1,
+        "name": "new"
+      },
+      "tracker": {
+        "id": 1,
+        "name": "Fix"
+      },
+      "priority": {
+        "id": 1,
+        "name": "altissima"
+      },
+      "author": {
+        "id": 1,
+        "login": "admin",
+        "mail": "admin@example.net",
+        "firstname": "Redmine",
+        "lastname": "Admin",
+        "identity_url": null,
+        "icon_url": "//www.gravatar.com/avatar/cb4f282fed12016bd18a879c1f27ff97?rating=PG&size=50"
+      },
+      "assignee": {
+        "id": 5,
+        "login": "ppallino",
+        "mail": "pinco@gmail.com",
+        "firstname": "pallino",
+        "lastname": "pinco",
+        "identity_url": null,
+        "icon_url": "//www.gravatar.com/avatar/4e86b5a2c5de4e4b9188d502c9bd00d1?rating=PG&size=50"
+      },
+      "watchers": []
+    },
+    "journal": {
+      "id": 5,
+      "notes": "",
+      "created_on": "2019-03-26T15:41:33.664Z",
+      "private_notes": false,
+      "author": {
+        "id": 1,
+        "login": "admin",
+        "mail": "admin@example.net",
+        "firstname": "Redmine",
+        "lastname": "Admin",
+        "identity_url": null,
+        "icon_url": "//www.gravatar.com/avatar/cb4f282fed12016bd18a879c1f27ff97?rating=PG&size=50"
+      },
+      "details": [
+        {
+          "id": 5,
+          "value": "new new bug 2",
+          "old_value": "new bug 2",
+          "prop_key": "subject",
+          "property": "attr"
+        },
+        {
+          "id": 6,
+          "value": "20",
+          "old_value": "10",
+          "prop_key": "done_ratio",
+          "property": "attr"
+        },
+        {
+          "id": 7,
+          "value": "6.0",
+          "old_value": "5.0",
+          "prop_key": "estimated_hours",
+          "property": "attr"
+        }
+      ]
+    },
+    "url": "http://localhost:15000/issues/2"
+  }
+}

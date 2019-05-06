@@ -1,7 +1,23 @@
+/**
+ * @project:   Butterfly
+ * @author:    DStack Group
+ * @module:    middleware-dispatcher
+ * @fileName:  Utils.java
+ * @created:   2019-03-07
+ *
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) 2019 DStack Group.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ *
+ * @description:
+ */
+
 package it.unipd.dstack.butterfly.middleware.dispatcher.utils;
 
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.avro.UserSingleContact;
+import it.unipd.dstack.butterfly.consumer.utils.ConsumerUtils;
 import it.unipd.dstack.butterfly.middleware.dispatcher.model.UserManagerResponseData;
 import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.controller.record.Record;
@@ -17,10 +33,16 @@ import java.util.stream.Collectors;
 public final class Utils {
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
-    public static List<EventWithUserContact> parseUserManagerResponseData(List<UserManagerResponseData> data, Event event) {
+    private Utils() {}
+
+    public static List<EventWithUserContact> parseUserManagerResponseData(
+            List<UserManagerResponseData> data,
+            Event event
+    ) {
         return data.stream()
                 .flatMap(user -> {
-                    var userSingleContactListStream = user.getContacts().entrySet()
+                    var userSingleContactListStream = user.getContacts().
+                            entrySet()
                             .stream()
                             .map(contactInfoEntry -> {
                                 logger.info("Trying to build UserSingleContact");
@@ -32,9 +54,9 @@ public final class Utils {
                                 return userSingleContactBuilder.build();
                             });
 
-                    logger.info("userSingleContactListStream " + userSingleContactListStream);
+                    logger.info(String.format("userSingleContactListStream: %s", userSingleContactListStream));
 
-                    var eventWithUserContactStream = userSingleContactListStream
+                    return userSingleContactListStream
                             .map(userSingleContact -> {
                                 logger.info("Trying to build EventWithUserContact");
                                 var eventWithUserContactBuilder = EventWithUserContact.newBuilder();
@@ -42,7 +64,6 @@ public final class Utils {
                                 eventWithUserContactBuilder.setUserContact(userSingleContact);
                                 return eventWithUserContactBuilder.build();
                             });
-                    return eventWithUserContactStream;
                 }).collect(Collectors.toList());
     }
 
@@ -56,6 +77,25 @@ public final class Utils {
      */
     public static <T extends SpecificRecord> Record<T> getProducerRecord(String topic, T avroRecord) {
         return new Record<>(topic, avroRecord);
+    }
+
+    /**
+     * Returns the destination topic from eventWithUserContact's contact platform.
+     *
+     * @param eventWithUserContact
+     * @return the destination topic
+     */
+
+    /**
+     * Returns the destination topic from eventWithUserContact's contact platform using a prefix.
+     * @param messageTopicPrefix
+     * @return a lowercase concatenation of the topic prefix and the actual contact type of the given event with
+     * user contact info attached.
+     */
+    public static Function<EventWithUserContact, String> extractTopicStrategy(String messageTopicPrefix) {
+        return (EventWithUserContact eventWithUserContact) ->
+            ConsumerUtils.getLowerCaseTopicFromEnum(messageTopicPrefix,
+                    eventWithUserContact.getUserContact().getContact());
     }
 
     /**
