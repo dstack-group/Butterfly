@@ -2,12 +2,15 @@ package it.unipd.dstack.butterfly.producer.gitlab.testutils;
 
 import it.unipd.dstack.butterfly.controller.record.Record;
 import it.unipd.dstack.butterfly.producer.producer.Producer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class ProducerTest<T> implements Producer<T> {
     private BrokerTest<T> broker;
+    private Logger logger = LoggerFactory.getLogger(ProducerTest.class);
 
     public ProducerTest(BrokerTest<T> broker) {
         this.broker = broker;
@@ -52,6 +55,8 @@ public class ProducerTest<T> implements Producer<T> {
      */
     @Override
     public CompletableFuture<Void> send(Record<T> record) {
+        logger.info("publishing into kafka broker test...");
+        logger.info("data inserted into broker test: " + record.getData().toString());
         return CompletableFuture.runAsync(() -> this.broker.publishToTopic(record.getTopic(), record.getData()));
     }
 }

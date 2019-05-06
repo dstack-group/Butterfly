@@ -117,13 +117,44 @@ public class GitlabProducerControllerTest {
         var broker = new BrokerTest<Event>();
         var originalProducer = new ProducerTest<>(broker);
         var producer = spy(originalProducer);
-        var gitlabProducerController = this.createGitlabProducerController(producer);
+        var gitlabProducerController = this.createGitlabProducerController(originalProducer);
         String kafkaTopic = configManager.getStringProperty("KAFKA_TOPIC");
+        var latch = new CountDownLatch(1);
 
-        //broker.publishToTopic(kafkaTopic, );
+        doAnswer((Answer<Void>) invocation -> {
+            // a single event should have been published to the broker, and its content should match the content
+            // of GITLAB_ISSUE_CREATED.json
+
+            List<Event> brokerData = broker.getDataByTopic(kafkaTopic);
+
+            logger.info("BROKER DATA: " + brokerData.get(0).toString());
+            assertEquals(1, brokerData.size());
+
+            Event brokerEvent = brokerData.get(0);
+            assertEquals(Long.valueOf(1550586119000L), brokerEvent.getTimestamp());
+            assertEquals(Services.GITLAB, brokerEvent.getService());
+            assertEquals("Butterfly", brokerEvent.getProjectName());
+            assertEquals("https://localhost:10443/dstack/butterfly", brokerEvent.getProjectURL());
+            assertEquals("10560918", brokerEvent.getEventId());
+            assertEquals(ServiceEventTypes.GITLAB_ISSUE_CREATED, brokerEvent.getEventType());
+            assertEquals(null, brokerEvent.getUserEmail());
+            assertEquals("Butterfly", brokerEvent.getTitle());
+            assertEquals("", brokerEvent.getDescription());
+
+            assertEquals(2, brokerEvent.getTags().size());
+            assertEquals("Doge", brokerEvent.getTags().get(0));
+            assertEquals("testing", brokerEvent.getTags().get(1));
+
+            assertEquals(false, true);
+            gitlabProducerController.close();
+
+            assertEquals(null, broker.getDataByTopic(kafkaTopic));
+            return null;
+        }).when(producer)
+                .send(any(Record.class));
 
         gitlabProducerController.start();
-        var latch = new CountDownLatch(1);
+
 
 
 
@@ -143,43 +174,10 @@ public class GitlabProducerControllerTest {
 
         var response = this.sendRequest(request).get();
 
-        doAnswer((Answer<Void>) invocation -> {
-            // a single event should have been published to the broker, and its content should match the content
-            // of GITLAB_ISSUE_CREATED.json
-
-            List<Event> brokerData = broker.getDataByTopic(kafkaTopic);
-
-            logger.info("BROKER DATA: " + brokerData.get(0).toString());
-            assertEquals(1, brokerData.size());
-/*
-            Event brokerEvent = brokerData.get(0);
-            assertEquals(Long.valueOf(1550586119000L), brokerEvent.getTimestamp());
-            assertEquals(Services.GITLAB, brokerEvent.getService());
-            assertEquals("Butterfly", brokerEvent.getProjectName());
-            assertEquals("https://localhost:10443/dstack/butterfly", brokerEvent.getProjectURL());
-            assertEquals("10560918", brokerEvent.getEventId());
-            assertEquals(ServiceEventTypes.GITLAB_ISSUE_CREATED, brokerEvent.getEventType());
-            assertEquals(null, brokerEvent.getUserEmail());
-            assertEquals("Butterfly", brokerEvent.getTitle());
-            assertEquals("", brokerEvent.getDescription());
-
-            assertEquals(2, brokerEvent.getTags().size());
-            assertEquals("Doge", brokerEvent.getTags().get(0));
-            assertEquals("testing", brokerEvent.getTags().get(1));
-
-            assertEquals(false, true);
-            gitlabProducerController.close();
-            */
-            assertEquals(null, broker.getDataByTopic(kafkaTopic));
-
-            latch.countDown();
-            return null;
-        }).when(producer)
-                .send(any(Record.class));
-
         // if the event is accepted by the producer it should return 200 with an empty body.
         assertEquals(200, response.statusCode());
-        assertEquals("", response.body());
+
         latch.await(1000, TimeUnit.MILLISECONDS);
+        assertEquals("", response.body());
     }
 }
