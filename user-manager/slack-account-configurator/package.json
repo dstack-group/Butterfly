@@ -1,0 +1,30 @@
+{
+  "name": "slack-account-configurator",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rimraf ./dist ./coverage",
+    "prebuild": "yarn lint",
+    "build": "tsc",
+    "lint": "tslint -c tslint.json -p tsconfig.json"
+  },
+  "keywords": [],
+  "author": "Alberto Schiabel <alberto.schiabel@gmail.com> (jkomyno)",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/hapi__joi": "^15.0.1",
+    "@types/node": "^12.0.0",
+    "@types/node-fetch": "^2.3.3",
+    "@types/pino": "^5.8.7",
+    "rimraf": "^2.6.3",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.5"
+  },
+  "dependencies": {
+    "@hapi/joi": "^15.0.1",
+    "@slack/bolt": "^1.0.1",
+    "node-fetch": "^2.5.0",
+    "pino": "^5.12.3"
+  }
+}

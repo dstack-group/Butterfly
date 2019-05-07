@@ -72,6 +72,23 @@ services:
       - middleware-dispatcher-network
       - telegram-consumer-network
 
+  slack-account-configurator:
+    build:
+      context: ./slack-account-configurator
+    restart: always
+    ports:
+      - "5200:5200"
+    links:
+      - user-manager
+    depends_on:
+      - user-manager
+    env_file: ./slack-account-configurator/.slack-account-configurator.env
+    environment:
+      NODE_ENV: "production"
+    networks:
+      - user-manager-network
+      - slack-consumer-network
+
 volumes:
   pg_data:
 
@@ -86,3 +103,6 @@ networks:
   telegram-consumer-network:
     external:
       name: telegram-consumer-network
+  slack-consumer-network:
+    external:
+      name: slack-consumer-network
