@@ -145,6 +145,21 @@ services:
       - schema-registry
     networks:
       - kafka-network
+      - email-consumer-network
+
+  slack-consumer:
+    build:
+      context: ./butterfly/slack-consumer
+      args:
+        JAR_FILE: 'slack-consumer-1.0-SNAPSHOT-jar-with-dependencies'
+    env_file: ./butterfly/slack-consumer/.slack-consumer.env
+    depends_on:
+      - kafka
+      - zookeeper
+      - schema-registry
+    networks:
+      - kafka-network
+      - slack-consumer-network
 
   middleware-dispatcher:
     build:
@@ -176,5 +191,9 @@ networks:
     name: middleware-dispatcher-network
   telegram-consumer-network:
     name: telegram-consumer-network
+  email-consumer-network:
+    name: email-consumer-network
+  slack-consumer-network:
+    name: slack-consumer-network
   kafka-network:
     name: kafka-network
