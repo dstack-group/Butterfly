@@ -555,7 +555,7 @@ BEGIN
 	-- If it doesn't, 'USER_NOT_FOUND' is thrown.
 	SELECT u.user_id
 	FROM public.user u
-	WHERE u.email = in_user_email
+	WHERE u.email = LOWER(in_user_email)
 	INTO v_user_id;
 	
 	IF v_user_id IS NULL THEN
@@ -632,7 +632,7 @@ BEGIN
 	-- If it doesn't, 'USER_NOT_FOUND' is thrown.
 	SELECT u.user_id
 	FROM public.user u
-	WHERE u.email = in_user_email
+	WHERE u.email = LOWER(in_user_email)
 	INTO v_user_id;
 	
 	IF v_user_id IS NULL THEN
@@ -846,7 +846,7 @@ BEGIN
 	-- If it doesn't, 'USER_NOT_FOUND' is thrown.
 	SELECT u.user_id
 	FROM public.user u
-	WHERE u.email = in_user_email
+	WHERE u.email = LOWER(in_user_email)
 	INTO v_user_id;
 	
 	IF v_user_id IS NULL THEN
@@ -1324,17 +1324,16 @@ BEGIN
 	INSERT INTO public.user(email, firstname, lastname) VALUES ('singh@gmail.com', 'Harwinder', 'Singh');
 
 	-- PERFORM is used when we're not interesting in the actual data returned from the called stored function.
-	-- PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'TELEGRAM', '38442289');
-	-- PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'SLACK', 'jkomyno');
-	-- PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
-	-- PERFORM public.create_user_contact('federico.rispo@gmail.com', 'TELEGRAM', 'frispo');
+	PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'TELEGRAM', '38442289');
+  PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'EMAIL', 'alberto.schiabel@gmail.com');
+	PERFORM public.create_user_contact('federico.rispo@gmail.com', 'TELEGRAM', '38442289');
 	-- PERFORM public.create_user_contact('federico.rispo@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
 	-- PERFORM public.create_user_contact('enrico.trinco@gmail.com', 'TELEGRAM', 'enrico_dogen');
 	-- PERFORM public.create_user_contact('enrico.trinco@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
 	-- PERFORM public.create_user_contact('thealchemist97@gmail.com', 'TELEGRAM', '191751378');
 	-- PERFORM public.create_user_contact('thealchemist97@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
 
-  -- PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, FIX, CLOSE}'::text[]);
+  -- PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{TELEGRAM, SLACK}'::public.consumer_service[], '{BUG, FIX, CLOSE}'::text[]);
   -- PERFORM public.create_subscription('alberto.schiabel@gmail.com', 'Butterfly', 'REDMINE_TICKET_CREATED', 'LOW', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{BUG, DOGE}'::text[]);
 	-- PERFORM public.create_subscription('thealchemist97@gmail.com', 'Butterfly', 'GITLAB_ISSUE_CREATED', 'MEDIUM', '{EMAIL}'::public.consumer_service[], '{DOGE, BREAK, VSCODE}'::text[]);
 	-- PERFORM public.create_subscription('thealchemist97@gmail.com', 'Butterfly', 'GITLAB_ISSUE_EDITED', 'MEDIUM', '{TELEGRAM, EMAIL}'::public.consumer_service[], '{DOGE, BREAK, BUG}'::text[]);
