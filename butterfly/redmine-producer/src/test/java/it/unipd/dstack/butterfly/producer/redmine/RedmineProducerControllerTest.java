@@ -1,17 +1,17 @@
-package it.unipd.dstack.butterfly.producer.gitlab;
+package it.unipd.dstack.butterfly.producer.redmine;
 
+import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.producer.avro.ServiceEventTypes;
 import it.unipd.dstack.butterfly.producer.avro.Services;
-import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.producer.producer.OnWebhookEventFromTopic;
 import it.unipd.dstack.butterfly.producer.producer.OnWebhookEventFromTopicImpl;
 import it.unipd.dstack.butterfly.producer.producer.Producer;
 import it.unipd.dstack.butterfly.producer.testutils.BrokerTest;
 import it.unipd.dstack.butterfly.producer.testutils.ProducerTest;
 import it.unipd.dstack.butterfly.producer.testutils.TestConfigManager;
-
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,22 +29,22 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
-public class GitlabProducerControllerTest {
-    private static final Logger logger = LoggerFactory.getLogger(GitlabProducerControllerTest.class);
+public class RedmineProducerControllerTest {
+    private static final Logger logger = LoggerFactory.getLogger(RedmineProducerControllerTest.class);
     private final HttpClient client = HttpClient.newBuilder().build();
     private static TestConfigManager configManager;
 
     @BeforeAll
     public static void initConfigManager() {
         configManager = new TestConfigManager();
-        configManager.setProperty("SERVICE_NAME", "gitlab-producer");
-        configManager.setProperty("KAFKA_TOPIC", "service-gitlab");
-        configManager.setProperty("SERVER_PORT", "3000");
+        configManager.setProperty("SERVICE_NAME", "redmine-producer");
+        configManager.setProperty("KAFKA_TOPIC", "service-redmine");
+        configManager.setProperty("SERVER_PORT", "4000");
         configManager.setProperty("SERVER_BASE_URL", "http://localhost");
-        configManager.setProperty("WEBHOOK_ENDPOINT", "/webhooks/gitlab");
-        configManager.setProperty("SECRET_TOKEN", "super-secret-token");
+        configManager.setProperty("WEBHOOK_ENDPOINT", "/webhooks/redmine");
+        configManager.setProperty("PRIORITIES_TO_CONSIDER", "Alta,Urgente,Immediata");
     }
 
     /**
@@ -55,14 +55,12 @@ public class GitlabProducerControllerTest {
      * @param json
      * @return
      */
-    private HttpRequest prepareRequest(String url, String gitlabToken, String gitlabEvent, String json) {
+    private HttpRequest prepareRequest(String url, String json) {
         return HttpRequest
                 .newBuilder()
                 .uri(URI.create(url))
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .header("Content-Type", "application/json")
-                .header("X-Gitlab-Token", gitlabToken)
-                .header("X-Gitlab-Event", gitlabEvent)
                 .build();
     }
 
@@ -85,32 +83,28 @@ public class GitlabProducerControllerTest {
         return Files.readString(filePath);
     }
 
-    private GitlabProducerController createGitlabProducerController(Producer<Event> producer) {
+    private RedmineProducerController createRedmineProducerController(Producer<Event> producer) {
         OnWebhookEventFromTopic<Event> onWebhookEventFromTopic = new OnWebhookEventFromTopicImpl<>();
-        return new GitlabProducerController(configManager, producer, onWebhookEventFromTopic);
+        return new RedmineProducerController(configManager, producer, onWebhookEventFromTopic);
     }
 
     @Test
-    public void shouldProduceAnIssueCreatedEvent() throws Exception {
+    public void shouldProduceATickedCreatedEvent() throws Exception {
         var broker = new BrokerTest<Event>();
         var originalProducer = new ProducerTest<>(broker);
-        var gitlabProducerController = this.createGitlabProducerController(originalProducer);
+        var redmineProducerController = this.createRedmineProducerController(originalProducer);
         String kafkaTopic = configManager.getStringProperty("KAFKA_TOPIC");
         var latch = new CountDownLatch(1);
 
-        gitlabProducerController.start();
+        redmineProducerController.start();
 
-        String issueCreatedJSON = this.readJSONFile("GITLAB_ISSUE_CREATED.json");
+        String issueCreatedJSON = this.readJSONFile("REDMINE_TICKET_CREATED.json");
         String requestURL = "http://localhost:" +
                 configManager.getStringProperty("SERVER_PORT") +
                 configManager.getStringProperty("WEBHOOK_ENDPOINT");
-        String gitlabToken = configManager.getStringProperty("SECRET_TOKEN");
-        String gitlabEvent = "Issue Hook";
 
         var request = this.prepareRequest(
                 requestURL,
-                gitlabToken,
-                gitlabEvent,
                 issueCreatedJSON
         );
 
@@ -119,19 +113,19 @@ public class GitlabProducerControllerTest {
             logger.info("broker contains: " + brokerData.get(0).toString());
             assertEquals(1, brokerData.size());
             Event brokerEvent = brokerData.get(0);
-            assertEquals(Long.valueOf(1550586119000L), brokerEvent.getTimestamp());
-            assertEquals(Services.GITLAB, brokerEvent.getService());
+            assertEquals(Long.valueOf(1553611940643L), brokerEvent.getTimestamp());
+            assertEquals(ServiceEventTypes.REDMINE_TICKET_CREATED, brokerEvent.getEventType());
+            assertEquals(Services.REDMINE, brokerEvent.getService());
+            assertEquals("New bug created by Doge", brokerEvent.getTitle());
+            assertEquals("A doge has to fix a new bug that affects the User Manager", brokerEvent.getDescription());
+            assertEquals("2", brokerEvent.getEventId());
             assertEquals("Butterfly", brokerEvent.getProjectName());
-            assertEquals("https://localhost:10443/dstack/butterfly", brokerEvent.getProjectURL());
-            assertEquals("18373993", brokerEvent.getEventId());
-            assertEquals(ServiceEventTypes.GITLAB_ISSUE_CREATED, brokerEvent.getEventType());
-            assertEquals(null, brokerEvent.getUserEmail());
-            assertEquals("Some bug written in VSCode by a Doge", brokerEvent.getTitle());
-            assertEquals("Breaking issue that affects the Middleware Dispatcher.", brokerEvent.getDescription());
-            assertEquals(2, brokerEvent.getTags().size());
-            assertEquals("Doge", brokerEvent.getTags().get(0));
-            assertEquals("testing", brokerEvent.getTags().get(1));
-            gitlabProducerController.close();
+            assertEquals("http://redmine.dstackgroup.com/butterfly/butterfly", brokerEvent.getProjectURL());
+            assertEquals(List.of("Bug"), brokerEvent.getTags());
+            assertEquals("admin@example.net", brokerEvent.getUserEmail());
+            assertEquals("admin", brokerEvent.getUsername());
+            logger.info("Assertions passed..");
+            redmineProducerController.close();
             assertEquals(null, broker.getDataByTopic(kafkaTopic));
             return answer;
         }).get();

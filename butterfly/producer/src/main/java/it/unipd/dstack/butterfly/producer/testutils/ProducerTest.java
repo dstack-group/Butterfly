@@ -1,4 +1,4 @@
-package it.unipd.dstack.butterfly.producer.gitlab.testutils;
+package it.unipd.dstack.butterfly.producer.testutils;
 
 import it.unipd.dstack.butterfly.controller.record.Record;
 import it.unipd.dstack.butterfly.producer.producer.Producer;

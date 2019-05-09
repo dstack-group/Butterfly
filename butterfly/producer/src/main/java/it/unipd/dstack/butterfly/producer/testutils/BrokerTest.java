@@ -1,4 +1,4 @@
-package it.unipd.dstack.butterfly.producer.gitlab.testutils;
+package it.unipd.dstack.butterfly.producer.testutils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
