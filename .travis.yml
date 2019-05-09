@@ -20,7 +20,8 @@ cache:
   - /usr/bin
   - $HOME/.travis_cache
   - $HOME/.m2 # Maven will download dependencies to this folder
-  - ./user-manager/user-manager-rest-api/node_modules # Node.js dependencies
+  - ./user-manager/user-manager-rest-api/node_modules # User Manager's Node.js dependencies
+  - ./user-manager/slack-account-configurator/node_modules # Slack Account Configurator's Node.js dependencies
 
 # matrix:
 #   fast_finish: true
@@ -43,8 +44,8 @@ before_install:
   # makes the shell files executable
   - find ./ -type f -name "*.sh" -exec chmod +x {} \;
   # install project dependencies
-  - ./install.sh
+  - ./run.sh install
 
 script:
   # tests the Java services and the User Manager
-  - ./test.sh
+  - ./run.sh test

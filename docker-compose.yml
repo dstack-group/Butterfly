@@ -74,6 +74,7 @@ services:
       args:
         SERVER_PORT: 3000
         JAR_FILE: 'gitlab-producer-1.0-SNAPSHOT-jar-with-dependencies'
+    container_name: gitlab-producer
     env_file: ./butterfly/gitlab-producer/.gitlab-producer.env
     depends_on:
       - kafka
@@ -91,6 +92,7 @@ services:
       args:
         SERVER_PORT: 4000
         JAR_FILE: 'redmine-producer-1.0-SNAPSHOT-jar-with-dependencies'
+    container_name: redmine-producer
     env_file: ./butterfly/redmine-producer/.redmine-producer.env
     depends_on:
       - kafka
@@ -108,6 +110,7 @@ services:
       args:
         SERVER_PORT: 6000
         JAR_FILE: 'sonarqube-producer-1.0-SNAPSHOT-jar-with-dependencies'
+    container_name: sonarqube-producer
     env_file: ./butterfly/sonarqube-producer/.sonarqube-producer.env
     depends_on:
       - kafka
@@ -124,6 +127,7 @@ services:
       context: ./butterfly/telegram-consumer
       args:
         JAR_FILE: 'telegram-consumer-1.0-SNAPSHOT-jar-with-dependencies'
+    container_name: telegram-consumer
     env_file: ./butterfly/telegram-consumer/.telegram-consumer.env
     depends_on:
       - kafka
@@ -138,6 +142,7 @@ services:
       context: ./butterfly/email-consumer
       args:
         JAR_FILE: 'email-consumer-1.0-SNAPSHOT-jar-with-dependencies'
+    container_name: email-consumer
     env_file: ./butterfly/email-consumer/.email-consumer.env
     depends_on:
       - kafka
@@ -152,6 +157,7 @@ services:
       context: ./butterfly/slack-consumer
       args:
         JAR_FILE: 'slack-consumer-1.0-SNAPSHOT-jar-with-dependencies'
+    container_name: slack-consumer
     env_file: ./butterfly/slack-consumer/.slack-consumer.env
     depends_on:
       - kafka
@@ -166,6 +172,7 @@ services:
       context: ./butterfly/middleware-dispatcher
       args:
         JAR_FILE: 'middleware-dispatcher-1.0-SNAPSHOT-jar-with-dependencies'
+    container_name: middleware-dispatcher
     env_file: ./butterfly/middleware-dispatcher/.middleware-dispatcher.env
     depends_on:
       - kafka
