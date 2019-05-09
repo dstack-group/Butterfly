@@ -68,21 +68,6 @@ public class ProducerImpl<V> implements Producer<V> {
     }
 
     /**
-     * Asynchronously produce a list of Record elements
-     *
-     * @param recordList
-     * @return
-     */
-    @Override
-    public CompletableFuture<Void> send(List<Record<V>> recordList) {
-        var completableFutureList = recordList
-                .stream()
-                .map(this::send)
-                .collect(Collectors.toList());
-        return ProducerUtils.composeFutureList(completableFutureList);
-    }
-
-    /**
      * Releases any system resources associated with the current object.
      */
     @Override

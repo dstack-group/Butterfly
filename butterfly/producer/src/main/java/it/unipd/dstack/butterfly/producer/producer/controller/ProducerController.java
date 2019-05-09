@@ -76,7 +76,7 @@ public abstract class ProducerController<V> implements Controller {
             logger.info(String.format("%s started", this.serviceName));
             logger.info(String.format("%s listening on port: %s", this.serviceName, this.serverPort));
         }
-        this.producer.awaitUntilError(this::onProduceException);
+        //this.producer.awaitUntilError(this::onProduceException);
     }
 
     /**
