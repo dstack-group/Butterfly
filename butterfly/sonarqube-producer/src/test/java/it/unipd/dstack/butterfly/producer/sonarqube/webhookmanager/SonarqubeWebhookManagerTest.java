@@ -63,18 +63,13 @@ public class SonarqubeWebhookManagerTest {
             assertEquals(ServiceEventTypes.SONARQUBE_PROJECT_ANALYSIS_COMPLETED, event.getEventType());
             assertEquals(Services.SONARQUBE, event.getService());
             assertEquals("SUCCESS", event.getTitle());
-            assertEquals("new_maintainability_rating: OK new_coverage: ERROR new_duplicated_lines_density: OK new_security_rating: OK new_reliability_rating: OK", event.getDescription());
+            assertEquals("new_maintainability_rating: OK new_coverage: ERROR new_duplicated_lines_density: OK new_security_rating: OK new_reliability_rating: OK ", event.getDescription());
             assertEquals("AWpMVIXi300Bl9GYiThJ", event.getEventId());
             assertEquals("Butterfly", event.getProjectName());
             assertEquals("http://localhost:9000/dashboard?id=it.unipd.dstack.butterfly%3Abutterfly", event.getProjectURL());
             assertEquals(null, event.getUserEmail());
             assertEquals(null, event.getUserEmail());
-           // assertEquals(null, event.getTimestamp());
-
-
-           // eventBuilder.setTimestamp(analysisEvent.getAnalysedAt().getTime());-
-           
-
+     
             
             latch.countDown();
             return null;
