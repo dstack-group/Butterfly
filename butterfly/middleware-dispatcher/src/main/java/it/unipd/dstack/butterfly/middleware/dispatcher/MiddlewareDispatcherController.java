@@ -117,7 +117,9 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
      * @param event Event record to be processed
      */
     private void processEvent(Event event) {
-        logger.info(String.format("Processing event in thread %s", Thread.currentThread().getId()));
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("Processing event in thread %s", Thread.currentThread().getId()));
+        }
         eventProcessor.processEvent(event, UserManagerResponse.class)
                 .thenAcceptAsync(response -> {
                     if (response == null) {
@@ -149,7 +151,6 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
              * Extracts every possible association between a user and 1 to N contact platforms, and aggregates this
              * information with the original event.
              */
-            logger.info(String.format("Trying to parse eventWithUserContactList: %s", data));
             List<EventWithUserContact> eventWithUserContactList =
                     Utils.parseUserManagerResponseData(data, event);
 
@@ -157,7 +158,6 @@ public class MiddlewareDispatcherController extends ConsumerController<Event> {
              * Creates a new ProducerImpl record for each EventWithUserContact instance in eventWithUserContactList.
              * The destination topic is extracted from the contact platform name.
              */
-            logger.info("Trying to assemble producerRecordList");
             var producerRecordList = Utils.processMessageDataList(
                     eventWithUserContactList,
                     Utils.extractTopicStrategy(this.messageTopicPrefix),

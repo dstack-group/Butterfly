@@ -119,13 +119,4 @@ public class JSONConverterImpl implements JSONConverter {
             return null;
         }
     }
-
-    /*
-    private class DateTimeDeserializer implements JsonDeserializer<DateTime> {
-        public DateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-                throws JsonParseException {
-            return new DateTime(json.getAsJsonPrimitive().getAsString());
-        }
-    }
-    */
 }
