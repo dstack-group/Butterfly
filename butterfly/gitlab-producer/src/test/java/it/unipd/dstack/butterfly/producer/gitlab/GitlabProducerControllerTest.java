@@ -10,7 +10,6 @@ import it.unipd.dstack.butterfly.producer.testutils.BrokerTest;
 import it.unipd.dstack.butterfly.producer.testutils.ProducerTest;
 import it.unipd.dstack.butterfly.producer.testutils.TestConfigManager;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,17 +33,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class GitlabProducerControllerTest {
     private static final Logger logger = LoggerFactory.getLogger(GitlabProducerControllerTest.class);
     private final HttpClient client = HttpClient.newBuilder().build();
-    private static TestConfigManager configManager;
+    private TestConfigManager configManager;
 
-    @BeforeAll
-    public static void initConfigManager() {
-        configManager = new TestConfigManager();
-        configManager.setProperty("SERVICE_NAME", "gitlab-producer");
-        configManager.setProperty("KAFKA_TOPIC", "service-gitlab");
-        configManager.setProperty("SERVER_PORT", "3000");
-        configManager.setProperty("SERVER_BASE_URL", "http://localhost");
-        configManager.setProperty("WEBHOOK_ENDPOINT", "/webhooks/gitlab");
-        configManager.setProperty("SECRET_TOKEN", "super-secret-token");
+    public GitlabProducerControllerTest() {
+        this.configManager = new TestConfigManager();
+        this.configManager.setProperty("SERVICE_NAME", "gitlab-producer");
+        this.configManager.setProperty("KAFKA_TOPIC", "service-gitlab");
+        this.configManager.setProperty("SERVER_PORT", "3000");
+        this.configManager.setProperty("SERVER_BASE_URL", "http://localhost");
+        this.configManager.setProperty("WEBHOOK_ENDPOINT", "/webhooks/gitlab");
+        this.configManager.setProperty("SECRET_TOKEN", "super-secret-token");
     }
 
     /**
@@ -87,7 +85,7 @@ public class GitlabProducerControllerTest {
 
     private GitlabProducerController createGitlabProducerController(Producer<Event> producer) {
         OnWebhookEventFromTopic<Event> onWebhookEventFromTopic = new OnWebhookEventFromTopicImpl<>();
-        return new GitlabProducerController(configManager, producer, onWebhookEventFromTopic);
+        return new GitlabProducerController(this.configManager, producer, onWebhookEventFromTopic);
     }
 
     @Test
@@ -104,6 +102,8 @@ public class GitlabProducerControllerTest {
         String requestURL = "http://localhost:" +
                 configManager.getStringProperty("SERVER_PORT") +
                 configManager.getStringProperty("WEBHOOK_ENDPOINT");
+
+        logger.info(String.format("RequestURL: %s", requestURL));
         String gitlabToken = configManager.getStringProperty("SECRET_TOKEN");
         String gitlabEvent = "Issue Hook";
 

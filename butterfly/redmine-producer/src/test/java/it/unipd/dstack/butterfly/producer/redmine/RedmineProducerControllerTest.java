@@ -34,17 +34,16 @@ import static org.junit.Assert.assertEquals;
 public class RedmineProducerControllerTest {
     private static final Logger logger = LoggerFactory.getLogger(RedmineProducerControllerTest.class);
     private final HttpClient client = HttpClient.newBuilder().build();
-    private static TestConfigManager configManager;
+    private TestConfigManager configManager;
 
-    @BeforeAll
-    public static void initConfigManager() {
-        configManager = new TestConfigManager();
-        configManager.setProperty("SERVICE_NAME", "redmine-producer");
-        configManager.setProperty("KAFKA_TOPIC", "service-redmine");
-        configManager.setProperty("SERVER_PORT", "4000");
-        configManager.setProperty("SERVER_BASE_URL", "http://localhost");
-        configManager.setProperty("WEBHOOK_ENDPOINT", "/webhooks/redmine");
-        configManager.setProperty("PRIORITIES_TO_CONSIDER", "Alta,Urgente,Immediata");
+    public RedmineProducerControllerTest() {
+        this.configManager = new TestConfigManager();
+        this.configManager.setProperty("SERVICE_NAME", "redmine-producer");
+        this.configManager.setProperty("KAFKA_TOPIC", "service-redmine");
+        this.configManager.setProperty("SERVER_PORT", "4000");
+        this.configManager.setProperty("SERVER_BASE_URL", "http://localhost");
+        this.configManager.setProperty("WEBHOOK_ENDPOINT", "/webhooks/redmine");
+        this.configManager.setProperty("PRIORITIES_TO_CONSIDER", "Alta,Urgente,Immediata");
     }
 
     /**
@@ -85,7 +84,7 @@ public class RedmineProducerControllerTest {
 
     private RedmineProducerController createRedmineProducerController(Producer<Event> producer) {
         OnWebhookEventFromTopic<Event> onWebhookEventFromTopic = new OnWebhookEventFromTopicImpl<>();
-        return new RedmineProducerController(configManager, producer, onWebhookEventFromTopic);
+        return new RedmineProducerController(this.configManager, producer, onWebhookEventFromTopic);
     }
 
     @Test
