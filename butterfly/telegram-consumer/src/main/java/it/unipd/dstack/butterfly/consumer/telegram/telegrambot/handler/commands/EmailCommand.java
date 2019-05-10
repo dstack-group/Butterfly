@@ -40,7 +40,7 @@ public class EmailCommand implements Command {
      */
     @Override
     public void execute(TelegramMessageSender sender, TelegramResponse response) throws Exception {
-        if(!response.getCommandArguments().isEmpty()) {
+        if (!response.getCommandArguments().isEmpty()) {
             String emailAddress = response.getCommandArguments().get(0);
             logger.info("emailAddress " + emailAddress);
 
@@ -78,7 +78,7 @@ public class EmailCommand implements Command {
                             return null;
                         });
             }
-        }else{
+        } else {
             TelegramMessage errorMessage = new TelegramMessage(response.getChatId(),
                     "You must specify an email address.");
             this.sendAnswer(sender, errorMessage);

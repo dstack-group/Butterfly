@@ -35,6 +35,15 @@ public final class Utils {
 
     private Utils() {}
 
+    /**
+     * Given a list of users with contact info attached and an event produced, where each user may
+     * have specified more than one contact platform, it should create a list of messages where
+     * each association between a user and a contact platform
+     * appears only once.
+     * @param data the list of contact info returned by the User Manager's match search
+     * @param event the event produced
+     * @return
+     */
     public static List<EventWithUserContact> parseUserManagerResponseData(
             List<UserManagerResponseData> data,
             Event event
