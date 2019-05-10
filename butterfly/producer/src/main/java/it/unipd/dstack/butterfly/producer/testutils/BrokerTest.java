@@ -30,7 +30,7 @@ public class BrokerTest<T> {
      */
     private Map<String, List<T>> broker = new HashMap<>();
 
-    private static <V> List<V> createList() {
+    private static <V> List<V> createList(String key) {
         return new ArrayList<>();
     }
 
