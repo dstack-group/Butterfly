@@ -20,12 +20,12 @@ print_usage() {
 
 SUBCOMMAND="";
 
-while [[ "$#" -gt 0 ]]; do
+while [ "$#" -gt 0 ]; do
   case $1 in
     -h|--help) print_usage; exit 0;;
-    -c|--clean) SUBCOMMAND+="clean ";;
+    -c|--clean) SUBCOMMAND="$SUBCOMMAND clean ";;
     -t|--test) SHOULD_TEST=1;;
-    -i|--install) SUBCOMMAND+="install ";;
+    -i|--install) SUBCOMMAND="$SUBCOMMAND install ";;
     -*) echo "Error: unknown option $1" >&2; print_usage; exit 1;;
     *) MODULE_TO_BUILD="$1"; shift;;
   esac;
@@ -42,7 +42,7 @@ else OPTION="-pl $MODULE_TO_BUILD -T5C"; ARGUMENT="$2";
 fi
 
 if [ -z $SHOULD_TEST ];
-then OPTION+=" -DskipTests";
+then OPTION=" $OPTION -DskipTests";
 fi
 
 COMMAND="mvn checkstyle:check ${SUBCOMMAND}package $OPTION";

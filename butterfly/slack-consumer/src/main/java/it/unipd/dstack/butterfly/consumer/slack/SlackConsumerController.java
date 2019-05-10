@@ -3,7 +3,7 @@
  * @author:    DStack Group
  * @module:    slack-consumer
  * @fileName:  SlackConsumerController.java
- * @created:   2019-03-07
+ * @created:   2019-05-03
  *
  * --------------------------------------------------------------------------------------------
  * Copyright (c) 2019 DStack Group.
@@ -16,26 +16,34 @@
 package it.unipd.dstack.butterfly.consumer.slack;
 
 import it.unipd.dstack.butterfly.config.AbstractConfigManager;
+import it.unipd.dstack.butterfly.controller.record.Record;
+import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.consumer.ConsumerFactory;
 import it.unipd.dstack.butterfly.consumer.consumer.controller.ConsumerController;
 import it.unipd.dstack.butterfly.consumer.consumer.formatstrategy.FormatStrategy;
-import it.unipd.dstack.butterfly.controller.record.Record;
-import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
+import it.unipd.dstack.butterfly.consumer.slack.message.SlackMessage;
+import it.unipd.dstack.butterfly.consumer.slack.slackbot.SlackBot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SlackConsumerController extends ConsumerController<EventWithUserContact> {
-    private static final Logger logger = LoggerFactory.getLogger(SlackConsumerController.class);
+    private static Logger logger = LoggerFactory.getLogger(SlackConsumerController.class);
 
+    private final SlackBot bot;
     private final FormatStrategy<EventWithUserContact> formatStrategy;
 
-    public SlackConsumerController(
-            AbstractConfigManager configManager,
-            ConsumerFactory<EventWithUserContact> consumerFactory,
-            FormatStrategy<EventWithUserContact> formatStrategy
-    ) {
+    public SlackConsumerController(AbstractConfigManager configManager,
+                                   ConsumerFactory<EventWithUserContact> consumerFactory,
+                                   SlackBot bot,
+                                   FormatStrategy<EventWithUserContact> formatStrategy) {
         super(configManager, consumerFactory);
+        this.bot = bot;
         this.formatStrategy = formatStrategy;
+
+        if (!this.bot.testSlackConnection()) {
+            this.logger.error("Cannot connect to Slack, closing.");
+            this.close();
+        }
     }
 
     /**
@@ -46,20 +54,18 @@ public class SlackConsumerController extends ConsumerController<EventWithUserCon
     @Override
     protected void onMessageConsume(Record<EventWithUserContact> record) {
         EventWithUserContact eventWithUserContact = record.getData();
+        String message = this.formatStrategy.format(eventWithUserContact);
+        String contactRef = eventWithUserContact.getUserContact().getContactRef();
 
-        logger.info("Consuming new event");
-        var event = eventWithUserContact.getEvent();
-        String subject = String.format("[%s] %s in project %s",
-                event.getService(),
-                event.getEventType(),
-                event.getProjectName());
-        String content = this.formatStrategy.format(eventWithUserContact);
-        String recipient = eventWithUserContact.getUserContact().getContactRef();
-        logger.info("Contact ref " + recipient);
+        SlackMessage slackMessage = new SlackMessage(contactRef, message);
+        this.bot.sendMessage(slackMessage);
+    }
 
-        /*
-        SlackMessage slackMessage = new SlackMessage(recipient, content, subject);
-        this.slackSender.sendMessage(emailMessage);
-        */
+    /**
+     * Releases SlackConsumerController's resources
+     */
+    @Override
+    protected void releaseResources() {
+        this.bot.close();
     }
 }

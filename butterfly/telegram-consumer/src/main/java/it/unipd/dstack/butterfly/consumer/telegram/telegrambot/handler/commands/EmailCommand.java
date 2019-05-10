@@ -40,43 +40,48 @@ public class EmailCommand implements Command {
      */
     @Override
     public void execute(TelegramMessageSender sender, TelegramResponse response) throws Exception {
-        String emailAddress = response.getCommandArguments().get(0);
-        logger.info("emailAddress " + emailAddress);
+        if(!response.getCommandArguments().isEmpty()) {
+            String emailAddress = response.getCommandArguments().get(0);
+            logger.info("emailAddress " + emailAddress);
 
-        if (!EmailValidator.isValidEmailAddress(emailAddress)) {
-            String messageContent = emailAddress + " non è un'email valida";
-            TelegramMessage newMessage = new TelegramMessage(response.getChatId(), messageContent);
-            try {
-                sender.send(newMessage);
-            } catch (TelegramApiException e) {
-                throw e;
+            if (!EmailValidator.isValidEmailAddress(emailAddress)) {
+                String messageContent = emailAddress + " is not a valid email.";
+                TelegramMessage newMessage = new TelegramMessage(response.getChatId(), messageContent);
+                try {
+                    sender.send(newMessage);
+                } catch (TelegramApiException e) {
+                    throw e;
+                }
+            } else {
+                var emailWithContactRefBuilder = EmailWithContactRef.newBuilder();
+                emailWithContactRefBuilder.setContactRef(response.getChatId());
+                emailWithContactRefBuilder.setUserEmail(emailAddress);
+                EmailWithContactRef emailWithContactRef = emailWithContactRefBuilder.build();
+
+                // it should process the event if and only if the email address is valid
+                eventProcessor.processEvent(emailWithContactRef, EmailCommand.class)
+                        .thenAcceptAsync(reply -> {
+                            String messageContent;
+                            if (reply == null) {
+                                logger.error("Reply lost from eventProcessor");
+                                messageContent = "Connection error.";
+                            } else {
+                                logger.info("Reply received from eventProcessor: " + reply);
+                                messageContent = "The connection with the User Manager was successfully established.";
+                            }
+
+                            TelegramMessage newMessage = new TelegramMessage(response.getChatId(), messageContent);
+                            this.sendAnswer(sender, newMessage);
+                        })
+                        .exceptionally(e -> {
+                            logger.error("Exception in processEvent: " + e);
+                            return null;
+                        });
             }
-        } else {
-            var emailWithContactRefBuilder = EmailWithContactRef.newBuilder();
-            emailWithContactRefBuilder.setContactRef(response.getChatId());
-            emailWithContactRefBuilder.setUserEmail(emailAddress);
-            EmailWithContactRef emailWithContactRef = emailWithContactRefBuilder.build();
-
-            // it should process the event if and only if the email address is valid
-            eventProcessor.processEvent(emailWithContactRef, EmailCommand.class)
-                    .thenAcceptAsync(reply -> {
-                        String messageContent;
-                        if (reply == null) {
-                            logger.error("Reply lost from eventProcessor");
-                            messageContent = "Connection error";
-                        } else {
-                            logger.info("Reply received from eventProcessor: " + reply);
-                            messageContent = "Connection successful";
-                        }
-
-                        TelegramMessage newMessage = new TelegramMessage(response.getChatId(), messageContent);
-                        this.sendAnswer(sender, newMessage);
-                    })
-                    .exceptionally(e -> {
-                        logger.error("Exception in processEvent: " + e);
-                        //todo this.onNotValidResponse()
-                        return null;
-                    });
+        }else{
+            TelegramMessage errorMessage = new TelegramMessage(response.getChatId(),
+                    "You must specify an email address.");
+            this.sendAnswer(sender, errorMessage);
         }
     }
 
@@ -84,7 +89,7 @@ public class EmailCommand implements Command {
         try {
             sender.send(message);
         } catch (Exception e) {
-            logger.error("errore while sending message: " + message.getContent());
+            logger.error("error while sending message: " + message.getContent());
         }
     }
 

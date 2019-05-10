@@ -23,12 +23,10 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class ProducerImpl<V> implements Producer<V> {
     private static final Logger logger = LoggerFactory.getLogger(ProducerImpl.class);
@@ -65,21 +63,6 @@ public class ProducerImpl<V> implements Producer<V> {
 
             this.kafkaProducer.send(kafkaRecord, callback);
         });
-    }
-
-    /**
-     * Asynchronously produce a list of Record elements
-     *
-     * @param recordList
-     * @return
-     */
-    @Override
-    public CompletableFuture<Void> send(List<Record<V>> recordList) {
-        var completableFutureList = recordList
-                .stream()
-                .map(this::send)
-                .collect(Collectors.toList());
-        return ProducerUtils.composeFutureList(completableFutureList);
     }
 
     /**

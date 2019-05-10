@@ -1,10 +1,18 @@
 version: '3.5'
 
 services:
-  install:
+  install-user-manager:
     image: node:10.15.3-alpine
     volumes:
       - ./user-manager-rest-api:/usr/app
+    working_dir: /usr/app
+    entrypoint:
+      - yarn
+
+  install-slack-account-configurator:
+    image: node:10.15.3-alpine
+    volumes:
+      - ./slack-account-configurator:/usr/app
     working_dir: /usr/app
     entrypoint:
       - yarn

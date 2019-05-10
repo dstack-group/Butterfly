@@ -45,6 +45,7 @@ public class WebhookHandler {
     public synchronized void listen(int port) {
         Spark.port(port);
         attachWebhookHandlerToMethod();
+        Spark.awaitInitialization();
     }
 
     public String getRoute() {
