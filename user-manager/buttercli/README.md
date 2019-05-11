@@ -1,4 +1,4 @@
-bumcli
+buttercli
 ======
 
 A CLI to interact with the Butterfly User Manager REST API
