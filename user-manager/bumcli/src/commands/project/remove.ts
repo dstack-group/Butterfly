@@ -11,10 +11,30 @@ export class Remove extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    gitlab: flags.boolean({char: 'g', description: 'remove project gitlab url', exclusive: ['redmine', 'sonarqube']}),
-    name: flags.string({char: 'n', description: 'project name (max 50 characters)', required: true}),
-    redmine: flags.boolean({char: 'r', description: 'remove project redmine url', exclusive: ['gitlab', 'sonarqube']}),
-    sonarqube: flags.boolean({char: 's', description: 'remove project sonarqube', exclusive: ['gitlab', 'redmine']}),
+
+    gitlab: flags.boolean({
+      char: 'g',
+      description: 'remove project gitlab url',
+      exclusive: ['redmine', 'sonarqube'],
+    }),
+
+    name: flags.string({
+      char: 'n',
+      description: 'project name (max 50 characters)',
+      required: true,
+    }),
+
+    redmine: flags.boolean({
+      char: 'r',
+      description: 'remove project redmine url',
+      exclusive: ['gitlab', 'sonarqube'],
+    }),
+
+    sonarqube: flags.boolean({
+      char: 's',
+      description: 'remove project sonarqube',
+      exclusive: ['gitlab', 'redmine'],
+    }),
   };
 
   async run() {
@@ -26,7 +46,7 @@ export class Remove extends BaseCommand {
 
       const project: RemoveProject = {projectName: flagss.name};
 
-      /*
+      /**
        * Add into project.service the service type selected if it was specified
        */
       if (flagss.gitlab !== undefined) {
@@ -46,7 +66,7 @@ export class Remove extends BaseCommand {
           this.log(`${project.service} project url removed successfully`);
 
     } catch (error) {
-      this.error(error.message);
+      this.showError(error.message);
     }
   }
 }
