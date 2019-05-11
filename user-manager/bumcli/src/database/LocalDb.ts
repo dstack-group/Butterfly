@@ -1,6 +1,5 @@
-import * as LowDb from 'lowdb';
+import * as lowDb from 'lowdb';
 import * as FileSync from 'lowdb/adapters/FileSync';
-import { forIn } from 'lodash';
 
 export enum Config {
   Server = 'ServerConfig',
@@ -9,8 +8,8 @@ export enum Config {
 
 export class LocalDb {
 
-  private file: LowDb.AdapterSync;
-  private db: LowDb.LowdbSync<LowDb.AdapterSync>;
+  private file: lowDb.AdapterSync;
+  private db: lowDb.LowdbSync<lowDb.AdapterSync>;
 
   constructor(path: string) {
 
@@ -20,7 +19,7 @@ export class LocalDb {
     }
 
     this.file = new FileSync(path);
-    this.db = LowDb(this.file);
+    this.db = lowDb(this.file);
 
     this.init();
   }
@@ -51,6 +50,7 @@ export class LocalDb {
     console.log(dbStructure);
     this.db.defaults(JSON.parse(dbStructure)).write();
     */
+
     this.db.defaults({ UserInfo: {}, ServerConfig: {}}).write();
   }
 
