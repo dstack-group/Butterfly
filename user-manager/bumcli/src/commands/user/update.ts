@@ -1,9 +1,9 @@
 import { flags } from '@oclif/command';
 import { UserRestRequests } from '../../rest-client';
-import { BaseCommand } from '../../base/base';
+import { BaseCommand, TableColumns } from '../../base/base';
 import { Config } from '../../database/LocalDb';
 import { Validator } from '../../utils/Validator';
-import { UpdateUser } from '../../rest-client/entities';
+import { User, UpdateUser } from '../../rest-client/entities';
 
 export class Update extends BaseCommand {
 
@@ -11,6 +11,7 @@ export class Update extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
+
     available: flags.boolean({
       allowNo: true,
       char: 'a',
@@ -18,9 +19,32 @@ export class Update extends BaseCommand {
       // must not change this value if the user does not use this flag
       description: 'the user is currently available (default is true)',
     }),
-    email: flags.string({char: 'e', description: 'user email address', required: true}),
-    firstname: flags.string({char: 'f', description: 'new first name (max 30 characters)'}),
-    lastname: flags.string({char: 'l', description: 'new last name (max 30 characters)'}),
+
+    email: flags.string({
+      char: 'e',
+      description: 'user email address',
+      required: true,
+    }),
+
+    firstname: flags.string({
+      char: 'f',
+      description: 'new first name (max 30 characters)',
+    }),
+
+    lastname: flags.string({
+      char: 'l',
+      description: 'new last name (max 30 characters)',
+    }),
+  };
+
+  private static readonly columns: TableColumns<User> = {
+    userId: {minWidth: 7, extended: true},
+    email: {minWidth: 7},
+    firstname: {minWidth: 7},
+    lastname: {minWidth: 7},
+    enabled: {get: user => user.enabled ? 'T' : 'F'},
+    created: {minWidth: 7, extended: true},
+    modified: {minWidth: 7, extended: true},
   };
 
   async run() {
@@ -30,7 +54,7 @@ export class Update extends BaseCommand {
 
       const user: UpdateUser = {email: Validator.isEmailValid(flagss.email)};
 
-      /*
+      /**
        * Add the user properties updated
        */
 
@@ -46,10 +70,11 @@ export class Update extends BaseCommand {
         user.enabled = flagss.available;
       }
 
-      this.print(await client.update(user), flagss.json);
+      const result = await client.update(user);
+      this.showResult<User>([result], Update.columns, flagss.json);
 
     } catch (error) {
-      this.error(error.message);
+      this.showError(error);
     }
   }
 }

@@ -10,7 +10,12 @@ export class Remove extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    email: flags.string({char: 'e', description: 'user email address', required: true}),
+
+    email: flags.string({
+      char: 'e',
+      description: 'user email address',
+      required: true,
+    }),
   };
 
   async run() {
@@ -27,7 +32,7 @@ export class Remove extends BaseCommand {
       (flagss.json) ? this.log('{}') : this.log('User removed successfully');
 
     } catch (error) {
-      this.error(error.message);
+      this.showError(error);
     }
   }
 }
