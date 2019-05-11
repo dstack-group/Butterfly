@@ -21,10 +21,12 @@ export type UpdateUserContact = CreateUserContact;
 export interface UserContact {
   userContactId: number;
   userEmail: string;
-  contactType: ContactService;
+  contactService: ContactService;
   contactRef: string;
 }
 
 export interface UserContacts {
-  contacts: {[key in ContactService]?: string};
+ EMAIL?: string;
+ SLACK?: string;
+ TELEGRAM?: string;
 }
