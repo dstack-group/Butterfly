@@ -1,6 +1,6 @@
-import {Command, flags} from '@oclif/command';
-import { BaseCommand } from '../../base/base';
-import { Config } from '../../database/LocalDb';
+import { Command, flags } from '@oclif/command';
+import { BaseCommand, TableColumns } from '../../base/base';
+import { Config, ServerConfig, UserInfo } from '../../database';
 
 export class List extends BaseCommand {
 
@@ -8,28 +8,52 @@ export class List extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    server: flags.boolean({char: 's', description: 'Get only the server settings'}),
-    user: flags.boolean({char: 'u', description: 'Get only the user settings'}),
+    server: flags.boolean({ char: 's', description: 'Get only the server settings' }),
+    user: flags.boolean({ char: 'u', description: 'Get only the user settings' }),
+  };
+
+  private static readonly serverColumns: TableColumns<ServerConfig> = {
+    hostname: { minWidth: 40 },
+    port: { minWidth: 15 },
+    timeout: { minWidth: 15 },
+  };
+
+  private static readonly userColumns: TableColumns<UserInfo> = {
+    email: { minWidth: 40 },
+    firstname: { minWidth: 15 },
+    lastname: { minWidth: 15 },
   };
 
   async run() {
+    try {
 
-    const flagss = this.parse(List).flags;
+      const flagss = this.parse(List).flags;
 
-    if (!flagss.user && !flagss.server) {
-      this.log('All configuration:');
-      this.print(this.db.getValues(Config.User), flagss.json);
-      this.print(this.db.getValues(Config.Server), flagss.json);
-    }
+      if (!flagss.user && !flagss.server) {
+        this.log('All configuration:');
 
-    if (flagss.user) {
-      this.log('User informations:');
-      this.print(this.db.getValues(Config.User), flagss.json);
-    }
+        const userResult = this.db.getValues(Config.User);
+        this.showResult<UserInfo>([userResult], List.userColumns, flagss.json);
 
-    if (flagss.server) {
-      this.log('Server configuration settings:');
-      this.print(this.db.getValues(Config.Server), flagss.json);
+        this.log('\n');
+
+        const serverResult = this.db.getValues(Config.Server);
+        this.showResult<ServerConfig>([serverResult], List.serverColumns, flagss.json);
+      }
+
+      if (flagss.user) {
+        this.log('User informations:');
+        const userResult = this.db.getValues(Config.User);
+        this.showResult<UserInfo>([userResult], List.userColumns, flagss.json);
+      }
+
+      if (flagss.server) {
+        this.log('Server configuration settings:');
+        const serverResult = this.db.getValues(Config.Server);
+        this.showResult<ServerConfig>([serverResult], List.serverColumns, flagss.json);
+      }
+    } catch (error) {
+      this.showError(error);
     }
   }
 }
