@@ -15,7 +15,7 @@ export enum HttpMethod {
   PUT = 'PUT',
 }
 
-export abstract class RestRequests {
+export class RestRequestsManager {
 
   private server: ServerConfig;
   private headers: {[key: string]: string};
@@ -34,7 +34,7 @@ export abstract class RestRequests {
     return `${this.server.hostname}:${this.server.port}`;
   }
 
-  submitRequest<T>(path: string, method: HttpMethod, body?: object): Promise<T> {
+  submitRequest<T>(path: string, method: HttpMethod, body?: {}): Promise<T> {
 
     // Create options parameters necessary for the request
     const options = {

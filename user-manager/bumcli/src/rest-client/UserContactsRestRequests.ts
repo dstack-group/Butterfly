@@ -1,32 +1,38 @@
 import { UserContacts, UserContact, CreateUserContact} from './entities/UserContactsEntities';
 import { UpdateUserContact, RemoveUserContact, FindUserContacts } from './entities/UserContactsEntities';
-import { RestRequests, HttpMethod } from './RestRequests';
+import { RestRequestsManager, HttpMethod } from './RestRequestsManager';
 import { ServerConfig } from '../database/ServerConfig';
 
-export class UserContactsRestRequests extends RestRequests {
+export class UserContactsRestRequests {
 
+  private manager: RestRequestsManager;
   private path: string;
 
   constructor(serverConfig: ServerConfig) {
-    super(serverConfig);
+    this.manager = new RestRequestsManager(serverConfig);
     this.path = 'user-contacts';
   }
 
   create(contact: CreateUserContact): Promise<UserContact> {
-    return this.submitRequest<UserContact>(`${this.path}/${contact.service}`, HttpMethod.POST, contact);
+    const { service, ...payload } = contact;
+    return this.manager.submitRequest<UserContact>(
+      `${this.path}/${contact.service}`,
+      HttpMethod.POST,
+      payload);
   }
 
   update(contact: UpdateUserContact): Promise<UserContact> {
-    const endpoint: string = `${this.path}/${contact.userEmail}/${contact.service}`;
-    return this.submitRequest<UserContact>(endpoint, HttpMethod.PUT, contact);
+    const { service, userEmail, ...payload } = contact;
+    const endpoint = `${this.path}/${contact.userEmail}/${contact.service}`;
+    return this.manager.submitRequest<UserContact>(endpoint, HttpMethod.PUT, payload);
   }
 
   find(contact: FindUserContacts): Promise<UserContacts> {
-    return this.submitRequest<UserContacts>(`${this.path}/${contact.userEmail}`, HttpMethod.GET);
+    return this.manager.submitRequest<UserContacts>(`${this.path}/${contact.userEmail}`, HttpMethod.GET);
   }
 
   remove(contact: RemoveUserContact): Promise<void> {
-    const endpoint: string = `${this.path}/${contact.userEmail}/${contact.service}`;
-    return this.submitRequest<void>(endpoint, HttpMethod.DELETE);
+    const endpoint = `${this.path}/${contact.userEmail}/${contact.service}`;
+    return this.manager.submitRequest<void>(endpoint, HttpMethod.DELETE);
   }
 }
