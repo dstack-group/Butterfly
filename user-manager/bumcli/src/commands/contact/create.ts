@@ -1,9 +1,9 @@
 import { flags } from '@oclif/command';
 import { UserContactsRestRequests } from '../../rest-client';
-import { BaseCommand } from '../../base/base';
+import { BaseCommand, TableColumns } from '../../base/base';
 import { Config } from '../../database/LocalDb';
 import { Validator } from '../../utils/Validator';
-import { CreateUserContact, ContactService } from '../../rest-client/entities';
+import { CreateUserContact, ContactService, UserContact } from '../../rest-client/entities';
 import { CommandFlagException } from '../../exceptions';
 
 export class Create extends BaseCommand {
@@ -12,10 +12,37 @@ export class Create extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    email: flags.string({char: 'e', description: 'email where receive notification', exclusive: ['slack', 'telegram']}),
-    slack: flags.string({char: 's', description: 'slack account', exclusive: ['telegram', 'email']}),
-    telegram: flags.string({char: 't', description: 'telegram account', exclusive: ['email', 'slack']}),
-    userEmail: flags.string({char: 'u', description: 'new user email address', required: true}),
+
+    emailc: flags.string({
+      char: 'c',
+      description: 'email where notifications are sent',
+      exclusive: ['slack', 'telegram'],
+    }),
+
+    slack: flags.string({
+      char: 's',
+      description: 'slack account',
+      exclusive: ['telegram', 'emailc'],
+    }),
+
+    telegram: flags.string({
+      char: 't',
+      description: 'telegram account',
+      exclusive: ['emailc', 'slack'],
+    }),
+
+    email: flags.string({
+      char: 'e',
+      description: 'user email address',
+      required: true,
+    }),
+  };
+
+  private static readonly columns: TableColumns<UserContact> = {
+    userContactId: {minWidth: 15},
+    userEmail: {minWidth: 15},
+    contactService: {minWidth: 40},
+    contactRef: {minWidth: 40},
   };
 
   async run() {
@@ -28,7 +55,7 @@ export class Create extends BaseCommand {
       let serviceSelected: ContactService;
       let identifier: string;
 
-      if (flagss.email !== undefined) {
+      if (flagss.emailc !== undefined) {
         serviceSelected = ContactService.EMAIL;
         identifier = Validator.isEmailValid(flagss.email);
 
@@ -43,20 +70,21 @@ export class Create extends BaseCommand {
       } else {
         throw new CommandFlagException({
           message: 'One of these flags is required!',
-          nameFlag: 'email | slack | telegram',
+          nameFlag: 'emailc | slack | telegram',
         });
       }
 
       const newUserContact: CreateUserContact = {
         contactRef: identifier,
         service: serviceSelected,
-        userEmail: Validator.isEmailValid(flagss.userEmail),
+        userEmail: Validator.isEmailValid(flagss.email),
       };
 
-      this.print(await client.create(newUserContact), flagss.json);
+      const result = await client.create(newUserContact);
+      this.showResult<UserContact>([result], Create.columns, flagss.json);
 
     } catch (error) {
-      this.error(error.message);
+      this.showError(error);
     }
   }
 }
