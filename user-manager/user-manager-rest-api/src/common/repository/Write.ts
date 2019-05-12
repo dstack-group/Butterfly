@@ -19,7 +19,7 @@
 export interface Write {
   /**
    * Creates a new resource and returns it.
-   * @param params the named parameters needed to craete a new resource.
+   * @param params the named parameters needed to create a new resource.
    */
   create<P, R>(params: P): Promise<R>;
 
