@@ -1,5 +1,5 @@
-import * as lowDb from 'lowdb';
-import * as FileSync from 'lowdb/adapters/FileSync';
+import lowDb from 'lowdb';
+import FileSync from 'lowdb/adapters/FileSync';
 
 export enum Config {
   Server = 'ServerConfig',

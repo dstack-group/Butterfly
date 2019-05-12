@@ -1,5 +1,5 @@
 import { Command, flags } from '@oclif/command';
-import { Table, cli } from 'cli-ux';
+import cli, { Table } from 'cli-ux';
 import { LocalDb, Config } from '../database/LocalDb';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -67,7 +67,7 @@ export abstract class BaseCommand extends Command {
    * False => call the printTable that show the result inside a table
    */
   protected showResult<T extends {}>(result: T[], columns: TableColumns<T>, jsonEnabled: boolean): void {
-    (jsonEnabled) ?
+    jsonEnabled ?
       this.print(result) :
       this.printTable(result, columns);
   }

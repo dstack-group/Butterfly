@@ -5,8 +5,13 @@ import { SubscriptionRestRequests } from '../../rest-client';
 import { BaseCommand, TableColumns } from '../../base/base';
 import { Config } from '../../database/LocalDb';
 import { Validator } from '../../utils/Validator';
-import { CreateSubscription, ServiceEventType,
-        ContactService, UserPriority, Subscription } from '../../rest-client/entities';
+import {
+  CreateSubscription,
+  ServiceEventType,
+  ContactService,
+  UserPriority,
+  Subscription,
+} from '../../rest-client/entities';
 import { CommandFlagException } from '../../exceptions';
 
 export class Create extends BaseCommand {
@@ -117,6 +122,30 @@ export class Create extends BaseCommand {
   };
 
   private static readonly columns: TableColumns<Subscription> = {
+    Email: {
+      get: email => email.contacts.EMAIL ? email.contacts.EMAIL : 'nd',
+      minWidth: 10,
+    },
+    Slack: {
+      get: slack => slack.contacts.SLACK ? slack.contacts.SLACK : 'nd',
+      minWidth: 10,
+    },
+    Telegram: {
+      get: telegram => telegram.contacts.TELEGRAM ?  telegram.contacts.TELEGRAM : 'nd',
+      minWidth: 10,
+    },
+    eventType: {
+      header: 'Event',
+      minWidth: 15,
+    },
+    keywordList: {
+      header: 'Keywords',
+      minWidth: 10,
+    },
+    projectName: {
+      header: 'Project name',
+      minWidth: 15,
+    },
     subscriptionId: {
       header: 'ID',
       minWidth: 10,
@@ -125,36 +154,11 @@ export class Create extends BaseCommand {
       header: 'User email',
       minWidth: 15,
     },
-    projectName: {
-      header: 'Project name',
-      minWidth: 15,
-    },
-    eventType: {
-      header: 'Event',
-      minWidth: 15,
-
-    },
-    Telegram: {
-      minWidth: 10,
-      get: telegram => telegram.contacts.TELEGRAM ?  telegram.contacts.TELEGRAM : 'nd',
-    },
-    Email: {
-      minWidth: 10,
-      get: email => email.contacts.EMAIL ? email.contacts.EMAIL : 'nd',
-    },
-    Slack: {
-      minWidth: 10,
-      get: slack => slack.contacts.SLACK ? slack.contacts.SLACK : 'nd',
-    },
     userPriority: {
       header: 'Priority',
       minWidth: 7,
     },
-    keywordList: {
-      header: 'Keywords',
-      minWidth: 10,
-     },
-   };
+  };
 
   async run() {
     try {
@@ -195,9 +199,6 @@ export class Create extends BaseCommand {
 
       } else {
         const response: any = await inquirer.prompt([{
-          name: 'event',
-          message: 'Select an event',
-          type: 'list',
           choices: [
             {name: ServiceEventType.GITLAB_COMMIT_CREATED},
             {name: ServiceEventType.GITLAB_ISSUE_CREATED},
@@ -213,6 +214,9 @@ export class Create extends BaseCommand {
             {name: ServiceEventType.SONARQUBE_PROJECT_ANALYSIS_COMPLETED},
             new inquirer.Separator(),
           ],
+          message: 'Select an event',
+          name: 'event',
+          type: 'list',
         }]);
 
         eventTypeSelected = response.event;
@@ -260,11 +264,11 @@ export class Create extends BaseCommand {
       }
 
       const newSubscription: CreateSubscription = {
-        userEmail: Validator.isEmailValid(flagss.email),
-        eventType: eventTypeSelected,
-        projectName: Validator.isStringValid('projectName', flagss.projectName, 0, 50),
         contactServices: contactSelected,
+        eventType: eventTypeSelected,
         keywords: flagss.keyword,
+        projectName: Validator.isStringValid('projectName', flagss.projectName, 0, 50),
+        userEmail: Validator.isEmailValid(flagss.email),
         userPriority: priority,
       };
 

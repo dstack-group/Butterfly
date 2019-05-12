@@ -3,7 +3,7 @@ import { Subscription, CreateSubscription, UpdateSubscription,
 import { RestRequestsManager, HttpMethod } from './RestRequestsManager';
 import { ServerConfig } from '../database/ServerConfig';
 
-export class SubscriptionRestRequests{
+export class SubscriptionRestRequests {
 
   private manager: RestRequestsManager;
   private path: string;
@@ -18,30 +18,22 @@ export class SubscriptionRestRequests{
   }
 
   update(subscription: UpdateSubscription): Promise<Subscription> {
-
-    const {userEmail, eventType, projectName, ...payload } = subscription;
-    const endpoint = `${this.path}/` + 
-                      `users/${subscription.userEmail}/` +
-                      `projects/${subscription.projectName}/` +
-                      `event-types/${subscription.eventType}`;
+    const { userEmail, eventType, projectName, ...payload } = subscription;
+    const endpoint = `${this.path}/users/${userEmail}/projects/${projectName}/event-types/${eventType}`;
 
     return this.manager.submitRequest<Subscription>(endpoint, HttpMethod.PATCH, payload);
   }
 
   remove(subscription: RemoveSubscription): Promise<void> {
-    const endpoint = `${this.path}/` +
-                      `users/${subscription.userEmail}/` +
-                      `projects/${subscription.projectName}/` +
-                      `event-types/${subscription.eventType}`;1
+    const { userEmail, eventType, projectName } = subscription;
+    const endpoint = `${this.path}/users/${userEmail}/projects/${projectName}/event-types/${eventType}`;
 
     return this.manager.submitRequest<void>(endpoint, HttpMethod.DELETE);
   }
 
   find(subscription: FindSubscription): Promise<Subscription> {
-    const endpoint = `${this.path}/` +
-                      `users/${subscription.userEmail}/` +
-                      `projects/${subscription.projectName}/` +
-                      `event-types/${subscription.eventType}`;
+    const { userEmail, eventType, projectName } = subscription;
+    const endpoint = `${this.path}/users/${userEmail}/projects/${projectName}/event-types/${eventType}`;
 
     return this.manager.submitRequest<Subscription>(endpoint, HttpMethod.GET);
   }

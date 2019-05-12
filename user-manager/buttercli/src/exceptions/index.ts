@@ -1,1 +1,1 @@
-export{ CommandFlagException } from './CommandFlagException';
+export { CommandFlagException } from './CommandFlagException';

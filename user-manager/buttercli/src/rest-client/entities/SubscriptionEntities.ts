@@ -39,7 +39,7 @@ export interface UpdateSubscription extends FindSubscription {
 
 export type RemoveSubscription = FindSubscription;
 
-export interface Subscription extends FindSubscription{
+export interface Subscription extends FindSubscription {
   contacts: UserContacts;
   keywordList: string[];
   userPriority: UserPriority;

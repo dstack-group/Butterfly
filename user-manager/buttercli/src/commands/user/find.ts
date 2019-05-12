@@ -12,17 +12,17 @@ export class Find extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    email: flags.string({char: 'e', description: 'user email address', required: true}),
+    email: flags.string({ char: 'e', description: 'user email address', required: true }),
   };
 
   private static readonly columns: TableColumns<User> = {
-    userId: {minWidth: 7, extended: true},
-    email: {minWidth: 7},
-    firstname: {minWidth: 7},
-    lastname: {minWidth: 7},
-    enabled: {get: user => user.enabled ? 'T' : 'F'},
-    created: {minWidth: 7, extended: true},
-    modified: {minWidth: 7, extended: true},
+    created: { minWidth: 7, extended: true },
+    email: { minWidth: 7 },
+    enabled: { get: user => user.enabled ? 'T' : 'F' },
+    firstname: { minWidth: 7 },
+    lastname: { minWidth: 7 },
+    modified: { minWidth: 7, extended: true },
+    userId: { minWidth: 7, extended: true },
   };
 
   async run() {
@@ -31,7 +31,7 @@ export class Find extends BaseCommand {
       const flagss = this.parse(Find).flags;
 
       Validator.isEmailValid(flagss.email);
-      const result = await client.find({email: flagss.email});
+      const result = await client.find({ email: flagss.email });
       this.showResult<User>([result], Find.columns, flagss.json);
 
     } catch (error) {

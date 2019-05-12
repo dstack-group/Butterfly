@@ -116,9 +116,6 @@ export class Remove extends BaseCommand {
 
       } else {
         const response: any = await inquirer.prompt([{
-          name: 'event',
-          message: 'Select an event',
-          type: 'list',
           choices: [
             {name: ServiceEventType.GITLAB_COMMIT_CREATED},
             {name: ServiceEventType.GITLAB_ISSUE_CREATED},
@@ -134,6 +131,9 @@ export class Remove extends BaseCommand {
             {name: ServiceEventType.SONARQUBE_PROJECT_ANALYSIS_COMPLETED},
             new inquirer.Separator(),
           ],
+          message: 'Select an event',
+          name: 'event',
+          type: 'list',
         }]);
 
         eventTypeSelected = response.event;

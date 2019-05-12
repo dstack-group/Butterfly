@@ -78,6 +78,30 @@ export class Find extends BaseCommand {
   };
 
   private static readonly columns: TableColumns<Subscription> = {
+    Email: {
+      get: email => email.contacts.EMAIL ? email.contacts.EMAIL : 'nd',
+      minWidth: 10,
+    },
+    Slack: {
+      get: slack => slack.contacts.SLACK ? slack.contacts.SLACK : 'nd',
+      minWidth: 10,
+    },
+    Telegram: {
+      get: telegram => telegram.contacts.TELEGRAM ?  telegram.contacts.TELEGRAM : 'nd',
+      minWidth: 10,
+    },
+    eventType: {
+      header: 'Event',
+      minWidth: 15,
+    },
+    keywordList: {
+      header: 'Keywords',
+      minWidth: 10,
+    },
+    projectName: {
+      header: 'Project name',
+      minWidth: 15,
+    },
     subscriptionId: {
       header: 'ID',
       minWidth: 10,
@@ -86,36 +110,11 @@ export class Find extends BaseCommand {
       header: 'User email',
       minWidth: 15,
     },
-    projectName: {
-      header: 'Project name',
-      minWidth: 15,
-    },
-    eventType: {
-      header: 'Event',
-      minWidth: 15,
-
-    },
-    Telegram: {
-      minWidth: 10,
-      get: telegram => telegram.contacts.TELEGRAM ?  telegram.contacts.TELEGRAM : 'nd',
-    },
-    Email: {
-      minWidth: 10,
-      get: email => email.contacts.EMAIL ? email.contacts.EMAIL : 'nd',
-    },
-    Slack: {
-      minWidth: 10,
-      get: slack => slack.contacts.SLACK ? slack.contacts.SLACK : 'nd',
-    },
     userPriority: {
       header: 'Priority',
       minWidth: 7,
     },
-    keywordList: {
-      header: 'Keywords',
-      minWidth: 10,
-     },
-   };
+  };
 
   async run() {
     try {
@@ -156,9 +155,6 @@ export class Find extends BaseCommand {
 
       } else {
         const response: any = await inquirer.prompt([{
-          name: 'event',
-          message: 'Select an event',
-          type: 'list',
           choices: [
             {name: ServiceEventType.GITLAB_COMMIT_CREATED},
             {name: ServiceEventType.GITLAB_ISSUE_CREATED},
@@ -174,6 +170,9 @@ export class Find extends BaseCommand {
             {name: ServiceEventType.SONARQUBE_PROJECT_ANALYSIS_COMPLETED},
             new inquirer.Separator(),
           ],
+          message: 'Select an event',
+          name: 'event',
+          type: 'list',
         }]);
 
         eventTypeSelected = response.event;
