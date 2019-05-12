@@ -51,7 +51,7 @@ print_logs_usage() {
 exec_install() {
   echo "Installing Java services dependencies...";
   cd ./butterfly;
-  ./install.sh;
+  ./build.sh --install;
   cd ..;
 
   echo "Installing User Manager dependencies...";

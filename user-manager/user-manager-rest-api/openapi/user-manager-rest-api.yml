@@ -295,7 +295,15 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - userEmail
+                - contactRef
               properties:
+                userEmail:
+                  type: string
+                  format: email
+                  description: >-
+                    the email that identifies the user which will have a new platform account
                 contactRef:
                   type: string
                   description: >-
@@ -1432,3 +1440,4 @@ components:
       schema:
         type: integer
         format: int32
+

@@ -406,7 +406,16 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "userEmail",
+                  "contactRef"
+                ],
                 "properties": {
+                  "userEmail": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "the email that identifies the user which will have a new platform account"
+                  },
                   "contactRef": {
                     "type": "string",
                     "description": "the contact account id, such as the Telegram's bot chat id, the Slack's user id, or the Email address (possibly different from the currently registered email)"
