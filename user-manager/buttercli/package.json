@@ -6,12 +6,22 @@
   "bin": {
     "buttercli": "./bin/run"
   },
-  "bugs": "",
+  "repository": "https://github.com/dstack-group/Butterfly",
+  "scripts": {
+    "prebuild": "yarn clean && yarn lint",
+    "build": "tsc",
+    "clean": "rimraf ./dist",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "postpack": "rimraf oclif.manifest.json",
+    "prepack": "yarn build && oclif-dev manifest && oclif-dev readme",
+    "version": "oclif-dev readme && git add README.md"
+  },
   "dependencies": {
     "@oclif/command": "^1.5.13",
     "@oclif/config": "^1.12.12",
     "@oclif/plugin-help": "^2.1.6",
-    "cli-table": "^0.3.1",
+    "@oclif/plugin-not-found": "^1.2.2",
+    "cli-ux": "^5.2.1",
     "inquirer": "^6.3.1",
     "lowdb": "^1.0.0",
     "node-fetch": "^2.4.1",
@@ -20,12 +30,12 @@
   "devDependencies": {
     "@oclif/dev-cli": "^1.22.0",
     "@oclif/tslint": "^3.1.1",
-    "@types/cli-table": "^0.3.0",
     "@types/inquirer": "^6.0.1",
     "@types/lowdb": "^1.0.7",
     "@types/node": "^10.14.6",
     "@types/node-fetch": "^2.3.3",
     "globby": "^8.0.2",
+    "rimraf": "^2.6.3",
     "ts-node": "^8.1.0",
     "tslint": "^5.14.0",
     "typescript": "^3.4.5"
@@ -39,26 +49,18 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
-  "homepage": "",
   "keywords": [
     "oclif"
   ],
   "license": "MIT",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "oclif": {
-    "commands": "./lib/commands",
+    "commands": "./dist/commands",
     "bin": "buttercli",
     "plugins": [
-      "@oclif/plugin-help"
+      "@oclif/plugin-help",
+      "@oclif/plugin-not-found"
     ]
   },
-  "repository": "/",
-  "scripts": {
-    "postpack": "rm -f oclif.manifest.json",
-    "posttest": "tslint -p . -t stylish",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "echo NO TESTS",
-    "version": "oclif-dev readme && git add README.md"
-  },
-  "types": "lib/index.d.ts"
+  "types": "dist/index.d.ts"
 }
