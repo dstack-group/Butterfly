@@ -60,7 +60,14 @@
     "plugins": [
       "@oclif/plugin-help",
       "@oclif/plugin-not-found"
-    ]
+    ],
+    "topics": {
+      "config": {"description": "Manage buttercli settings"},
+      "contact": {"description": "Perform contact related operations"},
+      "project": {"description": "Perform project related operations"},
+      "sub": {"description": "Perform subscription related operations"},
+      "user": {"description": "Perform user related operations"},
+    }
   },
   "types": "dist/index.d.ts"
 }
