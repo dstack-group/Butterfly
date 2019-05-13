@@ -19,13 +19,6 @@ export class Find extends BaseCommand {
   };
 
   private static readonly columns: TableColumns<Project> = {
-    gitlab: {
-      get: projects =>
-            projects.projectURL.GITLAB ?
-              projects.projectURL.GITLAB :
-              'No associated link',
-      minWidth: 40,
-    },
     projectId: {
       minWidth: 15,
     },
@@ -36,6 +29,13 @@ export class Find extends BaseCommand {
       get: projects =>
             projects.projectURL.REDMINE ?
               projects.projectURL.REDMINE :
+              'No associated link',
+      minWidth: 40,
+    },
+    gitlab: {
+      get: projects =>
+            projects.projectURL.GITLAB ?
+              projects.projectURL.GITLAB :
               'No associated link',
       minWidth: 40,
     },

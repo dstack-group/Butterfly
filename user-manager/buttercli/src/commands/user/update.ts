@@ -38,13 +38,13 @@ export class Update extends BaseCommand {
   };
 
   private static readonly columns: TableColumns<User> = {
-    created: { minWidth: 7, extended: true },
-    email: { minWidth: 7 },
-    enabled: { get: user => user.enabled ? 'T' : 'F' },
-    firstname: { minWidth: 7 },
-    lastname: { minWidth: 7 },
-    modified: { minWidth: 7, extended: true },
-    userId: { minWidth: 7, extended: true },
+    userId: {minWidth: 7, extended: true},
+    email: {minWidth: 7},
+    firstname: {minWidth: 7},
+    lastname: {minWidth: 7},
+    enabled: {get: user => user.enabled ? 'T' : 'F'},
+    created: {minWidth: 7, extended: true},
+    modified: {minWidth: 7, extended: true},
   };
 
   async run() {

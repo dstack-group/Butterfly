@@ -5,7 +5,10 @@ import { SubscriptionRestRequests } from '../../rest-client';
 import { BaseCommand } from '../../base/base';
 import { Config } from '../../database/LocalDb';
 import { Validator } from '../../utils/Validator';
-import { RemoveSubscription, ServiceEventType } from '../../rest-client/entities';
+import {
+  RemoveSubscription,
+  ServiceEventType,
+} from '../../rest-client/entities';
 
 export class Remove extends BaseCommand {
 
@@ -117,18 +120,18 @@ export class Remove extends BaseCommand {
       } else {
         const response: any = await inquirer.prompt([{
           choices: [
-            {name: ServiceEventType.GITLAB_COMMIT_CREATED},
-            {name: ServiceEventType.GITLAB_ISSUE_CREATED},
-            {name: ServiceEventType.GITLAB_ISSUE_EDITED},
-            {name: ServiceEventType.GITLAB_MERGE_REQUEST_CLOSED},
-            {name: ServiceEventType.GITLAB_MERGE_REQUEST_CREATED},
-            {name: ServiceEventType.GITLAB_MERGE_REQUEST_EDITED},
-            {name: ServiceEventType.GITLAB_MERGE_REQUEST_MERGED},
+            { name: ServiceEventType.GITLAB_COMMIT_CREATED },
+            { name: ServiceEventType.GITLAB_ISSUE_CREATED },
+            { name: ServiceEventType.GITLAB_ISSUE_EDITED },
+            { name: ServiceEventType.GITLAB_MERGE_REQUEST_CLOSED },
+            { name: ServiceEventType.GITLAB_MERGE_REQUEST_CREATED },
+            { name: ServiceEventType.GITLAB_MERGE_REQUEST_EDITED },
+            { name: ServiceEventType.GITLAB_MERGE_REQUEST_MERGED },
             new inquirer.Separator(),
-            {name: ServiceEventType.REDMINE_TICKET_CREATED},
-            {name: ServiceEventType.REDMINE_TICKET_EDITED},
+            { name: ServiceEventType.REDMINE_TICKET_CREATED },
+            { name: ServiceEventType.REDMINE_TICKET_EDITED },
             new inquirer.Separator(),
-            {name: ServiceEventType.SONARQUBE_PROJECT_ANALYSIS_COMPLETED},
+            { name: ServiceEventType.SONARQUBE_PROJECT_ANALYSIS_COMPLETED },
             new inquirer.Separator(),
           ],
           message: 'Select an event',
@@ -146,7 +149,11 @@ export class Remove extends BaseCommand {
       };
 
       await client.remove(subscription);
-      (flagss.json) ? this.log('{}') : this.log('Subscription removed successfully');
+      if (flagss.json) {
+        this.log('{}');
+      } else {
+        this.log('Subscription removed successfully');
+      }
 
     } catch (error) {
       this.showError(error);

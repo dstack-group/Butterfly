@@ -39,10 +39,10 @@ export class Update extends BaseCommand {
   };
 
   private static readonly columns: TableColumns<UserContact> = {
-    contactRef: { minWidth: 40 },
-    contactService: { minWidth: 40 },
     userContactId: { minWidth: 15 },
     userEmail: { minWidth: 15 },
+    contactService: { minWidth: 40 },
+    contactRef: { minWidth: 40 },
   };
 
   async run() {

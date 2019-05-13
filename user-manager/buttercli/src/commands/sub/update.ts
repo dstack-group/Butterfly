@@ -5,8 +5,13 @@ import { SubscriptionRestRequests } from '../../rest-client';
 import { BaseCommand, TableColumns } from '../../base/base';
 import { Config } from '../../database/LocalDb';
 import { Validator } from '../../utils/Validator';
-import { UpdateSubscription, ServiceEventType,
-        ContactService, UserPriority, Subscription } from '../../rest-client/entities';
+import {
+  UpdateSubscription,
+  ServiceEventType,
+  ContactService,
+  UserPriority,
+  Subscription,
+} from '../../rest-client/entities';
 
 export class Update extends BaseCommand {
 
@@ -115,30 +120,6 @@ export class Update extends BaseCommand {
   };
 
   private static readonly columns: TableColumns<Subscription> = {
-    Email: {
-      get: email => email.contacts.EMAIL ? email.contacts.EMAIL : 'nd',
-      minWidth: 10,
-    },
-    Slack: {
-      get: slack => slack.contacts.SLACK ? slack.contacts.SLACK : 'nd',
-      minWidth: 10,
-    },
-    Telegram: {
-      get: telegram => telegram.contacts.TELEGRAM ?  telegram.contacts.TELEGRAM : 'nd',
-      minWidth: 10,
-    },
-    eventType: {
-      header: 'Event',
-      minWidth: 15,
-    },
-    keywordList: {
-      header: 'Keywords',
-      minWidth: 10,
-    },
-    projectName: {
-      header: 'Project name',
-      minWidth: 15,
-    },
     subscriptionId: {
       header: 'ID',
       minWidth: 10,
@@ -147,9 +128,33 @@ export class Update extends BaseCommand {
       header: 'User email',
       minWidth: 15,
     },
+    projectName: {
+      header: 'Project name',
+      minWidth: 15,
+    },
+    eventType: {
+      header: 'Event',
+      minWidth: 15,
+    },
+    Telegram: {
+      minWidth: 10,
+      get: telegram => telegram.contacts.TELEGRAM ? telegram.contacts.TELEGRAM : 'nd',
+    },
+    Email: {
+      minWidth: 10,
+      get: email => email.contacts.EMAIL ? email.contacts.EMAIL : 'nd',
+    },
+    Slack: {
+      minWidth: 10,
+      get: slack => slack.contacts.SLACK ? slack.contacts.SLACK : 'nd',
+    },
     userPriority: {
       header: 'Priority',
       minWidth: 7,
+    },
+    keywordList: {
+      header: 'Keywords',
+      minWidth: 10,
     },
   };
 
@@ -193,18 +198,18 @@ export class Update extends BaseCommand {
       } else {
         const response: any = await inquirer.prompt([{
           choices: [
-            {name: ServiceEventType.GITLAB_COMMIT_CREATED},
-            {name: ServiceEventType.GITLAB_ISSUE_CREATED},
-            {name: ServiceEventType.GITLAB_ISSUE_EDITED},
-            {name: ServiceEventType.GITLAB_MERGE_REQUEST_CLOSED},
-            {name: ServiceEventType.GITLAB_MERGE_REQUEST_CREATED},
-            {name: ServiceEventType.GITLAB_MERGE_REQUEST_EDITED},
-            {name: ServiceEventType.GITLAB_MERGE_REQUEST_MERGED},
+            { name: ServiceEventType.GITLAB_COMMIT_CREATED },
+            { name: ServiceEventType.GITLAB_ISSUE_CREATED },
+            { name: ServiceEventType.GITLAB_ISSUE_EDITED },
+            { name: ServiceEventType.GITLAB_MERGE_REQUEST_CLOSED },
+            { name: ServiceEventType.GITLAB_MERGE_REQUEST_CREATED },
+            { name: ServiceEventType.GITLAB_MERGE_REQUEST_EDITED },
+            { name: ServiceEventType.GITLAB_MERGE_REQUEST_MERGED },
             new inquirer.Separator(),
-            {name: ServiceEventType.REDMINE_TICKET_CREATED},
-            {name: ServiceEventType.REDMINE_TICKET_EDITED},
+            { name: ServiceEventType.REDMINE_TICKET_CREATED },
+            { name: ServiceEventType.REDMINE_TICKET_EDITED },
             new inquirer.Separator(),
-            {name: ServiceEventType.SONARQUBE_PROJECT_ANALYSIS_COMPLETED},
+            { name: ServiceEventType.SONARQUBE_PROJECT_ANALYSIS_COMPLETED },
             new inquirer.Separator(),
           ],
           message: 'Select an event',

@@ -5,7 +5,11 @@ import { SubscriptionRestRequests } from '../../rest-client';
 import { BaseCommand, TableColumns } from '../../base/base';
 import { Config } from '../../database/LocalDb';
 import { Validator } from '../../utils/Validator';
-import { FindSubscription, ServiceEventType, Subscription } from '../../rest-client/entities';
+import {
+  FindSubscription,
+  ServiceEventType,
+  Subscription,
+} from '../../rest-client/entities';
 
 export class Find extends BaseCommand {
 
@@ -87,7 +91,7 @@ export class Find extends BaseCommand {
       minWidth: 10,
     },
     Telegram: {
-      get: telegram => telegram.contacts.TELEGRAM ?  telegram.contacts.TELEGRAM : 'nd',
+      get: telegram => telegram.contacts.TELEGRAM ? telegram.contacts.TELEGRAM : 'nd',
       minWidth: 10,
     },
     eventType: {
@@ -156,18 +160,18 @@ export class Find extends BaseCommand {
       } else {
         const response: any = await inquirer.prompt([{
           choices: [
-            {name: ServiceEventType.GITLAB_COMMIT_CREATED},
-            {name: ServiceEventType.GITLAB_ISSUE_CREATED},
-            {name: ServiceEventType.GITLAB_ISSUE_EDITED},
-            {name: ServiceEventType.GITLAB_MERGE_REQUEST_CLOSED},
-            {name: ServiceEventType.GITLAB_MERGE_REQUEST_CREATED},
-            {name: ServiceEventType.GITLAB_MERGE_REQUEST_EDITED},
-            {name: ServiceEventType.GITLAB_MERGE_REQUEST_MERGED},
+            { name: ServiceEventType.GITLAB_COMMIT_CREATED },
+            { name: ServiceEventType.GITLAB_ISSUE_CREATED },
+            { name: ServiceEventType.GITLAB_ISSUE_EDITED },
+            { name: ServiceEventType.GITLAB_MERGE_REQUEST_CLOSED },
+            { name: ServiceEventType.GITLAB_MERGE_REQUEST_CREATED },
+            { name: ServiceEventType.GITLAB_MERGE_REQUEST_EDITED },
+            { name: ServiceEventType.GITLAB_MERGE_REQUEST_MERGED },
             new inquirer.Separator(),
-            {name: ServiceEventType.REDMINE_TICKET_CREATED},
-            {name: ServiceEventType.REDMINE_TICKET_EDITED},
+            { name: ServiceEventType.REDMINE_TICKET_CREATED },
+            { name: ServiceEventType.REDMINE_TICKET_EDITED },
             new inquirer.Separator(),
-            {name: ServiceEventType.SONARQUBE_PROJECT_ANALYSIS_COMPLETED},
+            { name: ServiceEventType.SONARQUBE_PROJECT_ANALYSIS_COMPLETED },
             new inquirer.Separator(),
           ],
           message: 'Select an event',
