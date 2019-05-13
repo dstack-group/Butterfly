@@ -9,7 +9,8 @@
     "ordered-imports": false,
     "quotemark": [true, "single"],
     "member-access": [true, "no-public"],
-    "arrow-parens": [true, "ban-single-arg-parens"]
+    "arrow-parens": [true, "ban-single-arg-parens"],
+    "object-literal-sort-keys": false
   },
   "rulesDirectory": [],
   "linterOptions": {
