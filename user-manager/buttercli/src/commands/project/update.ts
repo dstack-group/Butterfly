@@ -37,10 +37,12 @@ export class Update extends BaseCommand {
 
   private static readonly columns: TableColumns<Project> = {
     projectId: {
+      header: 'Id',
       minWidth: 15,
     },
     projectName: {
-     minWidth: 15,
+      header: 'Name',
+      minWidth: 15,
     },
     redmine: {
       get: projects =>
