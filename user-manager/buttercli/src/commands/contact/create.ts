@@ -4,7 +4,6 @@ import { BaseCommand, TableColumns } from '../../base/base';
 import { Config } from '../../database/LocalDb';
 import { Validator } from '../../utils/Validator';
 import { CreateUserContact, ContactService, UserContact } from '../../rest-client/entities';
-import { CommandFlagException } from '../../exceptions';
 
 export class Create extends BaseCommand {
 
@@ -13,22 +12,10 @@ export class Create extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
 
-    emailc: flags.string({
-      char: 'c',
-      description: 'email where notifications are sent',
-      exclusive: ['slack', 'telegram'],
-    }),
-
-    slack: flags.string({
-      char: 's',
-      description: 'slack account',
-      exclusive: ['telegram', 'emailc'],
-    }),
-
-    telegram: flags.string({
-      char: 't',
-      description: 'telegram account',
-      exclusive: ['emailc', 'slack'],
+    account: flags.string({
+      char: 'a',
+      description: 'new identifier for the service specified',
+      required: true,
     }),
 
     email: flags.string({
@@ -36,13 +23,33 @@ export class Create extends BaseCommand {
       description: 'user email address',
       required: true,
     }),
+
+    platform: flags.string({
+      char: 'p',
+      description:
+        'choose the contact platform between SLACK, EMAIL.\nThe TELEGRAM contact can only be set from the Telegram Bot',
+      options: [ContactService.EMAIL, ContactService.SLACK],
+      required: true,
+    }),
   };
 
   private static readonly columns: TableColumns<UserContact> = {
-    userContactId: { minWidth: 15 },
-    userEmail: { minWidth: 15 },
-    contactService: { minWidth: 40 },
-    contactRef: { minWidth: 40 },
+    userContactId: {
+      header: 'Id',
+      minWidth: 15,
+    },
+    userEmail: {
+      header: 'Profile',
+      minWidth: 15,
+    },
+    contactService: {
+      header: 'Service',
+      minWidth: 40,
+     },
+    contactRef: {
+      header: 'Account',
+      minWidth: 40,
+    },
   };
 
   async run() {
@@ -52,31 +59,13 @@ export class Create extends BaseCommand {
 
       const flagss = this.parse(Create).flags;
 
-      let serviceSelected: ContactService;
-      let identifier: string;
-
-      if (flagss.emailc !== undefined) {
-        serviceSelected = ContactService.EMAIL;
-        identifier = Validator.isEmailValid(flagss.email);
-
-      } else if (flagss.slack !== undefined) {
-        serviceSelected = ContactService.SLACK;
-        identifier = flagss.slack;
-
-      } else if (flagss.telegram !== undefined) {
-        serviceSelected = ContactService.TELEGRAM;
-        identifier = flagss.telegram;
-
-      } else {
-        throw new CommandFlagException({
-          message: 'One of these flags is required!',
-          nameFlag: 'emailc | slack | telegram',
-        });
+      if (flagss.platform === ContactService.EMAIL) {
+        flagss.account = Validator.isEmailValid(flagss.account);
       }
 
       const newUserContact: CreateUserContact = {
-        contactRef: identifier,
-        service: serviceSelected,
+        contactRef: flagss.account,
+        service: ContactService[flagss.platform as keyof typeof ContactService],
         userEmail: Validator.isEmailValid(flagss.email),
       };
 
