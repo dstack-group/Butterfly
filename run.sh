@@ -33,7 +33,7 @@ print_usage() {
     stop                  Stops the services if they're running.
     ps                    Shows the list of services running.
     logs                  Fetches the logs for a service.
-    test                  Executes the whole test battery.
+    test                  Executes the test battery.
 " >&2;
 }
 
@@ -45,6 +45,18 @@ print_logs_usage() {
 
   Options:
     -h|--help             Show this help.
+" >&2;
+}
+
+print_test_usage() {
+  echo "Usage:
+  $0 test [OPTIONS]
+
+  Executes the test battery.
+
+  Options:
+    -h|--help             Show this help.
+    -u|--user-manager     Only run User Manager's tests.
 " >&2;
 }
 
@@ -62,9 +74,14 @@ exec_install() {
 }
 
 exec_test() {
+  exec_stop;
   echo "Executing butterfly tests...";
-  echo "Building and testing Java modules";
-  cd ./butterfly; ./build.sh --clean --install --test; cd ..;
+  
+  if [ -z ${SHOULD_TEST_USER_MANAGER_ONLY+x} ]; then
+    echo "Building and testing Java modules";
+    cd ./butterfly; ./build.sh --clean --install --test; cd ..;
+  fi;
+
   echo "Building and testing User Manager module";
   cd ./user-manager; ./test.sh; cd ..;
 }
@@ -131,17 +148,29 @@ case $1 in
   stop) exec_stop;;
   ps) exec_ps;;
   logs) SHOULD_LOG=1; shift;;
-  test) exec_test;;
+  test) SHOULD_TEST=1; shift;;
   *) "Error: unknown command $1" >&2; print_usage; exit 1;;
 esac;
 
-# parse logs command' options and service name to log
+# parse logs command's options and service name to log
 if [ ! -z ${SHOULD_LOG+x} ]; then
   case $1 in
-    -h|--help) print_logs_usage;;
-    -*) "Error: unknown option $1 for \"logs\" command" >&2; print_usage; exit 1;;
+    -h|--help) print_logs_usage; exit 0;;
+    -*) "Error: unknown option $1 for \"logs\" command" >&2; print_logs_usage; exit 1;;
     *) SERVICE_TO_LOG="$1";;
   esac;
 
   exec_logs
+fi
+
+# parse test command's options
+if [ ! -z ${SHOULD_TEST+x} ]; then
+  case $1 in
+    -h|--help) print_test_usage; exit 0;;
+    -u|--user-manager) SHOULD_TEST_USER_MANAGER_ONLY=1;;
+    -*) "Error: unknown option $1 for \"logs\" command" >&2; print_test_usage; exit 1;;
+    *) "Error: unknown command $1" >&2; print_test_usage; exit 1;;
+  esac;
+
+  exec_test
 fi
