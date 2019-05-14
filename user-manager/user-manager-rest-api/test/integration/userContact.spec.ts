@@ -301,13 +301,12 @@ describe(`PUT /user-contacts/:userEmail/:contactService`, () => {
             expect(response.body).not.toHaveProperty('error');
             expect(response.body).toHaveProperty('data');
             expect(response.body.data).toMatchObject({
-              contactType: userContactResult.contactService,
               contactRef: updateUserContactParams.contactRef,
+              contactService: userContactResult.contactService,
+              userEmail,
             });
             expect(response.body.data).toHaveProperty('userContactId');
             expect(typeof response.body.data.userContactId).toBe('string');
-            expect(response.body.data).toHaveProperty('userId');
-            expect(typeof response.body.data.userId).toBe('string');
           })
           .expect(200, done);
       })
