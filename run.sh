@@ -34,6 +34,7 @@ print_usage() {
     ps                    Shows the list of services running.
     logs                  Fetches the logs for a service.
     test                  Executes the test battery.
+    sonarcloud            Collects code metrics and uploads them on SonarCloud.
 " >&2;
 }
 
@@ -117,6 +118,13 @@ exec_logs() {
   $LOG_COMMAND;
 }
 
+exec_sonarcloud() {
+  echo "Collecting SonarCloud code metrics...";
+  cd ./butterfly;
+  ./sonarcloud.sh $SONAR_PROJECT_KEY $SONAR_PROJECT_ORGANIZATION $SONAR_TOKEN;
+  cd ..;
+}
+
 # show error if no argument is passed
 if [ $# -eq 0 ]; then
   echo "Error: a command is required" >&2;
@@ -149,6 +157,7 @@ case $1 in
   ps) exec_ps;;
   logs) SHOULD_LOG=1; shift;;
   test) SHOULD_TEST=1; shift;;
+  sonarcloud) exec_sonarcloud;;
   *) "Error: unknown command $1" >&2; print_usage; exit 1;;
 esac;
 
