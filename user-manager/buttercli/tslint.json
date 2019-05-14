@@ -10,7 +10,8 @@
     "quotemark": [true, "single"],
     "member-access": [true, "no-public"],
     "arrow-parens": [true, "ban-single-arg-parens"],
-    "object-literal-sort-keys": false
+    "object-literal-sort-keys": false,
+    "object-literal-key-quotes": false
   },
   "rulesDirectory": [],
   "linterOptions": {

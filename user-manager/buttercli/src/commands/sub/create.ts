@@ -132,12 +132,12 @@ export class Create extends BaseCommand {
       }
 
       const newSubscription: CreateSubscription = {
-        contactServices: ContactService[flagss.contact as keyof typeof ContactService,
-        eventType: ServiceEventType[flagss['event-type'] as keyof typeof ServiceEventType],
+        contactServices: flagss.contact as ContactService[],
+        eventType: ServiceEventType[flagss['event-type'] as ServiceEventType],
         keywords: flagss.keyword,
         projectName: Validator.isStringValid('project', flagss.project, 0, 50),
         userEmail: Validator.isEmailValid(flagss.email),
-        userPriority: UserPriority[flagss.priority as keyof typeof UserPriority],
+        userPriority: UserPriority[flagss.priority as UserPriority],
       };
 
       const result = await client.create(newSubscription);
