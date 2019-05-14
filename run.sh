@@ -132,6 +132,7 @@ if [ $# -eq 0 ]; then
   exit 1;
 fi
 
+echo "Option: $1";
 # parse optional options
 case $1 in
   -h|--help) print_usage; exit 0;;
@@ -146,6 +147,8 @@ if [ ! -z ${SHOULD_BUILD+x} ]; then
   ./build.sh
   cd ..;
 fi
+
+echo "Command: $1";
 
 # parse commands
 case $1 in
@@ -172,13 +175,15 @@ if [ ! -z ${SHOULD_LOG+x} ]; then
   exec_logs
 fi
 
+echo "Test options: $1";
+
 # parse test command's options
 if [ ! -z ${SHOULD_TEST+x} ]; then
   case $1 in
     -h|--help) print_test_usage; exit 0;;
     -u|--user-manager) SHOULD_TEST_USER_MANAGER_ONLY=1;;
-    -*) "Error: unknown option $1 for \"logs\" command" >&2; print_test_usage; exit 1;;
-    *) "Error: unknown command $1" >&2; print_test_usage; exit 1;;
+    -*) "Error: unknown option $1 for \"test\" command" >&2; print_test_usage; exit 1;;
+    ?) "Error: unknown command $1" >&2; print_test_usage; exit 1;;
   esac;
 
   exec_test
