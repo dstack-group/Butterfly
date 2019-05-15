@@ -1,4 +1,5 @@
 import { flags } from '@oclif/command';
+import * as inquirer from 'inquirer';
 import { UserContactsRestRequests } from '../../rest-client';
 import { BaseCommand } from '../../base/base';
 import { Config } from '../../database/LocalDb';
@@ -7,7 +8,7 @@ import { RemoveUserContact, ContactService } from '../../rest-client/entities';
 
 export class Remove extends BaseCommand {
 
-  static description = 'Remove an existing user contact specified by user email and contact service';
+  static description = 'Remove an existing user contact specified by user email and contact platform';
 
   static flags = {
     ...BaseCommand.flags,
@@ -20,13 +21,12 @@ export class Remove extends BaseCommand {
 
     platform: flags.string({
       char: 'p',
-      description: 'choose the contact platform to delete between SLACK, EMAIL',
+      description: 'choose the contact platform to delete between SLACK, EMAIL, TELEGRAM',
       options: [
         ContactService.EMAIL,
         ContactService.SLACK,
         ContactService.TELEGRAM,
       ],
-      required: true,
     }),
   };
 
@@ -37,8 +37,23 @@ export class Remove extends BaseCommand {
 
       const flagss = this.parse(Remove).flags;
 
+      if (!flagss.platform) {
+        const response: any = await inquirer.prompt([{
+          choices: [
+            { name: ContactService.EMAIL },
+            { name: ContactService.SLACK },
+            { name: ContactService.TELEGRAM },
+          ],
+          message: 'Select a contact platform',
+          name: 'platform',
+          type: 'list',
+        }]);
+
+        flagss.platform = response.platform;
+      }
+
       const userContact: RemoveUserContact = {
-        service: ContactService[flagss.platform as keyof typeof ContactService],
+        service: ContactService[flagss.platform as ContactService],
         userEmail: Validator.isEmailValid(flagss.email),
       };
 

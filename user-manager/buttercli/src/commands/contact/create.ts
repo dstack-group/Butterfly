@@ -1,4 +1,5 @@
 import { flags } from '@oclif/command';
+import * as inquirer from 'inquirer';
 import { UserContactsRestRequests } from '../../rest-client';
 import { BaseCommand, TableColumns } from '../../base/base';
 import { Config } from '../../database/LocalDb';
@@ -29,7 +30,6 @@ export class Create extends BaseCommand {
       description:
         'choose the contact platform between SLACK, EMAIL.\nThe TELEGRAM contact can only be set from the Telegram Bot',
       options: [ContactService.EMAIL, ContactService.SLACK],
-      required: true,
     }),
   };
 
@@ -59,13 +59,27 @@ export class Create extends BaseCommand {
 
       const flagss = this.parse(Create).flags;
 
+      if (!flagss.platform) {
+        const response: any = await inquirer.prompt([{
+          choices: [
+            { name: ContactService.EMAIL },
+            { name: ContactService.SLACK },
+          ],
+          message: 'Select a contact platform',
+          name: 'platform',
+          type: 'list',
+        }]);
+
+        flagss.platform = response.platform;
+      }
+
       if (flagss.platform === ContactService.EMAIL) {
         flagss.account = Validator.isEmailValid(flagss.account);
       }
 
       const newUserContact: CreateUserContact = {
         contactRef: flagss.account,
-        service: ContactService[flagss.platform as keyof typeof ContactService],
+        service: ContactService[flagss.platform as ContactService],
         userEmail: Validator.isEmailValid(flagss.email),
       };
 
