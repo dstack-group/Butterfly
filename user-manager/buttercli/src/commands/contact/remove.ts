@@ -21,7 +21,7 @@ export class Remove extends BaseCommand {
 
     platform: flags.string({
       char: 'p',
-      description: 'choose the contact platform to delete between SLACK, EMAIL, TELEGRAM',
+      description: '(required) choose the contact platform to delete between SLACK, EMAIL, TELEGRAM',
       options: [
         ContactService.EMAIL,
         ContactService.SLACK,

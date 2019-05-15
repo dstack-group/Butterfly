@@ -27,8 +27,8 @@ export class Create extends BaseCommand {
 
     platform: flags.string({
       char: 'p',
-      description:
-        'choose the contact platform between SLACK, EMAIL.\nThe TELEGRAM contact can only be set from the Telegram Bot',
+      description: '(required) choose the contact platform between SLACK, EMAIL.\
+                    \nThe TELEGRAM contact can only be set from the Telegram Bot',
       options: [ContactService.EMAIL, ContactService.SLACK],
     }),
   };

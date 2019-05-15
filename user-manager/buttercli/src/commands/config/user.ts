@@ -27,9 +27,6 @@ export class User extends BaseCommand {
     try {
       const flagss = this.parse(User).flags;
 
-      // TODO: When all the values of UserInfo are already memorized into the db
-      //       and the user set again only a subset of them I need to delete the
-      //       values not setted again? Now it removes them
       const userInfo: UserInfo = {};
 
       // Check if each flag exists before using it

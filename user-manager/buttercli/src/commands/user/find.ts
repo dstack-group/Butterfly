@@ -12,7 +12,11 @@ export class Find extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    email: flags.string({ char: 'e', description: 'user email address', required: true }),
+    email: flags.string({
+      char: 'e',
+      description: 'user email address',
+      required: true,
+    }),
   };
 
   private static readonly columns: TableColumns<User> = {

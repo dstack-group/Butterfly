@@ -13,16 +13,16 @@ export class Remove extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
 
-    service: flags.string({
-      char: 's',
-      description: 'remove service between GITLAB, REDMINE, SONARQUBE or ALL of them',
-      options: ['ALL', 'GITLAB', 'REDMINE', 'SONARQUBE'],
-    }),
-
     name: flags.string({
       char: 'n',
       description: 'project name (max 50 characters)',
       required: true,
+    }),
+
+    service: flags.string({
+      char: 's',
+      description: '(required) remove service between GITLAB, REDMINE, SONARQUBE or ALL of them',
+      options: ['ALL', 'GITLAB', 'REDMINE', 'SONARQUBE'],
     }),
   };
 

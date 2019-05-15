@@ -27,7 +27,7 @@ export class Update extends BaseCommand {
 
     platform: flags.string({
       char: 'p',
-      description: 'choose the contact platform to update between SLACK, EMAIL, TELEGRAM',
+      description: '(required) choose the contact platform to update between SLACK, EMAIL, TELEGRAM',
       options: [
         ContactService.EMAIL,
         ContactService.SLACK,
