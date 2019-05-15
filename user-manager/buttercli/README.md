@@ -507,7 +507,7 @@ _See code: [dist/commands/user/create.ts](https://github.com/dstack-group/Butter
 
 ## `buttercli user:find`
 
-Find all users or a specific user identified by email
+Find a specific user identified by email
 
 ```
 USAGE
