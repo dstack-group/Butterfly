@@ -21,7 +21,7 @@ export class Validator {
 
     if (email.match(emailRegExp) === null) {
       throw new CommandFlagException({
-        message: 'The email address is not a valid format',
+        message: 'The email address is not in a valid format',
         nameFlag: 'email',
       });
     }
@@ -30,14 +30,14 @@ export class Validator {
   }
 
   static isURLValid(url: string): string {
-    // TODO: Find a regexp for the hostname check
-    /*
-    const hostRegExp: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const hostRegExp: RegExp = /http[s]?:\/\/[^\s@]+$/;
 
-    if (hostname.match(hostRegExp) === null) {
-        return false;
+    if (url.match(hostRegExp) === null) {
+      throw new CommandFlagException({
+        message: 'The url is not in a valid format',
+        nameFlag: '',
+      });
     }
-    */
 
     return url;
   }
