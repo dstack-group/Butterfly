@@ -1,4 +1,5 @@
 import { flags } from '@oclif/command';
+import * as inquirer from 'inquirer';
 import { BaseCommand } from './../../base/base';
 import { ProjectRestRequests } from '../../rest-client';
 import { Config } from '../../database/LocalDb';
@@ -12,28 +13,16 @@ export class Remove extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
 
-    gitlab: flags.boolean({
-      char: 'g',
-      description: 'remove project gitlab url',
-      exclusive: ['redmine', 'sonarqube'],
+    service: flags.string({
+      char: 's',
+      description: 'remove service between GITLAB, REDMINE, SONARQUBE or ALL of them',
+      options: ['ALL', 'GITLAB', 'REDMINE', 'SONARQUBE'],
     }),
 
     name: flags.string({
       char: 'n',
       description: 'project name (max 50 characters)',
       required: true,
-    }),
-
-    redmine: flags.boolean({
-      char: 'r',
-      description: 'remove project redmine url',
-      exclusive: ['gitlab', 'sonarqube'],
-    }),
-
-    sonarqube: flags.boolean({
-      char: 's',
-      description: 'remove project sonarqube',
-      exclusive: ['gitlab', 'redmine'],
     }),
   };
 
@@ -44,17 +33,26 @@ export class Remove extends BaseCommand {
 
       Validator.isStringValid('name', flagss.name, 0, 50);
 
+      if (!flagss.service) {
+        const response: any = await inquirer.prompt([{
+          choices: [
+            { name: 'ALL' },
+            { name: Service.GITLAB },
+            { name: Service.REDMINE },
+            { name: Service.SONARQUBE },
+          ],
+          message: 'Select a service',
+          name: 'service',
+          type: 'list',
+        }]);
+
+        flagss.service = response.service;
+      }
+
       const project: RemoveProject = {projectName: flagss.name};
 
-      /**
-       * Add into project.service the service type selected if it was specified
-       */
-      if (flagss.gitlab !== undefined) {
-        project.service = Service.GITLAB;
-      } else if (flagss.redmine !== undefined) {
-        project.service = Service.REDMINE;
-      } else if (flagss.sonarqube !== undefined) {
-        project.service = Service.SONARQUBE;
+      if (flagss.service !== 'ALL') {
+        project.service = flagss.service as Service;
       }
 
       await client.remove(project);
