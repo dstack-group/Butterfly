@@ -46,7 +46,16 @@ export class UserController extends RouteController {
 
   private createUserCommand: RouteCommand<User> = async routeContext => {
     const userModel = routeContext.getValidatedRequestBody<CreateUser>(validateCreateUserBody);
-    const newUser = await this.manager.create<CreateUser, User>(userModel);
+
+    /**
+     * Here we need to manually set undefined values by default because if those fields
+     * aren't set, pg-promise is going to complain with a `Property ${property} doesn't exist` error.
+     */
+    const userParams: CreateUser = {
+      enabled: true,
+      ...userModel,
+    };
+    const newUser = await this.manager.create<CreateUser, User>(userParams);
 
     return {
       data: newUser,

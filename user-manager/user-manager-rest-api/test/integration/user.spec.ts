@@ -136,6 +136,43 @@ describe(`POST /users`, () => {
       });
   });
 
+  it(`Should be able to create a new disabled user`, done => {
+    const user: CreateUser = {
+      email: 'email@email.com',
+      enabled: false,
+      firstname: 'NEW_USER',
+      lastname: 'NEW_USER',
+    };
+
+    supertest(server)
+      .post('/users')
+      .send(user)
+      .expect('Content-Type', /application\/json/)
+      .expect(response => {
+        expect(response.body).toHaveProperty('data');
+        expect(response.body.data).toMatchObject({
+          email: user.email,
+          enabled: false,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          modified: null,
+        });
+
+        /**
+         * data.created must be a valid date.
+         */
+        expect(response.body.data).toHaveProperty('created');
+        expect(isValidDate(response.body.data.created)).toBe(true);
+
+        /**
+         * data.userId should be of type string.
+         */
+        expect(response.body.data).toHaveProperty('userId');
+        expect(typeof response.body.data.userId).toBe('string');
+      })
+    .expect(201, done);
+  });
+
   it(`Should return the newly inserted user if the INSERT operation is successful`, done => {
     const user: CreateUser = {
       email: 'email@email.com',

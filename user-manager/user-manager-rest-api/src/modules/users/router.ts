@@ -28,17 +28,6 @@ export const getUserRouter = (routesParams: RoutesInjectionParams) => {
 
   userRouter
     .get('/', userController.getUsers())
-    /*
-    .get('/',
-      async ctx => {
-        const { offset, limit } = ctx.query;
-        const userList = await userManager.list(offset, limit);
-        ctx.body = {
-          data: userList,
-        };
-        ctx.status = HttpStatus.OK;
-      })
-    */
     .post('/',
       middlewares.bodyParser(),
       userController.createUser())

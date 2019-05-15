@@ -274,7 +274,7 @@ CREATE TYPE public.subscription_denormalized_type AS (
 	"eventType" public.service_event_type,
 	"userPriority" public.user_priority,
 	"contacts" jsonb, -- each user contact associated with this subscription 
-	"keywordList" text[] -- each keyword associated with this subscription
+	"keywords" text[] -- each keyword associated with this subscription
 );
 
 CREATE OR REPLACE FUNCTION public.create_subscription(
@@ -425,7 +425,7 @@ BEGIN
 		GROUP BY 1, 2, 3, 4, 5
 	)
 	SELECT s.*,
-			sk.keyword_list AS "keywordList"
+			sk.keyword_list AS "keywords"
 	FROM SEL s
 	-- sorts keyword_list
 	JOIN LATERAL (
@@ -509,7 +509,7 @@ BEGIN
 			et.event_type_key AS "eventType",
 			s.user_priority AS "userPriority",
 			suc.contacts,
-			sk.keyword_list::text[] AS "keywordList"
+			sk.keyword_list::text[] AS "keywords"
 	FROM public.subscription s
 	JOIN public.user u
 			ON u.user_id = s.user_id
@@ -569,7 +569,7 @@ BEGIN
 			et.event_type_key AS "eventType",
 			s.user_priority AS "userPriority",
 			suc.contacts AS "contacts",
-			sk.keyword_list::text[] AS "keywordList"
+			sk.keyword_list::text[] AS "keywords"
 	FROM public.subscription s
 	JOIN public.user u
 			ON u.user_id = s.user_id
@@ -809,7 +809,7 @@ BEGIN
 		GROUP BY 1, 2, 3, 4, 5
 	)
 	SELECT s.*,
-		sk.keyword_list AS "keywordList"
+		sk.keyword_list AS "keywords"
 	FROM GROUP_UPD s
 	-- sorts keyword_list
 	JOIN LATERAL (
@@ -1151,6 +1151,62 @@ BEGIN
 		in_user_email AS "userEmail",
 		contact_type AS "contactService",
 		contact_ref AS "contactRef"
+	INTO v_result;
+
+	RETURN v_result;
+
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION public.update_user_contact(
+	in_user_email text,
+	in_contact_type public.consumer_service,
+	in_contact_ref text
+)
+RETURNS public.user_contact_denormalized_type
+LANGUAGE plpgsql
+COST 2
+VOLATILE
+AS $$
+#variable_conflict use_variable
+DECLARE v_user_id BIGINT;
+DECLARE v_result public.user_contact_denormalized_type;
+BEGIN
+	-- Check that the user associated with the user email `in_user_email` exists.
+	-- If it doesn't, 'USER_NOT_FOUND' is thrown.
+	SELECT u.user_id
+	FROM public.user u
+	WHERE u.email = in_user_email
+	INTO v_user_id;
+	
+	IF v_user_id IS NULL THEN
+		RAISE EXCEPTION 'USER_NOT_FOUND';
+	END IF;
+
+	WITH PATCH_PARAMS AS (
+			SELECT in_contact_type AS contact_service,
+					in_contact_ref AS contact_ref,
+					in_user_email AS user_email
+	),
+	upd AS (
+		UPDATE public.user_contact AS uc
+			SET contact_ref = p.contact_ref
+			FROM PATCH_PARAMS p
+		JOIN public.user u
+			ON u.email = p.user_email
+		WHERE uc.contact_type = p.contact_service
+			AND uc.user_id = u.user_id
+			RETURNING uc.user_contact_id,
+					p.user_email,
+					uc.contact_type,
+					uc.contact_ref
+	)
+	SELECT upd.user_contact_id AS "userContactId",
+			upd.user_email AS "userEmail",
+		upd.contact_type AS "contactService",
+			upd.contact_ref AS "contactRef"
+	FROM upd
 	INTO v_result;
 
 	RETURN v_result;

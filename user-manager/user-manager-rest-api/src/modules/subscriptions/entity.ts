@@ -44,7 +44,7 @@ export interface UpdateSubscription extends SubscriptionParams, UpdateSubscripti
 
 export interface Subscription {
   eventType: ServiceEventType;
-  keywordList: string[]; // each keyword associated with this subscription
+  keywords: string[]; // each keyword associated with this subscription
   projectName: string;
   subscriptionId?: string;
   contacts: {

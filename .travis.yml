@@ -13,6 +13,8 @@ install: true
 env:
   global:
     - DOCKER_COMPOSE_VERSION="1.23.2"
+    - SONAR_PROJECT_KEY="Butterfly"
+    - SONAR_PROJECT_ORGANIZATION="dstack-group"
   
 cache:
   directories:
@@ -48,4 +50,8 @@ before_install:
 
 script:
   # tests the Java services and the User Manager
-  - ./run.sh test
+  - ./run.sh --build test
+
+after_script:
+  # uploads code metrics to SonarCloud. Requires $SONAR_TOKEN to be a valid SonarCloud token.
+  - ./run.sh sonarcloud

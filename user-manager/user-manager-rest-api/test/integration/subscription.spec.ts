@@ -144,7 +144,7 @@ describe(`GET /subscripions/users/:userEmail`, () => {
           TELEGRAM: 'USER_0_TELEGRAM_REF',
         },
         eventType: createSubscriptionBodies[0].eventType,
-        keywordList: ['BUG', 'CLOSE', 'FIX'],
+        keywords: ['BUG', 'CLOSE', 'FIX'],
         projectName: createSubscriptionBodies[0].projectName,
         userEmail: users[0].email,
         userPriority: createSubscriptionBodies[0].userPriority,
@@ -154,7 +154,7 @@ describe(`GET /subscripions/users/:userEmail`, () => {
           TELEGRAM: 'USER_0_TELEGRAM_REF',
         },
         eventType: createSubscriptionBodies[1].eventType,
-        keywordList: ['KEYWORDS', 'SORTED'],
+        keywords: ['KEYWORDS', 'SORTED'],
         projectName: createSubscriptionBodies[1].projectName,
         userEmail: users[0].email,
         userPriority: createSubscriptionBodies[1].userPriority,
@@ -169,7 +169,7 @@ describe(`GET /subscripions/users/:userEmail`, () => {
           TELEGRAM: 'USER_1_TELEGRAM_REF',
         },
         eventType: createSubscriptionBodies[2].eventType,
-        keywordList: ['FIX', 'OTHER'],
+        keywords: ['FIX', 'OTHER'],
         projectName: createSubscriptionBodies[2].projectName,
         userEmail: users[1].email,
         userPriority: createSubscriptionBodies[2].userPriority,
@@ -373,7 +373,7 @@ describe(`POST /subscriptions`, () => {
         },
         eventType: createSubscriptionBody.eventType,
         // the returned keyword list should be sorted
-        keywordList: [
+        keywords: [
           'BUG',
           'CLOSE',
           'FIX',
@@ -505,7 +505,7 @@ describe(`GET /subscriptions/users/:userEmail/projects/:projectName/event-types/
         TELEGRAM: 'USER_0_TELEGRAM_REF',
       },
       eventType: createSubscriptionBodies[1].eventType,
-      keywordList: ['KEYWORDS', 'SORTED'],
+      keywords: ['KEYWORDS', 'SORTED'],
       projectName: createSubscriptionBodies[1].projectName,
       userEmail: users[0].email,
       userPriority: createSubscriptionBodies[1].userPriority,
@@ -674,7 +674,7 @@ describe(`PATCH /subscriptions/users/:userEmail/projects/:projectName/event-type
       },
       eventType: createSubscriptionBody.eventType,
       // the returned keyword list should be sorted
-      keywordList: [
+      keywords: [
         'FOR',
         'KEYWORDS',
         'NEW',
@@ -780,7 +780,7 @@ describe(`PATCH /subscriptions/users/:userEmail/projects/:projectName/event-type
       },
       eventType: createSubscriptionBody.eventType,
       // the returned keyword list should be sorted
-      keywordList: [
+      keywords: [
         'BUG',
         'CLOSE',
         'FIX',
@@ -884,7 +884,7 @@ describe(`PATCH /subscriptions/users/:userEmail/projects/:projectName/event-type
       },
       eventType: createSubscriptionBody.eventType,
       // the returned keyword list should be sorted
-      keywordList: [
+      keywords: [
         'BUG',
         'CLOSE',
         'FIX',
