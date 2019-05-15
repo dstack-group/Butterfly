@@ -94,7 +94,7 @@ export class Update extends BaseCommand {
       header: 'Priority',
       minWidth: 7,
     },
-    keywordList: {
+    keywords: {
       header: 'Keywords',
       minWidth: 10,
     },

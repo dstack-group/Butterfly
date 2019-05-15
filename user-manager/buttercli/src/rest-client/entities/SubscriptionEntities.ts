@@ -41,6 +41,6 @@ export type RemoveSubscription = FindSubscription;
 
 export interface Subscription extends FindSubscription {
   contacts: UserContacts;
-  keywordList: string[];
+  keywords: string[];
   userPriority: UserPriority;
 }
