@@ -26,11 +26,11 @@ export class Find extends BaseCommand {
 
     'event-type': flags.string({
       char: 't',
-      description: '(required) set the event type between\nREDMINE_TICKET_CREATED\
-                    \nREDMINE_TICKET_EDITED\nGITLAB_COMMIT_CREATED\nGITLAB_ISSUE_CREATED\
-                    \nGITLAB_ISSUE_EDITED\nGITLAB_MERGE_REQUEST_CREATED\nGITLAB_MERGE_REQUEST_EDITED\
-                    \nGITLAB_MERGE_REQUEST_MERGED\nGITLAB_MERGE_REQUEST_CLOSED\
-                    \nSONARQUBE_PROJECT_ANALYSIS_COMPLETED',
+      description: '(required) set the event type between\nGITLAB_COMMIT_CREATED\
+                    \nGITLAB_ISSUE_CREATED\nGITLAB_ISSUE_EDITED\nGITLAB_MERGE_REQUEST_CREATED\
+                    \nGITLAB_MERGE_REQUEST_EDITED\nGITLAB_MERGE_REQUEST_MERGED\
+                    \nGITLAB_MERGE_REQUEST_CLOSED\nREDMINE_TICKET_CREATED\
+                    \nREDMINE_TICKET_EDITED\nSONARQUBE_PROJECT_ANALYSIS_COMPLETED',
     }),
 
     project: flags.string({
@@ -73,7 +73,7 @@ export class Find extends BaseCommand {
       header: 'Priority',
       minWidth: 7,
     },
-    keywordList: {
+    keywords: {
       header: 'Keywords',
       minWidth: 10,
     },

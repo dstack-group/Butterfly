@@ -339,15 +339,15 @@ OPTIONS
 
   -t, --event-type=event-type
       (required) set the event type between
+      GITLAB_COMMIT_CREATED                    
+      GITLAB_ISSUE_CREATED
+      GITLAB_ISSUE_EDITED
+      GITLAB_MERGE_REQUEST_CREATED                    
+      GITLAB_MERGE_REQUEST_EDITED
+      GITLAB_MERGE_REQUEST_MERGED                    
+      GITLAB_MERGE_REQUEST_CLOSED
       REDMINE_TICKET_CREATED                    
       REDMINE_TICKET_EDITED
-      GITLAB_COMMIT_CREATED
-      GITLAB_ISSUE_CREATED                    
-      GITLAB_ISSUE_EDITED
-      GITLAB_MERGE_REQUEST_CREATED
-      GITLAB_MERGE_REQUEST_EDITED                    
-      GITLAB_MERGE_REQUEST_MERGED
-      GITLAB_MERGE_REQUEST_CLOSED                    
       SONARQUBE_PROJECT_ANALYSIS_COMPLETED
 
   -x, --extended
@@ -379,15 +379,15 @@ OPTIONS
 
   -t, --event-type=event-type
       (required) set the event type between
+      GITLAB_COMMIT_CREATED                    
+      GITLAB_ISSUE_CREATED
+      GITLAB_ISSUE_EDITED
+      GITLAB_MERGE_REQUEST_CREATED                    
+      GITLAB_MERGE_REQUEST_EDITED
+      GITLAB_MERGE_REQUEST_MERGED                    
+      GITLAB_MERGE_REQUEST_CLOSED
       REDMINE_TICKET_CREATED                    
       REDMINE_TICKET_EDITED
-      GITLAB_COMMIT_CREATED
-      GITLAB_ISSUE_CREATED                    
-      GITLAB_ISSUE_EDITED
-      GITLAB_MERGE_REQUEST_CREATED
-      GITLAB_MERGE_REQUEST_EDITED                    
-      GITLAB_MERGE_REQUEST_MERGED
-      GITLAB_MERGE_REQUEST_CLOSED                    
       SONARQUBE_PROJECT_ANALYSIS_COMPLETED
 
   -x, --extended
@@ -419,15 +419,15 @@ OPTIONS
 
   -t, --event-type=event-type
       (required) set the event type between
+      GITLAB_COMMIT_CREATED                    
+      GITLAB_ISSUE_CREATED
+      GITLAB_ISSUE_EDITED
+      GITLAB_MERGE_REQUEST_CREATED                    
+      GITLAB_MERGE_REQUEST_EDITED
+      GITLAB_MERGE_REQUEST_MERGED                    
+      GITLAB_MERGE_REQUEST_CLOSED
       REDMINE_TICKET_CREATED                    
       REDMINE_TICKET_EDITED
-      GITLAB_COMMIT_CREATED
-      GITLAB_ISSUE_CREATED                    
-      GITLAB_ISSUE_EDITED
-      GITLAB_MERGE_REQUEST_CREATED
-      GITLAB_MERGE_REQUEST_EDITED                    
-      GITLAB_MERGE_REQUEST_MERGED
-      GITLAB_MERGE_REQUEST_CLOSED                    
       SONARQUBE_PROJECT_ANALYSIS_COMPLETED
 
   -x, --extended
@@ -468,15 +468,15 @@ OPTIONS
 
   -t, --event-type=event-type
       (required) set the event type between
+      GITLAB_COMMIT_CREATED                    
+      GITLAB_ISSUE_CREATED
+      GITLAB_ISSUE_EDITED
+      GITLAB_MERGE_REQUEST_CREATED                    
+      GITLAB_MERGE_REQUEST_EDITED
+      GITLAB_MERGE_REQUEST_MERGED                    
+      GITLAB_MERGE_REQUEST_CLOSED
       REDMINE_TICKET_CREATED                    
       REDMINE_TICKET_EDITED
-      GITLAB_COMMIT_CREATED
-      GITLAB_ISSUE_CREATED                    
-      GITLAB_ISSUE_EDITED
-      GITLAB_MERGE_REQUEST_CREATED
-      GITLAB_MERGE_REQUEST_EDITED                    
-      GITLAB_MERGE_REQUEST_MERGED
-      GITLAB_MERGE_REQUEST_CLOSED                    
       SONARQUBE_PROJECT_ANALYSIS_COMPLETED
 
   -x, --extended
