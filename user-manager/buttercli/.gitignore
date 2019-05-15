@@ -100,3 +100,4 @@ dist/
 coverage/
 db.json
 oclif.manifest.json
+buttercli*

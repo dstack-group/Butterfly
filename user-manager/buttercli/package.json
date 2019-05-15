@@ -8,12 +8,13 @@
   },
   "repository": "https://github.com/dstack-group/Butterfly",
   "scripts": {
-    "prebuild": "yarn clean && yarn lint",
+    "prebuild": "yarn clean",
     "build": "tsc",
     "clean": "rimraf ./dist",
     "lint": "tslint -c tslint.json -p tsconfig.json",
-    "postpack": "rimraf oclif.manifest.json",
-    "prepack": "yarn build && oclif-dev manifest && oclif-dev readme",
+    "prestandalone": "oclif-dev manifest && rimraf buttercli",
+    "standalone": "pkg -t node10-linux-x64 .",
+    "poststandalone": "rimraf oclif.manifest.json",
     "version": "oclif-dev readme && git add README.md"
   },
   "dependencies": {
@@ -35,6 +36,7 @@
     "@types/node": "^10.14.6",
     "@types/node-fetch": "^2.3.3",
     "globby": "^8.0.2",
+    "pkg": "^4.4.0",
     "rimraf": "^2.6.3",
     "ts-node": "^8.1.0",
     "tslint": "^5.14.0",

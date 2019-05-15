@@ -16,3 +16,10 @@ services:
     working_dir: /usr/app
     entrypoint:
       - yarn
+
+  install-buttercli:
+    build:
+      context: ./buttercli
+    volumes:
+      - ./buttercli:/usr/app
+    working_dir: /usr/app

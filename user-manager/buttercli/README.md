@@ -14,7 +14,7 @@ $ npm install -g buttercli
 $ buttercli COMMAND
 running command...
 $ buttercli (-v|--version|version)
-buttercli/0.0.1 linux-x64 node-v10.15.2
+buttercli/0.0.1 win32-x64 node-v10.15.3
 $ buttercli --help [COMMAND]
 USAGE
   $ buttercli COMMAND
@@ -63,7 +63,7 @@ OPTIONS
   -x, --extended  show extra columns
 ```
 
-_See code: [dist/commands/config/list.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/config/list.ts)_
+_See code: [dist\commands\config\list.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\config\list.ts)_
 
 ## `buttercli config:server`
 
@@ -85,7 +85,7 @@ DESCRIPTION
   Remember that every time that config:server is invoked all the old server settings will be overwritten
 ```
 
-_See code: [dist/commands/config/server.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/config/server.ts)_
+_See code: [dist\commands\config\server.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\config\server.ts)_
 
 ## `buttercli config:user`
 
@@ -107,7 +107,7 @@ DESCRIPTION
   Remember that every time that config:user is invoked all the old user informations will be overwritten
 ```
 
-_See code: [dist/commands/config/user.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/config/user.ts)_
+_See code: [dist\commands\config\user.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\config\user.ts)_
 
 ## `buttercli contact:create`
 
@@ -129,7 +129,7 @@ OPTIONS
   -x, --extended              show extra columns
 ```
 
-_See code: [dist/commands/contact/create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/contact/create.ts)_
+_See code: [dist\commands\contact\create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\contact\create.ts)_
 
 ## `buttercli contact:find`
 
@@ -146,7 +146,7 @@ OPTIONS
   -x, --extended     show extra columns
 ```
 
-_See code: [dist/commands/contact/find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/contact/find.ts)_
+_See code: [dist\commands\contact\find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\contact\find.ts)_
 
 ## `buttercli contact:remove`
 
@@ -164,7 +164,7 @@ OPTIONS
   -x, --extended                       show extra columns
 ```
 
-_See code: [dist/commands/contact/remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/contact/remove.ts)_
+_See code: [dist\commands\contact\remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\contact\remove.ts)_
 
 ## `buttercli contact:update`
 
@@ -183,7 +183,7 @@ OPTIONS
   -x, --extended                       show extra columns
 ```
 
-_See code: [dist/commands/contact/update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/contact/update.ts)_
+_See code: [dist\commands\contact\update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\contact\update.ts)_
 
 ## `buttercli help [COMMAND]`
 
@@ -200,7 +200,7 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.1.6/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.1.6/src\commands\help.ts)_
 
 ## `buttercli init`
 
@@ -211,7 +211,7 @@ USAGE
   $ buttercli init
 ```
 
-_See code: [dist/commands/init.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/init.ts)_
+_See code: [dist\commands\init.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\init.ts)_
 
 ## `buttercli project:create`
 
@@ -231,7 +231,7 @@ OPTIONS
   -x, --extended             show extra columns
 ```
 
-_See code: [dist/commands/project/create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/project/create.ts)_
+_See code: [dist\commands\project\create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\project\create.ts)_
 
 ## `buttercli project:find`
 
@@ -248,7 +248,7 @@ OPTIONS
   -x, --extended   show extra columns
 ```
 
-_See code: [dist/commands/project/find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/project/find.ts)_
+_See code: [dist\commands\project\find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\project\find.ts)_
 
 ## `buttercli project:list`
 
@@ -264,7 +264,7 @@ OPTIONS
   -x, --extended  show extra columns
 ```
 
-_See code: [dist/commands/project/list.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/project/list.ts)_
+_See code: [dist\commands\project\list.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\project\list.ts)_
 
 ## `buttercli project:remove`
 
@@ -285,7 +285,7 @@ OPTIONS
   -x, --extended                              show extra columns
 ```
 
-_See code: [dist/commands/project/remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/project/remove.ts)_
+_See code: [dist\commands\project\remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\project\remove.ts)_
 
 ## `buttercli project:update`
 
@@ -305,7 +305,7 @@ OPTIONS
   -x, --extended             show extra columns
 ```
 
-_See code: [dist/commands/project/update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/project/update.ts)_
+_See code: [dist\commands\project\update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\project\update.ts)_
 
 ## `buttercli sub:create`
 
@@ -354,7 +354,7 @@ OPTIONS
       show extra columns
 ```
 
-_See code: [dist/commands/sub/create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/sub/create.ts)_
+_See code: [dist\commands\sub\create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\sub\create.ts)_
 
 ## `buttercli sub:find`
 
@@ -394,7 +394,7 @@ OPTIONS
       show extra columns
 ```
 
-_See code: [dist/commands/sub/find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/sub/find.ts)_
+_See code: [dist\commands\sub\find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\sub\find.ts)_
 
 ## `buttercli sub:remove`
 
@@ -434,7 +434,7 @@ OPTIONS
       show extra columns
 ```
 
-_See code: [dist/commands/sub/remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/sub/remove.ts)_
+_See code: [dist\commands\sub\remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\sub\remove.ts)_
 
 ## `buttercli sub:update`
 
@@ -483,7 +483,7 @@ OPTIONS
       show extra columns
 ```
 
-_See code: [dist/commands/sub/update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/sub/update.ts)_
+_See code: [dist\commands\sub\update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\sub\update.ts)_
 
 ## `buttercli user:create`
 
@@ -503,11 +503,11 @@ OPTIONS
   -x, --extended             show extra columns
 ```
 
-_See code: [dist/commands/user/create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/user/create.ts)_
+_See code: [dist\commands\user\create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\user\create.ts)_
 
 ## `buttercli user:find`
 
-Find a specific user identified by email
+Find all users or a specific user identified by email
 
 ```
 USAGE
@@ -520,7 +520,7 @@ OPTIONS
   -x, --extended     show extra columns
 ```
 
-_See code: [dist/commands/user/find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/user/find.ts)_
+_See code: [dist\commands\user\find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\user\find.ts)_
 
 ## `buttercli user:list`
 
@@ -536,7 +536,7 @@ OPTIONS
   -x, --extended  show extra columns
 ```
 
-_See code: [dist/commands/user/list.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/user/list.ts)_
+_See code: [dist\commands\user\list.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\user\list.ts)_
 
 ## `buttercli user:remove`
 
@@ -553,7 +553,7 @@ OPTIONS
   -x, --extended     show extra columns
 ```
 
-_See code: [dist/commands/user/remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/user/remove.ts)_
+_See code: [dist\commands\user\remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\user\remove.ts)_
 
 ## `buttercli user:update`
 
@@ -573,5 +573,5 @@ OPTIONS
   -x, --extended             show extra columns
 ```
 
-_See code: [dist/commands/user/update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/user/update.ts)_
+_See code: [dist\commands\user\update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\user\update.ts)_
 <!-- commandsstop -->
