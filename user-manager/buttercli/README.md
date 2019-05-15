@@ -14,7 +14,7 @@ $ npm install -g buttercli
 $ buttercli COMMAND
 running command...
 $ buttercli (-v|--version|version)
-buttercli/0.0.1 win32-x64 node-v10.15.3
+buttercli/0.0.1 linux-x64 node-v10.15.2
 $ buttercli --help [COMMAND]
 USAGE
   $ buttercli COMMAND
@@ -63,7 +63,7 @@ OPTIONS
   -x, --extended  show extra columns
 ```
 
-_See code: [dist\commands\config\list.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\config\list.ts)_
+_See code: [dist/commands/config/list.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/config/list.ts)_
 
 ## `buttercli config:server`
 
@@ -85,7 +85,7 @@ DESCRIPTION
   Remember that every time that config:server is invoked all the old server settings will be overwritten
 ```
 
-_See code: [dist\commands\config\server.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\config\server.ts)_
+_See code: [dist/commands/config/server.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/config/server.ts)_
 
 ## `buttercli config:user`
 
@@ -107,7 +107,7 @@ DESCRIPTION
   Remember that every time that config:user is invoked all the old user informations will be overwritten
 ```
 
-_See code: [dist\commands\config\user.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\config\user.ts)_
+_See code: [dist/commands/config/user.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/config/user.ts)_
 
 ## `buttercli contact:create`
 
@@ -118,16 +118,18 @@ USAGE
   $ buttercli contact:create
 
 OPTIONS
-  -c, --emailc=emailc      email where notifications are sent
-  -e, --email=email        (required) user email address
-  -h, --help               show CLI help
-  -j, --json               display results in json format
-  -s, --slack=slack        slack account
-  -t, --telegram=telegram  telegram account
-  -x, --extended           show extra columns
+  -a, --account=account       (required) new identifier for the service specified
+  -e, --email=email           (required) user email address
+  -h, --help                  show CLI help
+  -j, --json                  display results in json format
+
+  -p, --platform=EMAIL|SLACK  (required) choose the contact platform between SLACK, EMAIL.
+                              The TELEGRAM contact can only be set from the Telegram Bot
+
+  -x, --extended              show extra columns
 ```
 
-_See code: [dist\commands\contact\create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\contact\create.ts)_
+_See code: [dist/commands/contact/create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/contact/create.ts)_
 
 ## `buttercli contact:find`
 
@@ -144,47 +146,44 @@ OPTIONS
   -x, --extended     show extra columns
 ```
 
-_See code: [dist\commands\contact\find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\contact\find.ts)_
+_See code: [dist/commands/contact/find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/contact/find.ts)_
 
 ## `buttercli contact:remove`
 
-Remove an existing user contact specified by user email and contact service
+Remove an existing user contact specified by user email and contact platform
 
 ```
 USAGE
   $ buttercli contact:remove
 
 OPTIONS
-  -e, --email=email  (required) user email address
-  -h, --help         show CLI help
-  -j, --json         display results in json format
-  -m, --emailc       remove email account
-  -s, --slack        slack account
-  -t, --telegram     telegram account
-  -x, --extended     show extra columns
+  -e, --email=email                    (required) user email address
+  -h, --help                           show CLI help
+  -j, --json                           display results in json format
+  -p, --platform=EMAIL|SLACK|TELEGRAM  (required) choose the contact platform to delete between SLACK, EMAIL, TELEGRAM
+  -x, --extended                       show extra columns
 ```
 
-_See code: [dist\commands\contact\remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\contact\remove.ts)_
+_See code: [dist/commands/contact/remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/contact/remove.ts)_
 
 ## `buttercli contact:update`
 
-Update an existing user contact account specified by user email and contact service
+Update an existing user contact account specified by user email and contact platform
 
 ```
 USAGE
   $ buttercli contact:update
 
 OPTIONS
-  -e, --email=email        (required) user email address
-  -h, --help               show CLI help
-  -j, --json               display results in json format
-  -m, --emailc=emailc      email where notifications are sent
-  -s, --slack=slack        slack account
-  -t, --telegram=telegram  telegram account
-  -x, --extended           show extra columns
+  -a, --account=account                (required) new identifier for the service specified
+  -e, --email=email                    (required) user email address
+  -h, --help                           show CLI help
+  -j, --json                           display results in json format
+  -p, --platform=EMAIL|SLACK|TELEGRAM  (required) choose the contact platform to update between SLACK, EMAIL, TELEGRAM
+  -x, --extended                       show extra columns
 ```
 
-_See code: [dist\commands\contact\update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\contact\update.ts)_
+_See code: [dist/commands/contact/update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/contact/update.ts)_
 
 ## `buttercli help [COMMAND]`
 
@@ -201,7 +200,7 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.1.6/src\commands\help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.1.6/src/commands/help.ts)_
 
 ## `buttercli init`
 
@@ -212,7 +211,7 @@ USAGE
   $ buttercli init
 ```
 
-_See code: [dist\commands\init.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\init.ts)_
+_See code: [dist/commands/init.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/init.ts)_
 
 ## `buttercli project:create`
 
@@ -232,7 +231,7 @@ OPTIONS
   -x, --extended             show extra columns
 ```
 
-_See code: [dist\commands\project\create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\project\create.ts)_
+_See code: [dist/commands/project/create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/project/create.ts)_
 
 ## `buttercli project:find`
 
@@ -249,7 +248,7 @@ OPTIONS
   -x, --extended   show extra columns
 ```
 
-_See code: [dist\commands\project\find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\project\find.ts)_
+_See code: [dist/commands/project/find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/project/find.ts)_
 
 ## `buttercli project:list`
 
@@ -265,7 +264,7 @@ OPTIONS
   -x, --extended  show extra columns
 ```
 
-_See code: [dist\commands\project\list.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\project\list.ts)_
+_See code: [dist/commands/project/list.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/project/list.ts)_
 
 ## `buttercli project:remove`
 
@@ -276,16 +275,17 @@ USAGE
   $ buttercli project:remove
 
 OPTIONS
-  -g, --gitlab     remove project gitlab url
-  -h, --help       show CLI help
-  -j, --json       display results in json format
-  -n, --name=name  (required) project name (max 50 characters)
-  -r, --redmine    remove project redmine url
-  -s, --sonarqube  remove project sonarqube
-  -x, --extended   show extra columns
+  -h, --help                                  show CLI help
+  -j, --json                                  display results in json format
+  -n, --name=name                             (required) project name (max 50 characters)
+
+  -s, --service=ALL|GITLAB|REDMINE|SONARQUBE  (required) remove service between GITLAB, REDMINE, SONARQUBE or ALL of
+                                              them
+
+  -x, --extended                              show extra columns
 ```
 
-_See code: [dist\commands\project\remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\project\remove.ts)_
+_See code: [dist/commands/project/remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/project/remove.ts)_
 
 ## `buttercli project:update`
 
@@ -305,7 +305,7 @@ OPTIONS
   -x, --extended             show extra columns
 ```
 
-_See code: [dist\commands\project\update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\project\update.ts)_
+_See code: [dist/commands/project/update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/project/update.ts)_
 
 ## `buttercli sub:create`
 
@@ -316,31 +316,45 @@ USAGE
   $ buttercli sub:create
 
 OPTIONS
-  -H, --highPriority                      set priority to high
-  -L, --lowPriority                       set priority to low
-  -M, --mediumPriority                    set priority to medium
-  -c, --emailc                            send notifications via email
-  -e, --email=email                       (required) user email address
-  -h, --help                              show CLI help
-  -j, --json                              display results in json format
-  -k, --keyword=keyword                   (required) keyword compared with the contents of the future events
-  -p, --projectName=projectName           (required) project name
-  -s, --slack                             send notifications via slack
-  -t, --telegram                          send notifications via telegram
-  -x, --extended                          show extra columns
-  --gitlab_commit_created                 set event: GITLAB_COMMIT_CREATED
-  --gitlab_issue_created                  set event: GITLAB_ISSUE_CREATED
-  --gitlab_issue_edited                   set event: GITLAB_ISSUE_EDITED
-  --gitlab_merge_request_closed           set event: GITLAB_MERGE_REQUEST_CLOSED
-  --gitlab_merge_request_created          set event: GITLAB_MERGE_REQUEST_CREATED
-  --gitlab_merge_request_edited           set event: GITLAB_MERGE_REQUEST_EDITED
-  --gitlab_merge_request_merged           set event: GITLAB_MERGE_REQUEST_MERGED
-  --redmine_ticket_created                set event: REDMINE_TICKET_CREATED
-  --redmine_ticket_edited                 set event: REDMINE_TICKET_EDITED
-  --sonarqube_project_analysis_completed  set event: SONARQUBE_PROJECT_ANALYSIS_COMPLETED
+  -P, --priority=LOW|MEDIUM|HIGH
+      (required) set the priority between LOW, MEDIUM, HIGH
+
+  -c, --contact=EMAIL|SLACK|TELEGRAM
+      (required) choose the contact service between EMAIL, SLACK, TELEGRAM where the notification will be sent
+
+  -e, --email=email
+      (required) user email address
+
+  -h, --help
+      show CLI help
+
+  -j, --json
+      display results in json format
+
+  -k, --keyword=keyword
+      (required) keyword compared with the contents of the future events
+
+  -p, --project=project
+      (required) project name
+
+  -t, --event-type=event-type
+      (required) set the event type between
+      REDMINE_TICKET_CREATED                    
+      REDMINE_TICKET_EDITED
+      GITLAB_COMMIT_CREATED
+      GITLAB_ISSUE_CREATED                    
+      GITLAB_ISSUE_EDITED
+      GITLAB_MERGE_REQUEST_CREATED
+      GITLAB_MERGE_REQUEST_EDITED                    
+      GITLAB_MERGE_REQUEST_MERGED
+      GITLAB_MERGE_REQUEST_CLOSED                    
+      SONARQUBE_PROJECT_ANALYSIS_COMPLETED
+
+  -x, --extended
+      show extra columns
 ```
 
-_See code: [dist\commands\sub\create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\sub\create.ts)_
+_See code: [dist/commands/sub/create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/sub/create.ts)_
 
 ## `buttercli sub:find`
 
@@ -351,24 +365,36 @@ USAGE
   $ buttercli sub:find
 
 OPTIONS
-  -e, --email=email                       (required) user email address
-  -h, --help                              show CLI help
-  -j, --json                              display results in json format
-  -p, --projectName=projectName           (required) project name
-  -x, --extended                          show extra columns
-  --gitlab_commit_created                 set event: GITLAB_COMMIT_CREATED
-  --gitlab_issue_created                  set event: GITLAB_ISSUE_CREATED
-  --gitlab_issue_edited                   set event: GITLAB_ISSUE_EDITED
-  --gitlab_merge_request_closed           set event: GITLAB_MERGE_REQUEST_CLOSED
-  --gitlab_merge_request_created          set event: GITLAB_MERGE_REQUEST_CREATED
-  --gitlab_merge_request_edited           set event: GITLAB_MERGE_REQUEST_EDITED
-  --gitlab_merge_request_merged           set event: GITLAB_MERGE_REQUEST_MERGED
-  --redmine_ticket_created                set event: REDMINE_TICKET_CREATED
-  --redmine_ticket_edited                 set event: REDMINE_TICKET_EDITED
-  --sonarqube_project_analysis_completed  set event: SONARQUBE_PROJECT_ANALYSIS_COMPLETED
+  -e, --email=email
+      (required) user email address
+
+  -h, --help
+      show CLI help
+
+  -j, --json
+      display results in json format
+
+  -p, --project=project
+      (required) project name
+
+  -t, --event-type=event-type
+      (required) set the event type between
+      REDMINE_TICKET_CREATED                    
+      REDMINE_TICKET_EDITED
+      GITLAB_COMMIT_CREATED
+      GITLAB_ISSUE_CREATED                    
+      GITLAB_ISSUE_EDITED
+      GITLAB_MERGE_REQUEST_CREATED
+      GITLAB_MERGE_REQUEST_EDITED                    
+      GITLAB_MERGE_REQUEST_MERGED
+      GITLAB_MERGE_REQUEST_CLOSED                    
+      SONARQUBE_PROJECT_ANALYSIS_COMPLETED
+
+  -x, --extended
+      show extra columns
 ```
 
-_See code: [dist\commands\sub\find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\sub\find.ts)_
+_See code: [dist/commands/sub/find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/sub/find.ts)_
 
 ## `buttercli sub:remove`
 
@@ -379,24 +405,36 @@ USAGE
   $ buttercli sub:remove
 
 OPTIONS
-  -e, --email=email                       (required) user email address
-  -h, --help                              show CLI help
-  -j, --json                              display results in json format
-  -p, --projectName=projectName           (required) project name
-  -x, --extended                          show extra columns
-  --gitlab_commit_created                 set event: GITLAB_COMMIT_CREATED
-  --gitlab_issue_created                  set event: GITLAB_ISSUE_CREATED
-  --gitlab_issue_edited                   set event: GITLAB_ISSUE_EDITED
-  --gitlab_merge_request_closed           set event: GITLAB_MERGE_REQUEST_CLOSED
-  --gitlab_merge_request_created          set event: GITLAB_MERGE_REQUEST_CREATED
-  --gitlab_merge_request_edited           set event: GITLAB_MERGE_REQUEST_EDITED
-  --gitlab_merge_request_merged           set event: GITLAB_MERGE_REQUEST_MERGED
-  --redmine_ticket_created                set event: REDMINE_TICKET_CREATED
-  --redmine_ticket_edited                 set event: REDMINE_TICKET_EDITED
-  --sonarqube_project_analysis_completed  set event: SONARQUBE_PROJECT_ANALYSIS_COMPLETED
+  -e, --email=email
+      (required) user email address
+
+  -h, --help
+      show CLI help
+
+  -j, --json
+      display results in json format
+
+  -p, --project=project
+      (required) project name
+
+  -t, --event-type=event-type
+      (required) set the event type between
+      REDMINE_TICKET_CREATED                    
+      REDMINE_TICKET_EDITED
+      GITLAB_COMMIT_CREATED
+      GITLAB_ISSUE_CREATED                    
+      GITLAB_ISSUE_EDITED
+      GITLAB_MERGE_REQUEST_CREATED
+      GITLAB_MERGE_REQUEST_EDITED                    
+      GITLAB_MERGE_REQUEST_MERGED
+      GITLAB_MERGE_REQUEST_CLOSED                    
+      SONARQUBE_PROJECT_ANALYSIS_COMPLETED
+
+  -x, --extended
+      show extra columns
 ```
 
-_See code: [dist\commands\sub\remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\sub\remove.ts)_
+_See code: [dist/commands/sub/remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/sub/remove.ts)_
 
 ## `buttercli sub:update`
 
@@ -407,31 +445,45 @@ USAGE
   $ buttercli sub:update
 
 OPTIONS
-  -H, --highPriority                      set priority to high
-  -L, --lowPriority                       set priority to low
-  -M, --mediumPriority                    set priority to medium
-  -c, --emailc                            send notifications via email
-  -e, --email=email                       (required) user email address
-  -h, --help                              show CLI help
-  -j, --json                              display results in json format
-  -k, --keyword=keyword                   keyword compared with the contents of the future events
-  -p, --projectName=projectName           (required) project name
-  -s, --slack                             send notifications via slack
-  -t, --telegram                          send notifications via telegram
-  -x, --extended                          show extra columns
-  --gitlab_commit_created                 set event: GITLAB_COMMIT_CREATED
-  --gitlab_issue_created                  set event: GITLAB_ISSUE_CREATED
-  --gitlab_issue_edited                   set event: GITLAB_ISSUE_EDITED
-  --gitlab_merge_request_closed           set event: GITLAB_MERGE_REQUEST_CLOSED
-  --gitlab_merge_request_created          set event: GITLAB_MERGE_REQUEST_CREATED
-  --gitlab_merge_request_edited           set event: GITLAB_MERGE_REQUEST_EDITED
-  --gitlab_merge_request_merged           set event: GITLAB_MERGE_REQUEST_MERGED
-  --redmine_ticket_created                set event: REDMINE_TICKET_CREATED
-  --redmine_ticket_edited                 set event: REDMINE_TICKET_EDITED
-  --sonarqube_project_analysis_completed  set event: SONARQUBE_PROJECT_ANALYSIS_COMPLETED
+  -P, --priority=LOW|MEDIUM|HIGH
+      set the priority between LOW, MEDIUM, HIGH
+
+  -c, --contact=EMAIL|SLACK|TELEGRAM
+      choose the contact service between EMAIL, SLACK, TELEGRAM where the notification will be sent
+
+  -e, --email=email
+      (required) user email address
+
+  -h, --help
+      show CLI help
+
+  -j, --json
+      display results in json format
+
+  -k, --keyword=keyword
+      keyword compared with the contents of the future events
+
+  -p, --project=project
+      (required) project name
+
+  -t, --event-type=event-type
+      (required) set the event type between
+      REDMINE_TICKET_CREATED                    
+      REDMINE_TICKET_EDITED
+      GITLAB_COMMIT_CREATED
+      GITLAB_ISSUE_CREATED                    
+      GITLAB_ISSUE_EDITED
+      GITLAB_MERGE_REQUEST_CREATED
+      GITLAB_MERGE_REQUEST_EDITED                    
+      GITLAB_MERGE_REQUEST_MERGED
+      GITLAB_MERGE_REQUEST_CLOSED                    
+      SONARQUBE_PROJECT_ANALYSIS_COMPLETED
+
+  -x, --extended
+      show extra columns
 ```
 
-_See code: [dist\commands\sub\update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\sub\update.ts)_
+_See code: [dist/commands/sub/update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/sub/update.ts)_
 
 ## `buttercli user:create`
 
@@ -451,7 +503,7 @@ OPTIONS
   -x, --extended             show extra columns
 ```
 
-_See code: [dist\commands\user\create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\user\create.ts)_
+_See code: [dist/commands/user/create.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/user/create.ts)_
 
 ## `buttercli user:find`
 
@@ -468,7 +520,7 @@ OPTIONS
   -x, --extended     show extra columns
 ```
 
-_See code: [dist\commands\user\find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\user\find.ts)_
+_See code: [dist/commands/user/find.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/user/find.ts)_
 
 ## `buttercli user:list`
 
@@ -484,7 +536,7 @@ OPTIONS
   -x, --extended  show extra columns
 ```
 
-_See code: [dist\commands\user\list.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\user\list.ts)_
+_See code: [dist/commands/user/list.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/user/list.ts)_
 
 ## `buttercli user:remove`
 
@@ -501,7 +553,7 @@ OPTIONS
   -x, --extended     show extra columns
 ```
 
-_See code: [dist\commands\user\remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\user\remove.ts)_
+_See code: [dist/commands/user/remove.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/user/remove.ts)_
 
 ## `buttercli user:update`
 
@@ -521,5 +573,5 @@ OPTIONS
   -x, --extended             show extra columns
 ```
 
-_See code: [dist\commands\user\update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist\commands\user\update.ts)_
+_See code: [dist/commands/user/update.ts](https://github.com/dstack-group/Butterfly/blob/v0.0.1/dist/commands/user/update.ts)_
 <!-- commandsstop -->
