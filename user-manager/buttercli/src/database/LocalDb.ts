@@ -8,7 +8,6 @@ export enum Config {
 
 export class LocalDb {
 
-  private file: lowDb.AdapterSync;
   private db: lowDb.LowdbSync<lowDb.AdapterSync>;
 
   constructor(path: string) {
@@ -18,8 +17,8 @@ export class LocalDb {
       throw Error('Path cannot be empty!');
     }
 
-    this.file = new FileSync(path);
-    this.db = lowDb(this.file);
+    const file = new FileSync(path);
+    this.db = lowDb(file);
 
     this.init();
   }
@@ -54,7 +53,6 @@ export class LocalDb {
     this.db.defaults({ UserInfo: {}, ServerConfig: {}}).write();
   }
 
-  // TODO: The return type? value() returns any
   getValues(nameSet: Config) {
     if (this.db.has(nameSet).value()) {
       return this.db.get(nameSet).value();
