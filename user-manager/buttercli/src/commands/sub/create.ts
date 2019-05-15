@@ -11,9 +11,7 @@ import {
   ContactService,
   UserPriority,
   Subscription,
-  Service,
 } from '../../rest-client/entities';
-import { CommandFlagException } from '../../exceptions';
 
 export class Create extends BaseCommand {
 
@@ -38,7 +36,11 @@ export class Create extends BaseCommand {
 
     'event-type': flags.string({
       char: 't',
-      description: 'set the event type between ...',
+      description: '(required) set the event type between\nREDMINE_TICKET_CREATED\
+                    \nREDMINE_TICKET_EDITED\nGITLAB_COMMIT_CREATED\nGITLAB_ISSUE_CREATED\
+                    \nGITLAB_ISSUE_EDITED\nGITLAB_MERGE_REQUEST_CREATED\nGITLAB_MERGE_REQUEST_EDITED\
+                    \nGITLAB_MERGE_REQUEST_MERGED\nGITLAB_MERGE_REQUEST_CLOSED\
+                    \nSONARQUBE_PROJECT_ANALYSIS_COMPLETED',
     }),
 
     keyword: flags.string({
@@ -50,9 +52,8 @@ export class Create extends BaseCommand {
 
     priority: flags.string({
       char: 'P',
-      description: 'set the priority between LOW, MEDIUM, HIGH',
+      description: '(required) set the priority between LOW, MEDIUM, HIGH',
       options: ['LOW', 'MEDIUM', 'HIGH'],
-      required: true,
     }),
 
     project: flags.string({
@@ -79,10 +80,6 @@ export class Create extends BaseCommand {
       header: 'Event',
       minWidth: 15,
     },
-    Telegram: {
-      minWidth: 10,
-      get: telegram => telegram.contacts.TELEGRAM ? telegram.contacts.TELEGRAM : 'nd',
-    },
     Email: {
       minWidth: 10,
       get: email => email.contacts.EMAIL ? email.contacts.EMAIL : 'nd',
@@ -90,6 +87,10 @@ export class Create extends BaseCommand {
     Slack: {
       minWidth: 10,
       get: slack => slack.contacts.SLACK ? slack.contacts.SLACK : 'nd',
+    },
+    Telegram: {
+      minWidth: 10,
+      get: telegram => telegram.contacts.TELEGRAM ? telegram.contacts.TELEGRAM : 'nd',
     },
     userPriority: {
       header: 'Priority',
@@ -105,6 +106,21 @@ export class Create extends BaseCommand {
     try {
       const client: SubscriptionRestRequests = new SubscriptionRestRequests(this.db.getValues(Config.Server));
       const flagss = this.parse(Create).flags;
+
+      if (!flagss.priority) {
+        const response: any = await inquirer.prompt([{
+          choices: [
+            { name: UserPriority.HIGH },
+            { name: UserPriority.MEDIUM },
+            { name: UserPriority.LOW },
+          ],
+          message: 'Select a priority',
+          name: 'priority',
+          type: 'list',
+        }]);
+
+        flagss.priority = response.priority;
+      }
 
       if (!flagss['event-type'] || !(flagss['event-type'] in ServiceEventType)) {
         const response: any = await inquirer.prompt([{

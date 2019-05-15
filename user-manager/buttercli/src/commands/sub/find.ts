@@ -24,99 +24,58 @@ export class Find extends BaseCommand {
       required: true,
     }),
 
-    projectName: flags.string({
+    'event-type': flags.string({
+      char: 't',
+      description: '(required) set the event type between\nREDMINE_TICKET_CREATED\
+                    \nREDMINE_TICKET_EDITED\nGITLAB_COMMIT_CREATED\nGITLAB_ISSUE_CREATED\
+                    \nGITLAB_ISSUE_EDITED\nGITLAB_MERGE_REQUEST_CREATED\nGITLAB_MERGE_REQUEST_EDITED\
+                    \nGITLAB_MERGE_REQUEST_MERGED\nGITLAB_MERGE_REQUEST_CLOSED\
+                    \nSONARQUBE_PROJECT_ANALYSIS_COMPLETED',
+    }),
+
+    project: flags.string({
       char: 'p',
       description: 'project name',
       required: true,
     }),
-
-    gitlab_commit_created: flags.boolean({
-      description: 'set event: GITLAB_COMMIT_CREATED',
-      parse: input => ServiceEventType.GITLAB_COMMIT_CREATED,
-    }),
-
-    gitlab_issue_created: flags.boolean({
-      description: 'set event: GITLAB_ISSUE_CREATED',
-      parse: input => ServiceEventType.GITLAB_ISSUE_CREATED,
-    }),
-
-    gitlab_issue_edited: flags.boolean({
-      description: 'set event: GITLAB_ISSUE_EDITED',
-      parse: input => ServiceEventType.GITLAB_ISSUE_EDITED,
-    }),
-
-    gitlab_merge_request_created: flags.boolean({
-      description: 'set event: GITLAB_MERGE_REQUEST_CREATED',
-      parse: input => ServiceEventType.GITLAB_MERGE_REQUEST_CREATED,
-    }),
-
-    gitlab_merge_request_edited: flags.boolean({
-      description: 'set event: GITLAB_MERGE_REQUEST_EDITED',
-      parse: input => ServiceEventType.GITLAB_MERGE_REQUEST_EDITED,
-    }),
-
-    gitlab_merge_request_merged: flags.boolean({
-      description: 'set event: GITLAB_MERGE_REQUEST_MERGED',
-      parse: input => ServiceEventType.GITLAB_MERGE_REQUEST_MERGED,
-    }),
-
-    gitlab_merge_request_closed: flags.boolean({
-      description: 'set event: GITLAB_MERGE_REQUEST_CLOSED',
-      parse: input => ServiceEventType.GITLAB_MERGE_REQUEST_CLOSED,
-    }),
-
-    redmine_ticket_created: flags.boolean({
-      description: 'set event: REDMINE_TICKET_CREATED',
-      parse: input => ServiceEventType.REDMINE_TICKET_CREATED,
-    }),
-
-    redmine_ticket_edited: flags.boolean({
-      description: 'set event: REDMINE_TICKET_EDITED',
-      parse: input => ServiceEventType.REDMINE_TICKET_EDITED,
-    }),
-
-    sonarqube_project_analysis_completed: flags.boolean({
-      description: 'set event: SONARQUBE_PROJECT_ANALYSIS_COMPLETED',
-      parse: input => ServiceEventType.SONARQUBE_PROJECT_ANALYSIS_COMPLETED,
-    }),
   };
 
   private static readonly columns: TableColumns<Subscription> = {
-    Email: {
-      get: email => email.contacts.EMAIL ? email.contacts.EMAIL : 'nd',
-      minWidth: 10,
-    },
-    Slack: {
-      get: slack => slack.contacts.SLACK ? slack.contacts.SLACK : 'nd',
-      minWidth: 10,
-    },
-    Telegram: {
-      get: telegram => telegram.contacts.TELEGRAM ? telegram.contacts.TELEGRAM : 'nd',
-      minWidth: 10,
-    },
-    eventType: {
-      header: 'Event',
-      minWidth: 15,
-    },
-    keywordList: {
-      header: 'Keywords',
-      minWidth: 10,
-    },
-    projectName: {
-      header: 'Project name',
-      minWidth: 15,
-    },
     subscriptionId: {
-      header: 'ID',
+      header: 'Id',
       minWidth: 10,
     },
     userEmail: {
       header: 'User email',
       minWidth: 15,
     },
+    projectName: {
+      header: 'Project name',
+      minWidth: 15,
+    },
+    eventType: {
+      header: 'Event',
+      minWidth: 15,
+    },
+    Email: {
+      minWidth: 10,
+      get: email => email.contacts.EMAIL ? email.contacts.EMAIL : 'nd',
+    },
+    Slack: {
+      minWidth: 10,
+      get: slack => slack.contacts.SLACK ? slack.contacts.SLACK : 'nd',
+    },
+    Telegram: {
+      minWidth: 10,
+      get: telegram => telegram.contacts.TELEGRAM ? telegram.contacts.TELEGRAM : 'nd',
+    },
     userPriority: {
       header: 'Priority',
       minWidth: 7,
+    },
+    keywordList: {
+      header: 'Keywords',
+      minWidth: 10,
     },
   };
 
@@ -125,39 +84,7 @@ export class Find extends BaseCommand {
       const client: SubscriptionRestRequests = new SubscriptionRestRequests(this.db.getValues(Config.Server));
       const flagss = this.parse(Find).flags;
 
-      let eventTypeSelected = ServiceEventType.GITLAB_COMMIT_CREATED;
-
-      if (flagss.gitlab_commit_created !== undefined) {
-        eventTypeSelected = flagss.gitlab_commit_created;
-
-      } else if (flagss.gitlab_issue_created) {
-        eventTypeSelected = flagss.gitlab_issue_created;
-
-      } else if (flagss.gitlab_issue_edited) {
-        eventTypeSelected = flagss.gitlab_issue_edited;
-
-      } else if (flagss.gitlab_merge_request_created) {
-        eventTypeSelected = flagss.gitlab_merge_request_created;
-
-      } else if (flagss.gitlab_merge_request_edited) {
-        eventTypeSelected = flagss.gitlab_merge_request_edited;
-
-      } else if (flagss.gitlab_merge_request_merged) {
-        eventTypeSelected = flagss.gitlab_merge_request_merged;
-
-      } else if (flagss.gitlab_merge_request_closed) {
-        eventTypeSelected = flagss.gitlab_merge_request_closed;
-
-      } else if (flagss.redmine_ticket_created) {
-        eventTypeSelected = flagss.redmine_ticket_created;
-
-      } else if (flagss.redmine_ticket_edited) {
-        eventTypeSelected = flagss.redmine_ticket_edited;
-
-      } else if (flagss.sonarqube_project_analysis_completed) {
-        eventTypeSelected = flagss.sonarqube_project_analysis_completed;
-
-      } else {
+      if (!flagss['event-type'] || !(flagss['event-type'] in ServiceEventType)) {
         const response: any = await inquirer.prompt([{
           choices: [
             { name: ServiceEventType.GITLAB_COMMIT_CREATED },
@@ -179,12 +106,12 @@ export class Find extends BaseCommand {
           type: 'list',
         }]);
 
-        eventTypeSelected = response.event;
+        flagss['event-type'] = response.event;
       }
 
       const subscription: FindSubscription = {
-        eventType: eventTypeSelected,
-        projectName: Validator.isStringValid('projectName', flagss.projectName, 0, 50),
+        eventType: ServiceEventType[flagss['event-type'] as ServiceEventType],
+        projectName: Validator.isStringValid('projectName', flagss.project, 0, 50),
         userEmail: Validator.isEmailValid(flagss.email),
       };
 
