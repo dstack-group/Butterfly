@@ -8,7 +8,7 @@
 </div>
 
 <div align="center">
-  <sub>Created by <a href="https://github.com/jkomyno">Alberto Schiabel</a> with ❤️.</sub>
+  <sub>Created by <a href="https://github.com/dstack-group/">DStack Group</a> with ❤️.</sub>
 </div>
 
 Butterfly is a set of microservices that communicate via Apache Kafka and REST APIs which aims to simplify
@@ -28,6 +28,7 @@ This project has been developed by the DStack team during the Software Engineeri
 - [Wiki Links](#wiki-links)
 - [Create Issues](#create-issues)
 - [FAQ](#faq)
+- [Team](#team)
 - [License](#license)
 
 # Requirements
@@ -129,6 +130,18 @@ ERROR: Encountered errors while bringing up the project.
 </details>
 
   - **A**: just restart Docker, it's a known issue, especially on Windows
+
+# Team
+
+DStack is:
+
+- [Alberto Schiabel](https://github.com/jkomyno)
+- [Elton Stafa](https://github.com/eltonst)
+- [Eleonora Signor](https://github.com/eleonorasignor)
+- [Enrico Trinco](https://github.com/Dogemist)
+- [Federico Rispo](https://github.com/federicorispo)
+- [Harwinder Singh](https://github.com/singh-sardar)
+- [Niccolò Vettorello](https://github.com/niccolovettorello)
 
 # License
 
