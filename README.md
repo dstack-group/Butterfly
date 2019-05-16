@@ -95,7 +95,7 @@ Commands:
 - [email-consumer](./butterfly/email-consumer)
 - [telegram-consumer](./butterfly/telegram-consumer)
 - [slack-consumer](./butterfly/slack-consumer)
-- [slack-account-configuration](./user-manager/slack-account-configurator)
+- [slack-account-configurator](./user-manager/slack-account-configurator)
 - [user-manager-rest-api](./user-manager/user-manager-rest-api)
 - [user-manager-database](./user-manager/user-manager-database)
 - [buttercli](./user-manager/buttercli)
