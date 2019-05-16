@@ -90,8 +90,16 @@ Commands:
 
 Here are some in-depth documentation about Butterfly's internals (written in Italian):
 
-- [Message Structures]()
-- [Database]()
+- [Message Structures](./wiki/Struttura-Messaggi-Interni)
+- [User Manager](./wiki/Backend-Gestore-Personale)
+
+# Create Issues
+
+This repository supports 3 types of issues:
+
+- [**Bug report**](./issues/new?assignees=&labels=&template=bug_report.md&title=): Create a report to help us improve and correct a bug in the code;
+- [**Documentation error report**](./issues/new?assignees=&labels=&template=documentation-error-report.md&title=): Create a report to help us improve and correct an error in documents;
+- [**Feature request**](./issues/new?assignees=&labels=&template=feature_request.md&title=): Suggest an idea for this project.
 
 # FAQ
 
