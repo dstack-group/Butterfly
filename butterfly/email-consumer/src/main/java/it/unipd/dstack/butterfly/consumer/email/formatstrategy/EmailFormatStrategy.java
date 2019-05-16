@@ -18,7 +18,7 @@ package it.unipd.dstack.butterfly.consumer.email.formatstrategy;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.consumer.formatstrategy.FormatStrategy;
 
-import java.it.unipd.dstack.butterfly.avro.ServiceEventTypesTranslation;
+import it.unipd.dstack.butterfly.avro.ServiceEventTypesTranslation;
 
 public class EmailFormatStrategy implements FormatStrategy<EventWithUserContact> {
     /**

@@ -14,7 +14,7 @@
  * ServiceEventTypesTranslation returns an English translation starting from a ServiceEventTypes value.
  */
 
-package java.it.unipd.dstack.butterfly.avro;
+package it.unipd.dstack.butterfly.avro;
 
 import it.unipd.dstack.butterfly.producer.avro.ServiceEventTypes;
 

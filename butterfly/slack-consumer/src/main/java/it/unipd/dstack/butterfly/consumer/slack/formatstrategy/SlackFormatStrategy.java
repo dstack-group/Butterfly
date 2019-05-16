@@ -19,7 +19,7 @@ import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.consumer.formatstrategy.FormatStrategy;
 
-import java.it.unipd.dstack.butterfly.avro.ServiceEventTypesTranslation;
+import it.unipd.dstack.butterfly.avro.ServiceEventTypesTranslation;
 
 public class SlackFormatStrategy implements FormatStrategy<EventWithUserContact> {
     /**
