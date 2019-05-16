@@ -18,6 +18,8 @@ package it.unipd.dstack.butterfly.consumer.email.formatstrategy;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.consumer.formatstrategy.FormatStrategy;
 
+import java.it.unipd.dstack.butterfly.avro.ServiceEventTypesTranslation;
+
 public class EmailFormatStrategy implements FormatStrategy<EventWithUserContact> {
     /**
      * Returns the appropriate formatted message from an input event object.
@@ -32,8 +34,9 @@ public class EmailFormatStrategy implements FormatStrategy<EventWithUserContact>
         var intro = String.format("Hi %s %s, here's a new event for you.<br/><br/>",
                 eventWithUserContact.getUserContact().getFirstname(),
                 eventWithUserContact.getUserContact().getLastname());
+        var eventString = String.format("Event: %s<br/>", ServiceEventTypesTranslation.translate(event.getEventType()));
         var content = String.format("%s<br/>%s", event.getTitle(), event.getDescription());
 
-        return String.format("%s %s", intro, content);
+        return String.format("%s%s%s", intro, eventString, content);
     }
 }

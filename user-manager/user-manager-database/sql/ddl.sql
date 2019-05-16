@@ -1371,18 +1371,19 @@ BEGIN
 	INSERT INTO public.project(project_name, project_url) VALUES ('Uber', '{"GITLAB": "gitlab.uber.com/uber/uber.git"}');
 	INSERT INTO public.project(project_name, project_url) VALUES ('Twitter', '{"SONARQUBE": "sonarqube.twitter.com/twitter/twitter.git", "GITLAB": "gitlab.twitter.com/twitter/twitter.git"}');
 
-	INSERT INTO public.user(email, firstname, lastname) VALUES ('alberto.schiabel@gmail.com', 'Alberto', 'Schiabel');
-	INSERT INTO public.user(email, firstname, lastname) VALUES ('federico.rispo@gmail.com', 'Federico', 'Rispo');
-	INSERT INTO public.user(email, firstname, lastname) VALUES ('enrico.trinco@gmail.com', 'Enrico', 'Trinco');
-	INSERT INTO public.user(email, firstname, lastname) VALUES ('thealchemist97@gmail.com', 'Niccolò', 'Vettorello');
-	INSERT INTO public.user(email, firstname, lastname) VALUES ('eleonorasignor@gmail.com', 'Eleonora', 'Signor');
-	INSERT INTO public.user(email, firstname, lastname) VALUES ('elton97@gmail.com', 'Elton', 'Stafa');
-	INSERT INTO public.user(email, firstname, lastname) VALUES ('singh@gmail.com', 'Harwinder', 'Singh');
+	INSERT INTO public.user(email, firstname, lastname) VALUES ('admin@email.com', 'Admin', 'Admin');
+	-- INSERT INTO public.user(email, firstname, lastname) VALUES ('alberto.schiabel@gmail.com', 'Alberto', 'Schiabel');
+	-- INSERT INTO public.user(email, firstname, lastname) VALUES ('federico.rispo@gmail.com', 'Federico', 'Rispo');
+	-- INSERT INTO public.user(email, firstname, lastname) VALUES ('enrico.trinco@gmail.com', 'Enrico', 'Trinco');
+	-- INSERT INTO public.user(email, firstname, lastname) VALUES ('thealchemist97@gmail.com', 'Niccolò', 'Vettorello');
+	-- INSERT INTO public.user(email, firstname, lastname) VALUES ('eleonorasignor@gmail.com', 'Eleonora', 'Signor');
+	-- INSERT INTO public.user(email, firstname, lastname) VALUES ('elton97@gmail.com', 'Elton', 'Stafa');
+	-- INSERT INTO public.user(email, firstname, lastname) VALUES ('singh@gmail.com', 'Harwinder', 'Singh');
 
 	-- PERFORM is used when we're not interesting in the actual data returned from the called stored function.
-	PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'TELEGRAM', '38442289');
-  PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'EMAIL', 'alberto.schiabel@gmail.com');
-	PERFORM public.create_user_contact('federico.rispo@gmail.com', 'TELEGRAM', '38442289');
+	-- PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'TELEGRAM', '38442289');
+  -- PERFORM public.create_user_contact('alberto.schiabel@gmail.com', 'EMAIL', 'alberto.schiabel@gmail.com');
+	-- PERFORM public.create_user_contact('federico.rispo@gmail.com', 'TELEGRAM', '38442289');
 	-- PERFORM public.create_user_contact('federico.rispo@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');
 	-- PERFORM public.create_user_contact('enrico.trinco@gmail.com', 'TELEGRAM', 'enrico_dogen');
 	-- PERFORM public.create_user_contact('enrico.trinco@gmail.com', 'EMAIL', 'dstackgroup@gmail.com');

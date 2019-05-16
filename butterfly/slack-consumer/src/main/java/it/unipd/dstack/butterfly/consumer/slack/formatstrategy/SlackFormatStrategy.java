@@ -14,9 +14,12 @@
  */
 
 package it.unipd.dstack.butterfly.consumer.slack.formatstrategy;
+
 import it.unipd.dstack.butterfly.producer.avro.Event;
 import it.unipd.dstack.butterfly.consumer.avro.EventWithUserContact;
 import it.unipd.dstack.butterfly.consumer.consumer.formatstrategy.FormatStrategy;
+
+import java.it.unipd.dstack.butterfly.avro.ServiceEventTypesTranslation;
 
 public class SlackFormatStrategy implements FormatStrategy<EventWithUserContact> {
     /**
@@ -32,12 +35,13 @@ public class SlackFormatStrategy implements FormatStrategy<EventWithUserContact>
         var intro = String.format("Hi *%s* *%s*, here's a new event for you.\n",
                 eventWithUserContact.getUserContact().getFirstname(),
                 eventWithUserContact.getUserContact().getLastname());
-        var header = String.format("Progetto: [%s](%s)",
+        var eventString = String.format("Event: %s", ServiceEventTypesTranslation.translate(event.getEventType()));
+        var header = String.format("Project: %s\nURL: %s",
                 event.getProjectName(),
                 event.getProjectURL());
         var title = String.format("*%s*", event.getTitle());
         var description = String.format("%s", event.getDescription());
 
-        return String.format("%s\n%s\n%s\n%s", intro, header, title, description);
+        return String.format("%s\n%s\n%s\n%s\n%s", intro, eventString, header, title, description);
     }
 }
