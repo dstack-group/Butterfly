@@ -15,7 +15,7 @@
 # ~293 MB of docker image
 
 # Base layer with the essential build tools
-FROM node:10.15.3-alpine AS base
+FROM node:10.15.3-jessie AS base
 
 # Install git
 # RUN apk update && apk upgrade && \
