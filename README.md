@@ -17,6 +17,19 @@ This project has been developed by the DStack team during the Software Engineeri
 
 -------------------------------------------------------------------------------------------
 
+# Table of Contents
+
+- [Requirements](#requirements)
+- [Test everything](#test-everything)
+- [Run everything](#run-everything)
+- [Dev Scripts](#dev-scripts)
+- [Exposed services](#exposed-services)
+- [Modules](#modules)
+- [Wiki Links](#wiki-links)
+- [Create Issues](#create-issues)
+- [FAQ](#faq)
+- [License](#license)
+
 # Requirements
 
 Here's a list of tools you should have installed on your PC:
@@ -90,16 +103,16 @@ Commands:
 
 Here are some in-depth documentation about Butterfly's internals (written in Italian):
 
-- [Message Structures](./wiki/Struttura-Messaggi-Interni)
-- [User Manager](./wiki/Backend-Gestore-Personale)
+- [Message Structures](https://github.com/dstack-group/Butterfly/wiki/Struttura-Messaggi-Interni)
+- [User Manager](https://github.com/dstack-group/Butterfly/wiki/Backend-Gestore-Personale)
 
 # Create Issues
 
 This repository supports 3 types of issues:
 
-- [**Bug report**](./issues/new?assignees=&labels=&template=bug_report.md&title=): Create a report to help us improve and correct a bug in the code;
-- [**Documentation error report**](./issues/new?assignees=&labels=&template=documentation-error-report.md&title=): Create a report to help us improve and correct an error in documents;
-- [**Feature request**](./issues/new?assignees=&labels=&template=feature_request.md&title=): Suggest an idea for this project.
+- [**Bug report**](https://github.com/dstack-group/Butterfly/issues/new?assignees=&labels=&template=bug_report.md&title=): Create a report to help us improve and correct a bug in the code;
+- [**Documentation error report**](https://github.com/dstack-group/Butterfly/issues/new?assignees=&labels=&template=documentation-error-report.md&title=): Create a report to help us improve and correct an error in documents;
+- [**Feature request**](https://github.com/dstack-group/Butterfly/issues/new?assignees=&labels=&template=feature_request.md&title=): Suggest an idea for this project.
 
 # FAQ
 
@@ -117,3 +130,6 @@ ERROR: Encountered errors while bringing up the project.
 
   - **A**: just restart Docker, it's a known issue, especially on Windows
 
+# License
+
+This project is [MIT](License.txt) licensed.
