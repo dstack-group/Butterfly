@@ -10,6 +10,7 @@
 <div align="center">
   <sub>Created by <a href="https://github.com/dstack-group/">DStack Group</a> with ❤️.</sub>
 </div>
+<br />
 
 Butterfly is a set of microservices that communicate via Apache Kafka and REST APIs which aims to simplify
 how different project notifications are handled.
@@ -20,6 +21,7 @@ This project has been developed by the DStack team during the Software Engineeri
 # Table of Contents
 
 - [Requirements](#requirements)
+- [References](#references)
 - [Test everything](#test-everything)
 - [Run everything](#run-everything)
 - [Dev Scripts](#dev-scripts)
@@ -37,6 +39,10 @@ Here's a list of tools you should have installed on your PC:
 
 - docker 18.09.*
 - docker-compose 1.24.*
+
+# References
+
+[Here](https://www.math.unipd.it/~tullio/IS-1/2018/Progetto/C1.pdf) you can find the project requirements and details.
 
 # Test everything
 
