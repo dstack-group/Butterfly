@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@hapi/joi": "^15.0.1",
-    "@slack/bolt": "^1.0.1",
+    "@slack/bolt": "^1.4.0",
     "node-fetch": "^2.5.0",
     "pino": "^5.12.3"
   }
